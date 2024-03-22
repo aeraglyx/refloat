@@ -174,7 +174,7 @@ typedef struct {
  	float true_pitch_angle;
 	float gyro[3];
 	float duty_cycle, abs_duty_cycle, duty_smooth;
-	float erpm, abs_erpm, avg_erpm;
+	float erpm, abs_erpm, avg_erpm, erpm_smooth;
 	float motor_current;
 	float throttle_val;
 	float max_duty_with_margin;
@@ -381,6 +381,15 @@ static void biquad_reset(Biquad *biquad) {
 	biquad->z2 = 0;
 }
 
+// static void smooth_value(data *d, float *value_smooth, float value_current, float half_time) {
+// 	if (half_time == 0.0f) {
+// 		*value_smooth = value_current;
+// 	} else {
+// 		float mult = powf(2.0f, - d->loop_time_seconds / half_time);
+// 		*value_smooth = mult * *value_smooth + (1.0f - mult) * value_current;
+// 	}
+// }
+
 // First start only, set initial state
 static void app_init(data *d) {
 	if (d->state != DISABLED) {
@@ -491,7 +500,7 @@ static void configure(data *d) {
 		d->braketilt_factor = 0;
 	} else {
 		// incorporate negative sign into braketilt factor instead of adding it each balance loop
-		d->braketilt_factor = -(0.5 + (20 - d->float_conf.braketilt_strength)/ 5.0);
+		d->braketilt_factor = -(0.5 + (20 - d->float_conf.braketilt_strength) / 5.0);
 	}
 
 	// Feature: Turntilt
@@ -1224,17 +1233,26 @@ static void apply_inputtilt(data *d){ // Input Tiltback
 	d->setpoint += d->inputtilt_interpolated;
 }
 
+// static void get_wheelslip_probability(data *d) {
+// 	// Essentially a simplified ATR calculation
+// 	float accel_factor = 0.5 * (d->float_conf.atr_amps_decel_ratio + d->float_conf.atr_amps_accel_ratio);
+// 	float expected_acc = d->atr_filtered_current / accel_factor;
+// 	float acc_diff = d->acceleration - expected_acc;
+// 	// Any big acc_diff can be assumed to be wheelslip
+	
+// }
+
 static void apply_torquetilt(data *d) {
 	float tt_step_size = 0;
 	float atr_step_size = 0;
 	float braketilt_step_size = 0;
-	int torque_sign;
-	float abs_torque;
-	float atr_threshold;
-	float torque_offset;
-	float accel_factor;
-	float accel_factor2;
-	float expected_acc;
+	// int torque_sign;
+	// float abs_torque;
+	// float atr_threshold;
+	// float torque_offset;
+	// float accel_factor;
+	// float accel_factor2;
+	// float expected_acc;
 
 	// Filter current (Biquad)
 	if (d->float_conf.atr_filter > 0) {
@@ -1243,7 +1261,7 @@ static void apply_torquetilt(data *d) {
 		d->atr_filtered_current = d->motor_current;
 	}
 
-	torque_sign = SIGN(d->atr_filtered_current);
+	int torque_sign = SIGN(d->atr_filtered_current);
 
 	if ((d->abs_erpm > 250) && (torque_sign != SIGN(d->erpm))) {
 		// current is negative, so we are braking or going downhill
@@ -1296,16 +1314,20 @@ static void apply_torquetilt(data *d) {
 			}*/
 	}
 
-	// CLASSIC TORQUE TILT /////////////////////////////////
+	float accel_factor = d->braking ? d->float_conf.atr_amps_decel_ratio : d->float_conf.atr_amps_accel_ratio;
+	float torque_offset = 0.00022 * d->erpm_smooth * accel_factor;
+	float torque_adjusted = d->atr_filtered_current - torque_offset;
 
-	float tt_strength = d->braking ? d->float_conf.torquetilt_strength_regen : d->float_conf.torquetilt_strength;
+
+	// CLASSIC TORQUE TILT /////////////////////////////////
 
 	// Do stock FW torque tilt: (comment from Mitch Lustig)
 	// Take abs motor current, subtract start offset, and take the max of that with 0 to get the current above our start threshold (absolute).
 	// Then multiply it by "power" to get our desired angle, and min with the limit to respect boundaries.
 	// Finally multiply it by sign motor current to get directionality back
-	float abs_net_torque = fmaxf(0, (fabsf(d->atr_filtered_current) - d->float_conf.torquetilt_start_current));
-	d->torquetilt_target = fminf(abs_net_torque * tt_strength, d->float_conf.torquetilt_angle_limit) * SIGN(d->atr_filtered_current);
+	float tt_strength = d->braking ? d->float_conf.torquetilt_strength_regen : d->float_conf.torquetilt_strength;
+	float abs_net_torque = fmaxf(0, (fabsf(torque_adjusted) - d->float_conf.torquetilt_start_current));
+	d->torquetilt_target = fminf(abs_net_torque * tt_strength, d->float_conf.torquetilt_angle_limit) * SIGN(torque_adjusted);
 
 	if ((d->torquetilt_interpolated - d->torquetilt_target > 0 && d->torquetilt_target > 0) ||
 			(d->torquetilt_interpolated - d->torquetilt_target < 0 && d->torquetilt_target < 0)) {
@@ -1317,31 +1339,24 @@ static void apply_torquetilt(data *d) {
 	
 	// ADAPTIVE TORQUE RESPONSE ////////////////////////////
 
-	abs_torque = fabsf(d->atr_filtered_current);
-	torque_offset = 8;// hard-code to 8A for now (shouldn't really be changed much anyways)
-	atr_threshold = d->braking ? d->float_conf.atr_threshold_down : d->float_conf.atr_threshold_up;
-	accel_factor = d->braking ? d->float_conf.atr_amps_decel_ratio : d->float_conf.atr_amps_accel_ratio;
-	accel_factor2 = accel_factor * 1.3;
+	// torque_offset = 8;// hard-code to 8A for now (shouldn't really be changed much anyways)
+	float atr_threshold = d->braking ? d->float_conf.atr_threshold_down : d->float_conf.atr_threshold_up;
+	// accel_factor2 = accel_factor * 1.3;
 
 	// compare measured acceleration to expected acceleration
 	float measured_acc = fmaxf(d->acceleration, -5);
 	measured_acc = fminf(measured_acc, 5);
 
 	// expected acceleration is proportional to current (minus an offset, required to balance/maintain speed)
-	//XXXXXfloat expected_acc;
-	if (abs_torque < 25) {
-		expected_acc = (d->atr_filtered_current - SIGN(d->erpm) * torque_offset) / accel_factor;
-	}
-	else {
-		// primitive linear approximation of non-linear torque-accel relationship
-		expected_acc = (torque_sign * 25 - SIGN(d->erpm) * torque_offset) / accel_factor;
-		expected_acc += torque_sign * (abs_torque - 25) / accel_factor2;
-	}
-
-	bool forward = (d->erpm > 0);
-	if ((d->abs_erpm < 250) && (abs_torque > 30)) {
-		forward = (expected_acc > 0);
-	}
+	float expected_acc = torque_adjusted / accel_factor;
+	// if (abs_torque < 25) {
+	// 	expected_acc = (d->atr_filtered_current - SIGN(d->erpm) * torque_offset) / accel_factor;
+	// }
+	// else {
+	// 	// primitive linear approximation of non-linear torque-accel relationship
+	// 	expected_acc = (torque_sign * 25 - SIGN(d->erpm) * torque_offset) / accel_factor;
+	// 	expected_acc += torque_sign * (abs_torque - 25) / accel_factor2;
+	// }
 
 	float acc_diff = expected_acc - measured_acc;
 	d->float_expected_acc = expected_acc;
@@ -1356,6 +1371,12 @@ static void apply_torquetilt(data *d) {
 		d->accel_gap = 0.98 * d->accel_gap + 0.02 * acc_diff;
 	else {
 		d->accel_gap = 0;
+	}
+
+	float abs_torque = fabsf(d->atr_filtered_current);
+	bool forward = (d->erpm > 0);
+	if ((d->abs_erpm < 250) && (abs_torque > 30)) {
+		forward = (expected_acc > 0);
 	}
 
 	// d->accel_gap | > 0  | <= 0
@@ -1460,7 +1481,8 @@ static void apply_torquetilt(data *d) {
 		}
 	}
 
-	// Feature: Brake Tiltback
+	
+	// BRAKE TILTBACK //////////////////////////////////////
 
 	// braking also should cause setpoint change lift, causing a delayed lingering nose lift
 	if ((d->braketilt_factor < 0) && d->braking && (d->abs_erpm > 2000)) {
@@ -1821,9 +1843,12 @@ static void float_thd(void *arg) {
 		// Get the motor values we want
 		d->duty_cycle = VESC_IF->mc_get_duty_cycle_now();
 		d->abs_duty_cycle = fabsf(d->duty_cycle);
+		d->duty_smooth = d->duty_smooth * 0.9 + d->duty_cycle * 0.1;
+		
 		d->erpm = VESC_IF->mc_get_rpm();
 		d->abs_erpm = fabsf(d->erpm);
-		d->duty_smooth = d->duty_smooth * 0.9 + d->duty_cycle * 0.1;
+		d->erpm_smooth = d->erpm_smooth * 0.997 + d->erpm * 0.003;
+		// smooth_value(d, &d->erpm_smooth, d->erpm, 0.25);
 
 		// UART/PPM Remote Throttle ///////////////////////
 		bool remote_connected = false;

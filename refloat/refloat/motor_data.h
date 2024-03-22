@@ -29,6 +29,8 @@ typedef struct {
     float abs_erpm;
     float last_erpm;
     int8_t erpm_sign;
+    // float erpm_last;
+    float erpm_smooth;
 
     float current;
     bool braking;

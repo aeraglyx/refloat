@@ -275,7 +275,8 @@ static void configure(data *d) {
     d->loop_time_us = 1e6 / d->float_conf.hertz;
 
     // Loop time in seconds times 20 for a nice long grace period
-    d->motor_timeout_s = 20.0f / d->float_conf.hertz;
+    d->motor_timeout_s = 0.025f;
+    // d->motor_timeout_s = 20.0f / d->float_conf.hertz;
 
     d->startup_step_size = d->float_conf.startup_speed / d->float_conf.hertz;
     d->tiltback_duty_step_size = d->float_conf.tiltback_duty_speed / d->float_conf.hertz;

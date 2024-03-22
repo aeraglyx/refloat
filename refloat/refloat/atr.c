@@ -23,12 +23,12 @@
 #include <math.h>
 
 void atr_reset(ATR *atr) {
-    atr->accel_diff = 0;
-    atr->speed_boost = 0;
-    atr->target_offset = 0;
-    atr->offset = 0;
-    atr->braketilt_target_offset = 0;
-    atr->braketilt_offset = 0;
+    atr->accel_diff = 0.0f;
+    atr->speed_boost = 0.0f;
+    atr->target_offset = 0.0f;
+    atr->offset = 0.0f;
+    atr->braketilt_target_offset = 0.0f;
+    atr->braketilt_offset = 0.0f;
 }
 
 void atr_configure(ATR *atr, const RefloatConfig *config) {
@@ -39,41 +39,46 @@ void atr_configure(ATR *atr, const RefloatConfig *config) {
     if (fabsf(config->atr_speed_boost) > 0.4f) {
         // above 0.4 we add 500erpm for each extra 10% of speed boost, so at
         // most +6000 for 100% speed boost
-        atr->speed_boost_mult = 1.0f / ((fabsf(config->atr_speed_boost) - 0.4f) * 5000 + 3000.0f);
+        atr->speed_boost_mult = 1.0f / ((fabsf(config->atr_speed_boost) - 0.4f) * 5000.0f + 3000.0f);
     }
 
-    if (config->braketilt_strength == 0) {
-        atr->braketilt_factor = 0;
+    if (config->braketilt_strength == 0.0f) {
+        atr->braketilt_factor = 0.0f;
     } else {
         // incorporate negative sign into braketilt factor instead of adding it each balance loop
         atr->braketilt_factor = -(0.5f + (20 - config->braketilt_strength) / 5.0f);
     }
 }
 
+// static void get_wheelslip_probability(MotorData *motor, const RefloatConfig *config) {
+// 	// simplified ATR calculation
+// 	float accel_factor = 0.5f * (config->atr_amps_decel_ratio + config->atr_amps_accel_ratio);
+// 	float expected_acc = motor->atr_filtered_current / accel_factor;
+// 	float accel_diff = motor->acceleration - expected_acc;
+	
+//     // any large accel_diff is probably wheelslip or freespin
+//     float start = 3.0f;
+//     float end = 6.0f;
+//     float wheelslip_prob = (fabs(accel_diff) - start) / (end - start);
+// 	wheelslip_prob = clampf(wheelslip_prob, 0.0f, 1.0f);
+//     motor->wheelslip_prob = wheelslip_prob;
+// }
+
 static void atr_update(ATR *atr, const MotorData *motor, const RefloatConfig *config) {
     float abs_torque = fabsf(motor->atr_filtered_current);
-    float torque_offset = 8;  // hard-code to 8A for now (shouldn't really be changed much anyways)
     float atr_threshold = motor->braking ? config->atr_threshold_down : config->atr_threshold_up;
     float accel_factor =
         motor->braking ? config->atr_amps_decel_ratio : config->atr_amps_accel_ratio;
-    float accel_factor2 = accel_factor * 1.3;
 
     // compare measured acceleration to expected acceleration
-    float measured_acc = fmaxf(motor->acceleration, -5);
-    measured_acc = fminf(measured_acc, 5);
+    float measured_acc = clampf(motor->acceleration, -5.0f, 5.0f);
+
+	float torque_offset = 0.00022f * motor->erpm_smooth * accel_factor;
+	float current_adjusted = motor->atr_filtered_current - torque_offset;
 
     // expected acceleration is proportional to current (minus an offset, required to
     // balance/maintain speed)
-    float expected_acc;
-    if (abs_torque < 25) {
-        expected_acc =
-            (motor->atr_filtered_current - motor->erpm_sign * torque_offset) / accel_factor;
-    } else {
-        // primitive linear approximation of non-linear torque-accel relationship
-        int torque_sign = sign(motor->atr_filtered_current);
-        expected_acc = (torque_sign * 25 - motor->erpm_sign * torque_offset) / accel_factor;
-        expected_acc += torque_sign * (abs_torque - 25) / accel_factor2;
-    }
+    float expected_acc = current_adjusted / accel_factor;
 
     bool forward = motor->erpm > 0;
     if (motor->abs_erpm < 250 && abs_torque > 30) {
@@ -81,15 +86,10 @@ static void atr_update(ATR *atr, const MotorData *motor, const RefloatConfig *co
     }
 
     float new_accel_diff = expected_acc - measured_acc;
-    if (motor->abs_erpm > 2000) {
-        atr->accel_diff = 0.9f * atr->accel_diff + 0.1f * new_accel_diff;
-    } else if (motor->abs_erpm > 1000) {
-        atr->accel_diff = 0.95f * atr->accel_diff + 0.05f * new_accel_diff;
-    } else if (motor->abs_erpm > 250) {
-        atr->accel_diff = 0.98f * atr->accel_diff + 0.02f * new_accel_diff;
-    } else {
-        atr->accel_diff = 0;
-    }
+
+    // float diff_smoothing = 0.01f + 0.000045f * motor->fabsf(erpm_smooth);
+    // atr->accel_diff = (1.0f - diff_smoothing) * atr->accel_diff + diff_smoothing * new_accel_diff;
+    atr->accel_diff = 0.95f * atr->accel_diff + 0.05f * new_accel_diff;
 
     // atr->accel_diff | > 0  | <= 0
     // -------------+------+-------
@@ -112,28 +112,17 @@ static void atr_update(ATR *atr, const MotorData *motor, const RefloatConfig *co
 
     // now ATR target is purely based on gap between expected and actual acceleration
     float new_atr_target = atr_strength * atr->accel_diff;
-    if (fabsf(new_atr_target) < atr_threshold) {
-        new_atr_target = 0;
-    } else {
-        new_atr_target -= sign(new_atr_target) * atr_threshold;
-    }
 
-    atr->target_offset = atr->target_offset * 0.95 + 0.05 * new_atr_target;
-    atr->target_offset = fminf(atr->target_offset, config->atr_angle_limit);
-    atr->target_offset = fmaxf(atr->target_offset, -config->atr_angle_limit);
+    dead_zonef(&new_atr_target, atr_threshold);
+    atr->target_offset = 0.95f * atr->target_offset + 0.05f * new_atr_target;
+    angle_limitf(&atr->target_offset, config->atr_angle_limit);
 
-    float response_boost = 1;
-    if (motor->abs_erpm > 2500) {
-        response_boost = config->atr_response_boost;
-    }
-    if (motor->abs_erpm > 6000) {
-        response_boost *= config->atr_response_boost;
-    }
+    float response_boost = 1.0f + (2.0f / 10000) * motor->fabsf(erpm_smooth);  // 2x at 10K erpm (0.0001f)
 
     // Key to keeping the board level and consistent is to determine the appropriate step size!
     // We want to react quickly to changes, but we don't want to overreact to glitches in
     // acceleration data or trigger oscillations...
-    float atr_step_size = 0;
+    float atr_step_size = 0.0f;
     const float TT_BOOST_MARGIN = 2;
     if (forward) {
         if (atr->offset < 0) {
@@ -249,4 +238,9 @@ void atr_and_braketilt_winddown(ATR *atr) {
     atr->target_offset *= 0.99;
     atr->braketilt_offset *= 0.995;
     atr->braketilt_target_offset *= 0.99;
+
+    // smooth_value(&atr->offset, 0.0f, 0.1f, 800);
+    // smooth_value(&atr->target_offset, 0.0f, 0.1f, 800);
+    // smooth_value(&atr->braketilt_offset, 0.0f, 0.1f, 800);
+    // smooth_value(&atr->braketilt_target_offset, 0.0f, 0.1f, 800);
 }

@@ -35,18 +35,11 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *motor, const RefloatCon
     float strength =
         motor->braking ? config->torquetilt_strength_regen : config->torquetilt_strength;
 
-    // Take abs motor current, subtract start offset, and take the max of that
-    // with 0 to get the current above our start threshold (absolute). Then
-    // multiply it by "power" to get our desired angle, and min with the limit
-    // to respect boundaries. Finally multiply it by motor current sign to get
-    // directionality back.
-    float target_offset =
-        fminf(
-            fmaxf((fabsf(motor->atr_filtered_current) - config->torquetilt_start_current), 0) *
-                strength,
-            config->torquetilt_angle_limit
-        ) *
-        sign(motor->atr_filtered_current);
+    tt->offset = motor->current_adjusted * strength;
+    
+    // 1.5 should be similar to the old behavior
+    dead_zonef(&tt->offset, config->torquetilt_threshold);  // was torquetilt_start_current
+    angle_limitf(&tt->offset, config->torquetilt_angle_limit);
 
     float step_size = 0;
     if ((tt->offset - target_offset > 0 && target_offset > 0) ||

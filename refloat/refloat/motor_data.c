@@ -25,6 +25,7 @@
 
 void motor_data_reset(MotorData *m) {
     m->duty_smooth = 0;
+    m->erpm_smooth = 0;
 
     m->acceleration = 0;
     m->accel_idx = 0;
@@ -48,11 +49,14 @@ void motor_data_update(MotorData *m) {
     m->erpm = VESC_IF->mc_get_rpm();
     m->abs_erpm = fabsf(m->erpm);
     m->erpm_sign = sign(m->erpm);
+    // smooth_value(&m->erpm_smooth, erpm, 0.2f, 800);
+    m->erpm_smooth = m->erpm_smooth * 0.997f + m->erpm * 0.003f;
 
     m->current = VESC_IF->mc_get_tot_current_directional_filtered();
     m->braking = m->abs_erpm > 250 && sign(m->current) != m->erpm_sign;
 
     m->duty_cycle = fabsf(VESC_IF->mc_get_duty_cycle_now());
+    // smooth_value(&m->duty_smooth, duty_cycle, 0.01f, 800);
     m->duty_smooth = m->duty_smooth * 0.9f + m->duty_cycle * 0.1f;
 
     float current_acceleration = m->erpm - m->last_erpm;
@@ -67,4 +71,7 @@ void motor_data_update(MotorData *m) {
     } else {
         m->atr_filtered_current = m->current;
     }
+
+    float torque_offset = 0.00022f * m->erpm_smooth * accel_factor;
+	m->current_adjusted = m->atr_filtered_current - torque_offset;
 }
