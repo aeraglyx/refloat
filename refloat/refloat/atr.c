@@ -66,9 +66,15 @@ void atr_configure(ATR *atr, const RefloatConfig *config) {
 
 static void atr_update(ATR *atr, const MotorData *motor, const RefloatConfig *config) {
     float abs_torque = fabsf(motor->atr_filtered_current);
-    float atr_threshold = motor->braking ? config->atr_threshold_down : config->atr_threshold_up;
-    float accel_factor =
-        motor->braking ? config->atr_amps_decel_ratio : config->atr_amps_accel_ratio;
+    // float atr_threshold = motor->braking ? config->atr_threshold_down : config->atr_threshold_up;
+    float atr_threshold = remap(
+        motor->gas_factor, config->atr_threshold_down, config->atr_threshold_up
+    );
+    // float accel_factor =
+    //     motor->braking ? config->atr_amps_decel_ratio : config->atr_amps_accel_ratio;
+    float accel_factor = remap(
+        motor->gas_factor, config->atr_amps_decel_ratio, config->atr_amps_accel_ratio
+    );
 
     // compare measured acceleration to expected acceleration
     float measured_acc = clampf(motor->acceleration, -5.0f, 5.0f);
@@ -80,7 +86,7 @@ static void atr_update(ATR *atr, const MotorData *motor, const RefloatConfig *co
     // balance/maintain speed)
     float expected_acc = current_adjusted / accel_factor;
 
-    bool forward = motor->erpm > 0;
+    bool forward = motor->erpm_filtered > 0;
     if (motor->abs_erpm < 250 && abs_torque > 30) {
         forward = (expected_acc > 0);
     }

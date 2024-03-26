@@ -26,6 +26,7 @@
 
 typedef struct {
     float erpm;
+    float erpm_filtered;
     float abs_erpm;
     float last_erpm;
     int8_t erpm_sign;
@@ -34,6 +35,7 @@ typedef struct {
 
     float current;
     bool braking;
+    float gas_factor;
 
     float duty_cycle;
     float duty_smooth;

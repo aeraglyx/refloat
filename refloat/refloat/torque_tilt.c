@@ -34,6 +34,12 @@ void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *config) {
 void torque_tilt_update(TorqueTilt *tt, const MotorData *motor, const RefloatConfig *config) {
     float strength =
         motor->braking ? config->torquetilt_strength_regen : config->torquetilt_strength;
+    
+    float strength = remap(
+        motor->brake_gas_factor,
+        config->torquetilt_strength_regen,
+        config->torquetilt_strength
+    )
 
     tt->offset = motor->current_adjusted * strength;
     

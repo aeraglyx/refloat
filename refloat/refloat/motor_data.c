@@ -25,6 +25,7 @@
 
 void motor_data_reset(MotorData *m) {
     m->duty_smooth = 0;
+    m->erpm_filtered = 0;
     m->erpm_smooth = 0;
 
     m->acceleration = 0;
@@ -47,13 +48,16 @@ void motor_data_configure(MotorData *m, float frequency) {
 
 void motor_data_update(MotorData *m) {
     m->erpm = VESC_IF->mc_get_rpm();
-    m->abs_erpm = fabsf(m->erpm);
-    m->erpm_sign = sign(m->erpm);
-    // smooth_value(&m->erpm_smooth, erpm, 0.2f, 800);
+    m->erpm_filtered = m->erpm_filtered * 0.9f + m->erpm * 0.1f;
+    m->abs_erpm = fabsf(m->erpm_filtered);
+    m->erpm_sign = sign(m->erpm_filtered);
     m->erpm_smooth = m->erpm_smooth * 0.997f + m->erpm * 0.003f;
+    // smooth_value(&m->erpm_smooth, erpm, 0.2f, 800);
 
     m->current = VESC_IF->mc_get_tot_current_directional_filtered();
     m->braking = m->abs_erpm > 250 && sign(m->current) != m->erpm_sign;
+    m->gas_factor = sigmoid_norm(m->current * sigmoid(m->erpm_filtered, 500), 5.0f);
+    // m->braking_factor = sigmoid(m->current * m->erpm_sign, 5.0f);
 
     m->duty_cycle = fabsf(VESC_IF->mc_get_duty_cycle_now());
     // smooth_value(&m->duty_smooth, duty_cycle, 0.01f, 800);

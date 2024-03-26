@@ -62,6 +62,23 @@ float smoothstep(float x) {
     return x * x * (3.0f - 2.0f * x);
 }
 
+float sigmoid(float x, float radius) {
+    return tanhf(x / radius);
+}
+
+float sigmoid_norm(float x, float radius) {
+    return 0.5f + 0.5f * sigmoid(x, radius);
+}
+
+float remap(float x, float a, float b) {
+    // remap -1 to a and 1 to b
+    return 0.5f * (a - a * x + b + b * x);
+}
+
+float remap_norm(float x, float a, float b) {
+    return (1.0f - x) * a + x * b;
+}
+
 float clampf(float value, float min, float max) {
     const float m = value < min ? min : value;
     return m > max ? max : m;
