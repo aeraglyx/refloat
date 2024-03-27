@@ -123,7 +123,7 @@ static void atr_update(ATR *atr, const MotorData *motor, const RefloatConfig *co
     atr->target_offset = 0.95f * atr->target_offset + 0.05f * new_atr_target;
     angle_limitf(&atr->target_offset, config->atr_angle_limit);
 
-    float response_boost = 1.0f + (2.0f / 10000) * motor->fabsf(erpm_smooth);  // 2x at 10K erpm (0.0001f)
+    float response_boost = 1.0f + (2.0f / 10000) * fabsf(motor->erpm_smooth);  // 2x at 10K erpm (0.0001f)
 
     // Key to keeping the board level and consistent is to determine the appropriate step size!
     // We want to react quickly to changes, but we don't want to overreact to glitches in

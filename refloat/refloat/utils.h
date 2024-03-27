@@ -97,3 +97,13 @@ float clampf(float value, float min, float max);
  * @param step A maximum unit of change of @p value.
  */
 void rate_limitf(float *value, float target, float step);
+
+void angle_limitf(float *angle_in, float angle_limit);
+
+void dead_zonef(float *value, float threshold);
+
+float sigmoid(float x, float radius);
+float sigmoid_norm(float x, float radius);
+
+float remap(float x, float a, float b);
+float remap_norm(float x, float a, float b);
