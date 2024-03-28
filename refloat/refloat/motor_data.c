@@ -56,7 +56,7 @@ void motor_data_update(MotorData *m) {
 
     m->current = VESC_IF->mc_get_tot_current_directional_filtered();
     m->braking = m->abs_erpm > 250 && sign(m->current) != m->erpm_sign;
-    m->gas_factor = sigmoid_norm(m->current * sigmoid(m->erpm_filtered, 500), 5.0f);
+    // m->gas_factor = sigmoid_norm(m->current * sigmoid(m->erpm_filtered, 500), 5.0f);
     // m->braking_factor = sigmoid(m->current * m->erpm_sign, 5.0f);
 
     m->duty_cycle = fabsf(VESC_IF->mc_get_duty_cycle_now());
@@ -76,6 +76,6 @@ void motor_data_update(MotorData *m) {
         m->atr_filtered_current = m->current;
     }
 
-    float torque_offset = 0.00022f * m->erpm_smooth * accel_factor;
-	m->current_adjusted = m->atr_filtered_current - torque_offset;
+    // float torque_offset = 0.00022f * m->erpm_smooth * accel_factor;
+	// m->current_adjusted = m->atr_filtered_current - torque_offset;
 }

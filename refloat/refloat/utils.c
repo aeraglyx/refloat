@@ -33,62 +33,68 @@ void rate_limitf(float *value, float target, float step) {
     }
 }
 
-void angle_limitf(float *angle_in, float angle_limit) {
-    if (fabsf(*angle_in) > angle_limit) {
-        *angle_in = fminf(*angle_in, angle_limit);
-        *angle_in = fmaxf(*angle_in, -angle_limit);
-    }
+void limit_speed(float *value, float target, float speed, float max_speed, uint16_t freq) {
+    float offset = target - *value;
+    // *value += max_speed * clampf(speed * offset / max_speed, -1.0f, 1.0f) / (float)freq;
+    *value += max_speed * tanhf(speed * offset / max_speed) / (float)freq;
 }
+
+// void angle_limitf(float *angle_in, float angle_limit) {
+//     if (fabsf(*angle_in) > angle_limit) {
+//         *angle_in = fminf(*angle_in, angle_limit);
+//         *angle_in = fmaxf(*angle_in, -angle_limit);
+//     }
+// }
 void angle_limitf(float *angle_in, float angle_limit) {
     *angle_in = clampf(*angle_in, -angle_limit, angle_limit);
 }
 
 
-void dead_zonef(float *value, float thr_pos, float thr_neg) {
-    if (*value > thr_pos) {
-        *value = *value - thr_pos;
-    } else if (*value < -thr_neg) {
-        *value = *value + thr_neg;
-    } else {
-        *value = 0.0f;
-    }
-}
+// void dead_zonef(float *value, float thr_pos, float thr_neg) {
+//     if (*value > thr_pos) {
+//         *value = *value - thr_pos;
+//     } else if (*value < -thr_neg) {
+//         *value = *value + thr_neg;
+//     } else {
+//         *value = 0.0f;
+//     }
+// }
 void dead_zonef(float *value, float threshold) {
     *value = max(fabsf(*value) - threshold, 0.0f) * sign(*value);
 }
 
 
-float smoothstep(float x) {
-    return x * x * (3.0f - 2.0f * x);
-}
+// float smoothstep(float x) {
+//     return x * x * (3.0f - 2.0f * x);
+// }
 
-float sigmoid(float x, float radius) {
-    return tanhf(x / radius);
-}
+// float sigmoid(float x, float radius) {
+//     return tanhf(x / radius);
+// }
 
-float sigmoid_norm(float x, float radius) {
-    return 0.5f + 0.5f * sigmoid(x, radius);
-}
+// float sigmoid_norm(float x, float radius) {
+//     return 0.5f + 0.5f * sigmoid(x, radius);
+// }
 
-float remap(float x, float a, float b) {
-    // remap -1 to a and 1 to b
-    return 0.5f * (a - a * x + b + b * x);
-}
+// float remap(float x, float a, float b) {
+//     // remap -1 to a and 1 to b
+//     return 0.5f * (a - a * x + b + b * x);
+// }
 
-float remap_norm(float x, float a, float b) {
-    return (1.0f - x) * a + x * b;
-}
+// float remap_norm(float x, float a, float b) {
+//     return (1.0f - x) * a + x * b;
+// }
 
 float clampf(float value, float min, float max) {
     const float m = value < min ? min : value;
     return m > max ? max : m;
 }
 
-void smooth_value(float *value_smooth, float value_current, float half_time, uint16_t hertz) {
-	if (half_time == 0.0f) {
-		*value_smooth = value_current;
-	} else {
-		float mult = powf(2.0f, -1.0f / (half_time * (float)hertz));
-		*value_smooth = mult * *value_smooth + (1.0f - mult) * value_current;
-	}
-}
+// void smooth_value(float *value_smooth, float value_current, float half_time, uint16_t hertz) {
+// 	if (half_time == 0.0f) {
+// 		*value_smooth = value_current;
+// 	} else {
+// 		float mult = powf(2.0f, -1.0f / (half_time * (float)hertz));
+// 		*value_smooth = mult * *value_smooth + (1.0f - mult) * value_current;
+// 	}
+// }

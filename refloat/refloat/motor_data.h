@@ -35,7 +35,7 @@ typedef struct {
 
     float current;
     bool braking;
-    float gas_factor;
+    // float gas_factor;
 
     float duty_cycle;
     float duty_smooth;

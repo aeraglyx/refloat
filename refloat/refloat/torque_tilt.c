@@ -26,40 +26,45 @@ void torque_tilt_reset(TorqueTilt *tt) {
     tt->offset = 0;
 }
 
-void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *config) {
-    tt->on_step_size = config->atr_on_speed / config->hertz;
-    tt->off_step_size = config->atr_off_speed / config->hertz;
+void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *cfg) {
+    tt->on_step_size = cfg->torquetilt_on_speed / cfg->hertz;
+    tt->off_step_size = cfg->torquetilt_off_speed / cfg->hertz;
 }
 
-void torque_tilt_update(TorqueTilt *tt, const MotorData *motor, const RefloatConfig *config) {
-    float strength =
-        motor->braking ? config->torquetilt_strength_regen : config->torquetilt_strength;
+void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfig *cfg) {
+    // float strength =
+    //     mot->braking ? cfg->torquetilt_strength_regen : cfg->torquetilt_strength;
     
-    float strength = remap(
-        motor->brake_gas_factor,
-        config->torquetilt_strength_regen,
-        config->torquetilt_strength
-    )
+    // float strength = remap(
+    //     mot->gas_factor, cfg->torquetilt_strength_regen, cfg->torquetilt_strength
+    // );
+    float strength = cfg->torquetilt_strength;
 
-    tt->offset = motor->current_adjusted * strength;
+    // float accel_factor = remap(
+    //     mot->gas_factor, cfg->atr_amps_decel_ratio, cfg->atr_amps_accel_ratio
+    // );
+    float accel_factor = cfg->atr_amps_accel_ratio;
+
+    float torque_offset = 0.00022f * mot->erpm_smooth * accel_factor;
+	float current_adjusted = mot->atr_filtered_current - torque_offset;
+
+    float target_offset = current_adjusted;
+    dead_zonef(&target_offset, cfg->torquetilt_start_current);
+    target_offset *= strength;
+    angle_limitf(&target_offset, cfg->torquetilt_angle_limit);
     
     // 1.5 should be similar to the old behavior
-    dead_zonef(&tt->offset, config->torquetilt_threshold);  // was torquetilt_start_current
-    angle_limitf(&tt->offset, config->torquetilt_angle_limit);
+    // dead_zonef(&tt->offset, cfg->torquetilt_threshold);  // was torquetilt_start_current
 
-    float step_size = 0;
-    if ((tt->offset - target_offset > 0 && target_offset > 0) ||
-        (tt->offset - target_offset < 0 && target_offset < 0)) {
-        step_size = tt->off_step_size;
-    } else {
-        step_size = tt->on_step_size;
-    }
+    float responsivness = cfg->brkbooster_ramp;
 
-    if (motor->abs_erpm < 500) {
-        step_size /= 2;
-    }
+    // if (mot->abs_erpm < 500) {
+    //     responsivness /= 2;
+    // }
 
-    rate_limitf(&tt->offset, target_offset, step_size);
+    limit_speed(&tt->offset, target_offset, responsivness, cfg->torquetilt_on_speed, cfg->hertz);
+
+    // rate_limitf(&tt->offset, target_offset, step_size);
 }
 
 void torque_tilt_winddown(TorqueTilt *tt) {
