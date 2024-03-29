@@ -32,13 +32,13 @@ void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *cfg) {
 }
 
 void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfig *cfg) {
-    // float strength =
-    //     mot->braking ? cfg->torquetilt_strength_regen : cfg->torquetilt_strength;
+    float strength =
+        mot->braking ? cfg->torquetilt_strength_regen : cfg->torquetilt_strength;
     
     // float strength = remap(
     //     mot->gas_factor, cfg->torquetilt_strength_regen, cfg->torquetilt_strength
     // );
-    float strength = cfg->torquetilt_strength;
+    // float strength = cfg->torquetilt_strength;
 
     // float accel_factor = remap(
     //     mot->gas_factor, cfg->atr_amps_decel_ratio, cfg->atr_amps_accel_ratio
@@ -62,7 +62,8 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfi
     //     responsivness /= 2;
     // }
 
-    limit_speed(&tt->offset, target_offset, responsivness, cfg->torquetilt_on_speed, cfg->hertz);
+    // limit_speed(&tt->offset, target_offset, responsivness, cfg->torquetilt_on_speed, cfg->hertz);
+    rate_limit_v02(&tt->offset, target_offset, tt->on_step_size, responsivness);
 
     // rate_limitf(&tt->offset, target_offset, step_size);
 }

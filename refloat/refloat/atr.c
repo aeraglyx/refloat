@@ -127,11 +127,12 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
     float response_boost = exp2f(cfg->atr_response_boost * fabsf(mot->erpm_smooth) / 10000);
     responsivness *= response_boost;
 
-    if (mot->abs_erpm < 500) {
-        responsivness /= 2;
-    }
+    // if (mot->abs_erpm < 500) {
+    //     responsivness /= 2;
+    // }
     
-    limit_speed(&atr->offset, atr->target_offset, responsivness, cfg->atr_on_speed, cfg->hertz);
+    // limit_speed(&atr->offset, atr->target_offset, responsivness, cfg->atr_on_speed, cfg->hertz);
+    rate_limit_v02(&atr->offset, atr->target_offset, atr->on_step_size, responsivness);
 
     // Key to keeping the board level and consistent is to determine the appropriate step size!
     // We want to react quickly to changes, but we don't want to overreact to glitches in

@@ -23,6 +23,12 @@ uint32_t rnd(uint32_t seed) {
     return seed * 1664525u + 1013904223u;
 }
 
+
+float clampf(float value, float min, float max) {
+    const float m = value < min ? min : value;
+    return m > max ? max : m;
+}
+
 void rate_limitf(float *value, float target, float step) {
     if (fabsf(target - *value) < step) {
         *value = target;
@@ -33,10 +39,16 @@ void rate_limitf(float *value, float target, float step) {
     }
 }
 
-void limit_speed(float *value, float target, float speed, float max_speed, uint16_t freq) {
+// void limit_speed(float *value, float target, float speed, float max_speed, uint16_t freq) {
+//     float offset = target - *value;
+//     // *value += max_speed * clampf(speed * offset / max_speed, -1.0f, 1.0f) / (float)freq;
+//     *value += max_speed * tanhf(speed * offset / max_speed) / (float)freq;
+// }
+
+void rate_limit_v02(float *value, float target, float max_step, float ramp) {
     float offset = target - *value;
-    // *value += max_speed * clampf(speed * offset / max_speed, -1.0f, 1.0f) / (float)freq;
-    *value += max_speed * tanhf(speed * offset / max_speed) / (float)freq;
+    *value += clampf(offset / ramp, -1.0f, 1.0f) * max_step;
+    // *value += tanhf(offset / ramp) * max_step;
 }
 
 // void angle_limitf(float *angle_in, float angle_limit) {
@@ -84,11 +96,6 @@ void dead_zonef(float *value, float threshold) {
 // float remap_norm(float x, float a, float b) {
 //     return (1.0f - x) * a + x * b;
 // }
-
-float clampf(float value, float min, float max) {
-    const float m = value < min ? min : value;
-    return m > max ? max : m;
-}
 
 // void smooth_value(float *value_smooth, float value_current, float half_time, uint16_t hertz) {
 // 	if (half_time == 0.0f) {
