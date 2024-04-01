@@ -55,7 +55,7 @@ void atr_configure(ATR *atr, const RefloatConfig *cfg) {
 // 	float accel_factor = 0.5f * (cfg->atr_amps_decel_ratio + cfg->atr_amps_accel_ratio);
 // 	float expected_acc = mot->atr_filtered_current / accel_factor;
 // 	float accel_diff = mot->acceleration - expected_acc;
-	
+    
 //     // any large accel_diff is probably wheelslip or freespin
 //     float start = 3.0f;
 //     float end = 6.0f;
@@ -80,8 +80,8 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
     
     float measured_acc = clampf(mot->acceleration, -5.0f, 5.0f);
 
-	float torque_offset = 0.00022f * mot->erpm_smooth * accel_factor;
-	float current_adjusted = mot->atr_filtered_current - torque_offset;
+    float torque_offset = 0.00022f * mot->erpm_smooth * accel_factor;
+    float current_adjusted = mot->atr_filtered_current - torque_offset;
 
     float expected_acc = current_adjusted / accel_factor;
 

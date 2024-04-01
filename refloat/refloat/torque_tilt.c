@@ -45,10 +45,13 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfi
     // );
     float accel_factor = cfg->atr_amps_accel_ratio;
 
-    float torque_offset = 0.00022f * mot->erpm_smooth * accel_factor;
-	float current_adjusted = mot->atr_filtered_current - torque_offset;
+    // float amp_offset_speed = 0.00022f * mot->erpm_smooth * accel_factor;
+    // float amp_offset_atr = accel_diff * accel_factor;
+    // float amps_adjusted = mot->atr_filtered_current - amp_offset_speed - amp_offset_atr;
+    float motor_current = mot->atr_filtered_current;
+    float measured_acc = clampf(mot->acceleration, -5.0f, 5.0f);
 
-    float target_offset = current_adjusted;
+    float target_offset = measured_acc * accel_factor;
     dead_zonef(&target_offset, cfg->torquetilt_start_current);
     target_offset *= strength;
     angle_limitf(&target_offset, cfg->torquetilt_angle_limit);

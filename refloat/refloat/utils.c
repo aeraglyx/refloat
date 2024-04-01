@@ -45,11 +45,13 @@ void rate_limitf(float *value, float target, float step) {
 //     *value += max_speed * tanhf(speed * offset / max_speed) / (float)freq;
 // }
 
-void rate_limit_v02(float *value, float target, float max_step, float ramp) {
+void rate_limit_v02(float *value, float target, float step, float ramp) {
     float offset = target - *value;
-    *value += clampf(offset / ramp, -1.0f, 1.0f) * max_step;
-    // *value += tanhf(offset / ramp) * max_step;
+    float ramp_limited = fmaxf(ramp, 0.01f);
+    float step_multiplier = tanhf(offset / ramp_limited);
+    *value += step * step_multiplier;
 }
+    // float step_multiplier = clampf(offset / ramp_limited, -1.0f, 1.0f);
 
 // void angle_limitf(float *angle_in, float angle_limit) {
 //     if (fabsf(*angle_in) > angle_limit) {
@@ -72,7 +74,7 @@ void angle_limitf(float *angle_in, float angle_limit) {
 //     }
 // }
 void dead_zonef(float *value, float threshold) {
-    *value = max(fabsf(*value) - threshold, 0.0f) * sign(*value);
+    *value = fmaxf(fabsf(*value) - threshold, 0.0f) * sign(*value);
 }
 
 
