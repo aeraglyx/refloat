@@ -29,6 +29,7 @@ void atr_reset(ATR *atr) {
     atr->offset = 0.0f;
     atr->braketilt_target_offset = 0.0f;
     atr->braketilt_offset = 0.0f;
+    atr->step_smooth = 0.0f;
 }
 
 void atr_configure(ATR *atr, const RefloatConfig *cfg) {
@@ -123,82 +124,22 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
     angle_limitf(&atr->target_offset, cfg->atr_angle_limit);
 
     // float response_boost = 1.0f + (2.0f / 10000) * fabsf(mot->erpm_smooth);  // 2x at 10K erpm (0.0001f)
-    float responsivness = cfg->booster_ramp;
-    float response_boost = exp2f(cfg->atr_response_boost * fabsf(mot->erpm_smooth) / 10000);
-    responsivness *= response_boost;
 
     // if (mot->abs_erpm < 500) {
-    //     responsivness /= 2;
+    //     ramp /= 2;
     // }
     
-    // limit_speed(&atr->offset, atr->target_offset, responsivness, cfg->atr_on_speed, cfg->hertz);
-    rate_limit_v02(&atr->offset, atr->target_offset, atr->on_step_size, responsivness);
+    // limit_speed(&atr->offset, atr->target_offset, ramp, cfg->atr_on_speed, cfg->hertz);
+    // float step_new = rate_limit_smooth(&atr->offset, atr->target_offset, atr->on_step_size, ramp);
+    // float step = get_step_ramped(offset, step_max, ramp);
+    float response_boost = exp2f(cfg->atr_response_boost * fabsf(mot->erpm_smooth) / 10000);
+    float step_max = atr->on_step_size * response_boost;
 
-    // Key to keeping the board level and consistent is to determine the appropriate step size!
-    // We want to react quickly to changes, but we don't want to overreact to glitches in
-    // acceleration data or trigger oscillations...
-    // float atr_step_size = 0.0f;
-    // const float TT_BOOST_MARGIN = 2;
-    // if (forward) {
-    //     if (atr->offset < 0) {
-    //         // downhill
-    //         if (atr->offset < atr->target_offset) {
-    //             // to avoid oscillations we go down slower than we go up
-    //             atr_step_size = atr->off_step_size;
-    //             if ((atr->target_offset > 0) &&
-    //                 ((atr->target_offset - atr->offset) > TT_BOOST_MARGIN) &&
-    //                 mot->abs_erpm > 2000) {
-    //                 // boost the speed if tilt target has reversed (and if there's a significant
-    //                 // margin)
-    //                 atr_step_size = atr->off_step_size * cfg->atr_transition_boost;
-    //             }
-    //         } else {
-    //             // ATR is increasing
-    //             atr_step_size = atr->on_step_size * response_boost;
-    //         }
-    //     } else {
-    //         // uphill or other heavy resistance (grass, mud, etc)
-    //         if ((atr->target_offset > -3) && (atr->offset > atr->target_offset)) {
-    //             // ATR winding down (current ATR is bigger than the target)
-    //             // normal wind down case: to avoid oscillations we go down slower than we go up
-    //             atr_step_size = atr->off_step_size;
-    //         } else {
-    //             // standard case of increasing ATR
-    //             atr_step_size = atr->on_step_size * response_boost;
-    //         }
-    //     }
-    // } else {
-    //     if (atr->offset > 0) {
-    //         // downhill
-    //         if (atr->offset > atr->target_offset) {
-    //             // to avoid oscillations we go down slower than we go up
-    //             atr_step_size = atr->off_step_size;
-    //             if ((atr->target_offset < 0) &&
-    //                 ((atr->offset - atr->target_offset) > TT_BOOST_MARGIN) &&
-    //                 mot->abs_erpm > 2000) {
-    //                 // boost the speed if tilt target has reversed (and if there's a significant
-    //                 // margin)
-    //                 atr_step_size = atr->off_step_size * cfg->atr_transition_boost;
-    //             }
-    //         } else {
-    //             // ATR is increasing
-    //             atr_step_size = atr->on_step_size * response_boost;
-    //         }
-    //     } else {
-    //         // uphill or other heavy resistance (grass, mud, etc)
-    //         if ((atr->target_offset < 3) && (atr->offset < atr->target_offset)) {
-    //             // normal wind down case: to avoid oscillations we go down slower than we go up
-    //             atr_step_size = atr->off_step_size;
-    //         } else {
-    //             // standard case of increasing torquetilt
-    //             atr_step_size = atr->on_step_size * response_boost;
-    //         }
-    //     }
-    // }
-
-    // if (mot->abs_erpm < 500) {
-    //     atr_step_size /= 2;
-    // }
+    float offset = atr->target_offset - atr->offset;
+    float ramp = cfg->booster_ramp;
+    float step = get_step(offset, step_max, ramp);
+    smooth_value(&atr->step_smooth, step, ramp * 0.05f, cfg->hertz);
+    atr->offset += atr->step_smooth;
 
     // rate_limitf(&atr->offset, atr->target_offset, atr_step_size);
 }
@@ -235,7 +176,7 @@ static void braketilt_update(
     }
 
     if (mot->abs_erpm < 500) {
-        braketilt_step_size /= 2;
+        braketilt_step_size /= 2.0f;
     }
 
     rate_limitf(&atr->braketilt_offset, atr->braketilt_target_offset, braketilt_step_size);
@@ -249,10 +190,10 @@ void atr_and_braketilt_update(
 }
 
 void atr_and_braketilt_winddown(ATR *atr) {
-    atr->offset *= 0.995;
-    atr->target_offset *= 0.99;
-    atr->braketilt_offset *= 0.995;
-    atr->braketilt_target_offset *= 0.99;
+    atr->offset *= 0.995f;
+    atr->target_offset *= 0.99f;
+    atr->braketilt_offset *= 0.995f;
+    atr->braketilt_target_offset *= 0.99f;
 
     // smooth_value(&atr->offset, 0.0f, 0.1f, 800);
     // smooth_value(&atr->target_offset, 0.0f, 0.1f, 800);

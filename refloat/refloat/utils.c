@@ -39,26 +39,20 @@ void rate_limitf(float *value, float target, float step) {
     }
 }
 
-// void limit_speed(float *value, float target, float speed, float max_speed, uint16_t freq) {
+// void rate_limit_v02(float *value, float target, float step, float ramp) {
 //     float offset = target - *value;
-//     // *value += max_speed * clampf(speed * offset / max_speed, -1.0f, 1.0f) / (float)freq;
-//     *value += max_speed * tanhf(speed * offset / max_speed) / (float)freq;
+//     float ramp_limited = fmaxf(ramp, 0.01f);
+//     float step_multiplier = tanhf(offset / ramp_limited);
+//     *value += step * step_multiplier;
 // }
 
-void rate_limit_v02(float *value, float target, float step, float ramp) {
-    float offset = target - *value;
-    float ramp_limited = fmaxf(ramp, 0.01f);
-    float step_multiplier = tanhf(offset / ramp_limited);
-    *value += step * step_multiplier;
+float get_step(float offset, float step_max, float ramp) {
+    const float ramp_limited = fmaxf(ramp, 0.01f);
+    const float step_multiplier = clampf(offset / ramp_limited, -1.0f, 1.0f);
+    // const float step_multiplier = tanhf(offset / ramp_limited);
+    return step_max * step_multiplier;
 }
-    // float step_multiplier = clampf(offset / ramp_limited, -1.0f, 1.0f);
 
-// void angle_limitf(float *angle_in, float angle_limit) {
-//     if (fabsf(*angle_in) > angle_limit) {
-//         *angle_in = fminf(*angle_in, angle_limit);
-//         *angle_in = fmaxf(*angle_in, -angle_limit);
-//     }
-// }
 void angle_limitf(float *angle_in, float angle_limit) {
     *angle_in = clampf(*angle_in, -angle_limit, angle_limit);
 }
@@ -99,11 +93,11 @@ void dead_zonef(float *value, float threshold) {
 //     return (1.0f - x) * a + x * b;
 // }
 
-// void smooth_value(float *value_smooth, float value_current, float half_time, uint16_t hertz) {
-// 	if (half_time == 0.0f) {
-// 		*value_smooth = value_current;
-// 	} else {
-// 		float mult = powf(2.0f, -1.0f / (half_time * (float)hertz));
-// 		*value_smooth = mult * *value_smooth + (1.0f - mult) * value_current;
-// 	}
-// }
+void smooth_value(float *value_smooth, float value_current, float half_time, uint16_t hertz) {
+	if (half_time == 0.0f) {
+		*value_smooth = value_current;
+	} else {
+		float mult = powf(2.0f, -1.0f / (half_time * (float)hertz));
+		*value_smooth = mult * *value_smooth + (1.0f - mult) * value_current;
+	}
+}

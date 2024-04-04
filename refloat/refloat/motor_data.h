@@ -40,10 +40,9 @@ typedef struct {
     float duty_cycle;
     float duty_smooth;
 
-    // an average calculated over last ACCEL_ARRAY_SIZE values
     float acceleration;
-    float accel_history[ACCEL_ARRAY_SIZE];
-    uint8_t accel_idx;
+    // float accel_history[ACCEL_ARRAY_SIZE];
+    // uint8_t accel_idx;
 
     bool atr_filter_enabled;
     Biquad atr_current_biquad;

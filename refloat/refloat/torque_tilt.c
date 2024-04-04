@@ -23,7 +23,8 @@
 #include <math.h>
 
 void torque_tilt_reset(TorqueTilt *tt) {
-    tt->offset = 0;
+    tt->offset = 0.0f;
+    tt->step_smooth = 0.0f;
 }
 
 void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *cfg) {
@@ -38,7 +39,6 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfi
     // float strength = remap(
     //     mot->gas_factor, cfg->torquetilt_strength_regen, cfg->torquetilt_strength
     // );
-    // float strength = cfg->torquetilt_strength;
 
     // float accel_factor = remap(
     //     mot->gas_factor, cfg->atr_amps_decel_ratio, cfg->atr_amps_accel_ratio
@@ -48,27 +48,24 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfi
     // float amp_offset_speed = 0.00022f * mot->erpm_smooth * accel_factor;
     // float amp_offset_atr = accel_diff * accel_factor;
     // float amps_adjusted = mot->atr_filtered_current - amp_offset_speed - amp_offset_atr;
-    float motor_current = mot->atr_filtered_current;
-    float measured_acc = clampf(mot->acceleration, -5.0f, 5.0f);
 
-    float target_offset = measured_acc * accel_factor;
+    float current_filtered = mot->atr_filtered_current;
+    float acceleration = clampf(mot->acceleration, -5.0f, 5.0f);
+    float current_based_on_accel = acceleration * accel_factor;
+
+    float method = cfg->booster_angle;
+    float target_offset = (1.0f - method) * current_filtered + method * current_based_on_accel;
+
     dead_zonef(&target_offset, cfg->torquetilt_start_current);
     target_offset *= strength;
     angle_limitf(&target_offset, cfg->torquetilt_angle_limit);
     
-    // 1.5 should be similar to the old behavior
-    // dead_zonef(&tt->offset, cfg->torquetilt_threshold);  // was torquetilt_start_current
-
-    float responsivness = cfg->brkbooster_ramp;
-
-    // if (mot->abs_erpm < 500) {
-    //     responsivness /= 2;
-    // }
-
-    // limit_speed(&tt->offset, target_offset, responsivness, cfg->torquetilt_on_speed, cfg->hertz);
-    rate_limit_v02(&tt->offset, target_offset, tt->on_step_size, responsivness);
-
-    // rate_limitf(&tt->offset, target_offset, step_size);
+    float ramp = cfg->booster_ramp;
+    float offset = target_offset - tt->offset;
+    float step_max = tt->on_step_size;
+    float step = get_step(offset, step_max, ramp);
+    smooth_value(&tt->step_smooth, step, ramp * 0.05f, cfg->hertz);
+    tt->offset += tt->step_smooth;
 }
 
 void torque_tilt_winddown(TorqueTilt *tt) {

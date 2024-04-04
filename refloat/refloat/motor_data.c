@@ -24,15 +24,18 @@
 #include <math.h>
 
 void motor_data_reset(MotorData *m) {
-    m->duty_smooth = 0;
-    m->erpm_filtered = 0;
-    m->erpm_smooth = 0;
+    m->erpm_filtered = 0.0f;
+    m->erpm_smooth = 0.0f;
 
-    m->acceleration = 0;
-    m->accel_idx = 0;
-    for (int i = 0; i < 40; i++) {
-        m->accel_history[i] = 0;
-    }
+    m->last_erpm = 0.0f;
+    m->acceleration = 0.0f;
+
+    m->duty_smooth = 0.0f;
+
+    // m->accel_idx = 0;
+    // for (int i = 0; i < ACCEL_ARRAY_SIZE; i++) {
+    //     m->accel_history[i] = 0;
+    // }
 
     biquad_reset(&m->atr_current_biquad);
 }
@@ -52,6 +55,10 @@ void motor_data_update(MotorData *m) {
     m->abs_erpm = fabsf(m->erpm_filtered);
     m->erpm_sign = sign(m->erpm_filtered);
     m->erpm_smooth = m->erpm_smooth * 0.997f + m->erpm * 0.003f;
+
+    float current_acceleration = m->erpm - m->last_erpm;
+    m->acceleration = m->acceleration * 0.98f + current_acceleration * 0.02f;
+    m->last_erpm = m->erpm;
     // smooth_value(&m->erpm_smooth, erpm, 0.2f, 800);
 
     m->current = VESC_IF->mc_get_tot_current_directional_filtered();
@@ -63,12 +70,9 @@ void motor_data_update(MotorData *m) {
     // smooth_value(&m->duty_smooth, duty_cycle, 0.01f, 800);
     m->duty_smooth = m->duty_smooth * 0.9f + m->duty_cycle * 0.1f;
 
-    float current_acceleration = m->erpm - m->last_erpm;
-    m->last_erpm = m->erpm;
-
-    m->acceleration += (current_acceleration - m->accel_history[m->accel_idx]) / ACCEL_ARRAY_SIZE;
-    m->accel_history[m->accel_idx] = current_acceleration;
-    m->accel_idx = (m->accel_idx + 1) % ACCEL_ARRAY_SIZE;
+    // m->acceleration += (current_acceleration - m->accel_history[m->accel_idx]) / ACCEL_ARRAY_SIZE;
+    // m->accel_history[m->accel_idx] = current_acceleration;
+    // m->accel_idx = (m->accel_idx + 1) % ACCEL_ARRAY_SIZE;
 
     if (m->atr_filter_enabled) {
         m->atr_filtered_current = biquad_process(&m->atr_current_biquad, m->current);
