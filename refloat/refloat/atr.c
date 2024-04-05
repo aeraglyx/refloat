@@ -53,85 +53,51 @@ void atr_configure(ATR *atr, const RefloatConfig *cfg) {
 
 // static void get_wheelslip_probability(MotorData *mot, const RefloatConfig *cfg) {
 // 	// simplified ATR calculation
-// 	float accel_factor = 0.5f * (cfg->atr_amps_decel_ratio + cfg->atr_amps_accel_ratio);
+// 	float accel_factor = cfg->atr_amps_accel_ratio;
 // 	float expected_acc = mot->atr_filtered_current / accel_factor;
 // 	float accel_diff = mot->acceleration - expected_acc;
     
-//     // any large accel_diff is probably wheelslip or freespin
-//     float start = 3.0f;
-//     float end = 6.0f;
+//     const float start = 4.0f;
+//     const float end = 8.0f;
+
 //     float wheelslip_prob = (fabs(accel_diff) - start) / (end - start);
 // 	wheelslip_prob = clampf(wheelslip_prob, 0.0f, 1.0f);
 //     mot->wheelslip_prob = wheelslip_prob;
 // }
 
 static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
-    float abs_torque = fabsf(mot->atr_filtered_current);
     float atr_threshold = mot->braking ? cfg->atr_threshold_down : cfg->atr_threshold_up;
-    // float atr_threshold = remap(
-    //     mot->gas_factor, cfg->atr_threshold_down, cfg->atr_threshold_up
-    // );
+    float accel_factor = cfg->atr_amps_accel_ratio;
     // float accel_factor =
     //     mot->braking ? cfg->atr_amps_decel_ratio : cfg->atr_amps_accel_ratio;
-    // float accel_factor = remap(
-    //     mot->gas_factor, cfg->atr_amps_decel_ratio, cfg->atr_amps_accel_ratio
-    // );
-    float accel_factor = cfg->atr_amps_accel_ratio;
-
-    
     // float measured_acc = clampf(mot->acceleration, -5.0f, 5.0f);
 
-    float torque_offset = 0.00022f * mot->erpm_smooth * accel_factor;
-    float current_adjusted = mot->atr_filtered_current - torque_offset;
+    float amp_offset = 0.00022f * mot->erpm_smooth * accel_factor;
+    float amps_adjusted = mot->current_filtered - amp_offset;
+    float expected_acc = amps_adjusted / accel_factor;
+    // atr->accel_diff = expected_acc - mot->accel_clamped;
 
-    float expected_acc = current_adjusted / accel_factor;
-
+    float new_accel_diff = expected_acc - mot->accel_clamped;
+    float accel_diff_half_time = 0.1f * exp2f(-0.002f * mot->erpm_smooth);
+    smooth_value(&atr->accel_diff, new_accel_diff, accel_diff_half_time, 800);
+    // atr->accel_diff = 0.95f * atr->accel_diff + 0.05f * new_accel_diff;
 
     bool forward = mot->erpm_filtered > 0;
-    if (mot->abs_erpm < 250 && abs_torque > 30) {
+    if (mot->abs_erpm < 250 && fabsf(mot->current_filtered) > 30) {
         forward = (expected_acc > 0);
     }
 
-    float new_accel_diff = expected_acc - mot->accel_clamped;
-
-    // float diff_smoothing = 0.01f + 0.000045f * mot->fabsf(erpm_smooth);
-    // atr->accel_diff = (1.0f - diff_smoothing) * atr->accel_diff + diff_smoothing * new_accel_diff;
-    atr->accel_diff = 0.95f * atr->accel_diff + 0.05f * new_accel_diff;
-
-    // atr->accel_diff | > 0  | <= 0
-    // -------------+------+-------
-    //         forward | up   | down
-    //        !forward | down | up
     float atr_strength =
         forward == (atr->accel_diff > 0) ? cfg->atr_strength_up : cfg->atr_strength_down;
 
-    // from 3000 to 6000..9000 erpm gradually crank up the torque response
-    // if (mot->abs_erpm > 3000 && !mot->braking) {
-    //     float speed_boost_mult = (mot->abs_erpm - 3000.0f) * atr->speed_boost_mult;
-    //     // configured speedboost can now also be negative (-1..1)
-    //     // -1 brings it to 0 (if erpm exceeds 9000)
-    //     // +1 doubles it     (if erpm exceeds 9000)
-    //     atr->speed_boost = fminf(1, speed_boost_mult) * cfg->atr_speed_boost;
-    //     atr_strength += atr_strength * atr->speed_boost;
-    // } else {
-    //     atr->speed_boost = 0.0f;
-    // }
+    // atr->speed_boost = 0.0f;
 
-    float new_atr_target = atr_strength * atr->accel_diff;
+    float new_atr_target = atr->accel_diff * atr_strength;
 
     dead_zonef(&new_atr_target, atr_threshold);
+    angle_limitf(&new_atr_target, cfg->atr_angle_limit);
     atr->target_offset = 0.95f * atr->target_offset + 0.05f * new_atr_target;
-    angle_limitf(&atr->target_offset, cfg->atr_angle_limit);
 
-    // float response_boost = 1.0f + (2.0f / 10000) * fabsf(mot->erpm_smooth);  // 2x at 10K erpm (0.0001f)
-
-    // if (mot->abs_erpm < 500) {
-    //     ramp /= 2;
-    // }
-    
-    // limit_speed(&atr->offset, atr->target_offset, ramp, cfg->atr_on_speed, cfg->hertz);
-    // float step_new = rate_limit_smooth(&atr->offset, atr->target_offset, atr->on_step_size, ramp);
-    // float step = get_step_ramped(offset, step_max, ramp);
     float response_boost = exp2f(cfg->atr_response_boost * fabsf(mot->erpm_smooth) / 10000);
     float step_max = atr->on_step_size * response_boost;
 

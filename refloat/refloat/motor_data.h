@@ -48,6 +48,8 @@ typedef struct {
     bool atr_filter_enabled;
     Biquad atr_current_biquad;
     float atr_filtered_current;
+    float current_filtered;
+    // float atr_smoothing;
 } MotorData;
 
 void motor_data_reset(MotorData *m);

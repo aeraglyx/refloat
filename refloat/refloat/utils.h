@@ -98,7 +98,7 @@ float clampf(float value, float min, float max);
  */
 void rate_limitf(float *value, float target, float step);
 float get_step(float offset, float step_max, float ramp);
-void smooth_value(float *value_smooth, float value_current, float half_time, uint16_t hertz);
+void smooth_value(float *value_smooth, float value_current, float half_time_sec, uint16_t hertz);
 // void rate_limit_smooth(float *value, float target, float max_step, float ramp);
 // void limit_speed(float *value, float target, float speed, float max_speed, uint16_t freq);
 

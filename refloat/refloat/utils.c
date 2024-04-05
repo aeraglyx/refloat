@@ -93,11 +93,21 @@ void dead_zonef(float *value, float threshold) {
 //     return (1.0f - x) * a + x * b;
 // }
 
-void smooth_value(float *value_smooth, float value_current, float half_time, uint16_t hertz) {
-	if (half_time == 0.0f) {
+void smooth_value(float *value_smooth, float value_current, float half_time_sec, uint16_t hertz) {
+	if (half_time_sec == 0.0f) {
 		*value_smooth = value_current;
 	} else {
-		float mult = powf(2.0f, -1.0f / (half_time * (float)hertz));
+		float mult = powf(2.0f, -1.0f / (half_time_sec * (float)hertz));
 		*value_smooth = mult * *value_smooth + (1.0f - mult) * value_current;
 	}
 }
+
+
+// void smooth_value(float *value_smooth, float value_current, float smoothing) {
+//     *value_smooth = smoothing * *value_smooth + (1.0f - smoothing) * value_current;
+// }
+
+
+// void get_smoothing_factor(float half_time_sec, uint16_t hertz) {
+//     return powf(2.0f, -1.0f / (half_time_sec * (float)hertz));
+// }
