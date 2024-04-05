@@ -50,17 +50,18 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfi
     // float amps_adjusted = mot->atr_filtered_current - amp_offset_speed - amp_offset_atr;
 
     float current_filtered = mot->atr_filtered_current;
-    float acceleration = clampf(mot->acceleration, -5.0f, 5.0f);
-    float current_based_on_accel = acceleration * accel_factor;
+    // float acceleration = clampf(mot->acceleration, -5.0f, 5.0f);
+    float current_based_on_accel = mot->accel_clamped * accel_factor;
+    // float current_based_on_accel = acceleration * accel_factor;
 
-    float method = cfg->booster_angle;
+    float method = cfg->booster_ramp;
     float target_offset = (1.0f - method) * current_filtered + method * current_based_on_accel;
 
     dead_zonef(&target_offset, cfg->torquetilt_start_current);
     target_offset *= strength;
     angle_limitf(&target_offset, cfg->torquetilt_angle_limit);
     
-    float ramp = cfg->booster_ramp;
+    float ramp = cfg->booster_angle;
     float offset = target_offset - tt->offset;
     float step_max = tt->on_step_size;
     float step = get_step(offset, step_max, ramp);

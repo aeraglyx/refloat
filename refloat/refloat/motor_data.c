@@ -29,6 +29,7 @@ void motor_data_reset(MotorData *m) {
 
     m->last_erpm = 0.0f;
     m->acceleration = 0.0f;
+    m->accel_clamped = 0.0f;
 
     m->duty_smooth = 0.0f;
 
@@ -57,7 +58,9 @@ void motor_data_update(MotorData *m) {
     m->erpm_smooth = m->erpm_smooth * 0.997f + m->erpm * 0.003f;
 
     float current_acceleration = m->erpm - m->last_erpm;
+    float current_accel_clamped = clampf(current_acceleration, -5.0f, 5.0f);
     m->acceleration = m->acceleration * 0.98f + current_acceleration * 0.02f;
+    m->accel_clamped = m->accel_clamped * 0.98f + current_accel_clamped * 0.02f;
     m->last_erpm = m->erpm;
     // smooth_value(&m->erpm_smooth, erpm, 0.2f, 800);
 

@@ -79,7 +79,7 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
     float accel_factor = cfg->atr_amps_accel_ratio;
 
     
-    float measured_acc = clampf(mot->acceleration, -5.0f, 5.0f);
+    // float measured_acc = clampf(mot->acceleration, -5.0f, 5.0f);
 
     float torque_offset = 0.00022f * mot->erpm_smooth * accel_factor;
     float current_adjusted = mot->atr_filtered_current - torque_offset;
@@ -92,7 +92,7 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
         forward = (expected_acc > 0);
     }
 
-    float new_accel_diff = expected_acc - measured_acc;
+    float new_accel_diff = expected_acc - mot->accel_clamped;
 
     // float diff_smoothing = 0.01f + 0.000045f * mot->fabsf(erpm_smooth);
     // atr->accel_diff = (1.0f - diff_smoothing) * atr->accel_diff + diff_smoothing * new_accel_diff;
@@ -136,7 +136,7 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
     float step_max = atr->on_step_size * response_boost;
 
     float offset = atr->target_offset - atr->offset;
-    float ramp = cfg->booster_ramp;
+    float ramp = cfg->booster_angle;
     float step = get_step(offset, step_max, ramp);
     smooth_value(&atr->step_smooth, step, ramp * 0.05f, cfg->hertz);
     atr->offset += atr->step_smooth;

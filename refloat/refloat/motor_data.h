@@ -41,6 +41,7 @@ typedef struct {
     float duty_smooth;
 
     float acceleration;
+    float accel_clamped;
     // float accel_history[ACCEL_ARRAY_SIZE];
     // uint8_t accel_idx;
 
