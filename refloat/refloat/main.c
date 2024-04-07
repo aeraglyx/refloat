@@ -880,9 +880,16 @@ static void apply_noseangling(data *d) {
         noseangling_target += d->float_conf.tiltback_constant * d->motor.erpm_sign;
     }
 
-    rate_limitf(&d->noseangling_interpolated, noseangling_target, d->noseangling_step_size);
+    // rate_limitf(&d->noseangling_interpolated, noseangling_target, d->noseangling_step_size);
+    // d->setpoint += d->noseangling_interpolated;
 
+    float offset = noseangling_target - d->noseangling_interpolated;
+    float ramp = d->float_conf.booster_angle;
+    float step = get_step(offset, d->noseangling_step_size, ramp);
+    smooth_value(&d->noseangling_interpolated, d->noseangling_interpolated + step, ramp * 0.05f, d->float_conf.hertz);
     d->setpoint += d->noseangling_interpolated;
+
+    // rate_limit_v02(&d->noseangling_interpolated, d->noseangling_target, d->noseangling_step_size, d->float_conf.booster_angle);
 }
 
 static void apply_inputtilt(data *d) {
@@ -1022,7 +1029,13 @@ static void apply_turntilt(data *d) {
     }
 
     // Move towards target limited by max speed
-    rate_limitf(&d->turntilt_interpolated, d->turntilt_target, d->turntilt_step_size);
+    // rate_limitf(&d->turntilt_interpolated, d->turntilt_target, d->turntilt_step_size);
+    // d->setpoint += d->turntilt_interpolated;
+
+    float offset = d->turntilt_target - d->turntilt_interpolated;
+    float ramp = d->float_conf.booster_angle;
+    float step = get_step(offset, d->turntilt_step_size, ramp);
+    smooth_value(&d->turntilt_interpolated, d->turntilt_interpolated + step, ramp * 0.05f, d->float_conf.hertz);
     d->setpoint += d->turntilt_interpolated;
 }
 

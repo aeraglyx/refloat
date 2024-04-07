@@ -39,11 +39,11 @@ void rate_limitf(float *value, float target, float step) {
     }
 }
 
-// void rate_limit_v02(float *value, float target, float step, float ramp) {
-//     float offset = target - *value;
-//     float ramp_limited = fmaxf(ramp, 0.01f);
-//     float step_multiplier = tanhf(offset / ramp_limited);
-//     *value += step * step_multiplier;
+// void rate_limit_v02(float *interpolated, float target, float max_step, float ramp){
+//     float offset = target - *interpolated;
+//     float step = get_step(offset, max_step, ramp);
+//     smooth_value(interpolated, *interpolated + step, ramp * 0.05f, 800);
+//     // return *interpolated;
 // }
 
 float get_step(float offset, float step_max, float ramp) {
@@ -101,6 +101,7 @@ void smooth_value(float *value_smooth, float value_current, float half_time_sec,
 		*value_smooth = mult * *value_smooth + (1.0f - mult) * value_current;
 	}
 }
+
 
 
 // void smooth_value(float *value_smooth, float value_current, float smoothing) {

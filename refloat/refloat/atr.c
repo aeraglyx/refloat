@@ -52,17 +52,21 @@ void atr_configure(ATR *atr, const RefloatConfig *cfg) {
 }
 
 // static void get_wheelslip_probability(MotorData *mot, const RefloatConfig *cfg) {
-// 	// simplified ATR calculation
 // 	float accel_factor = cfg->atr_amps_accel_ratio;
 // 	float expected_acc = mot->atr_filtered_current / accel_factor;
 // 	float accel_diff = mot->acceleration - expected_acc;
     
-//     const float start = 4.0f;
-//     const float end = 8.0f;
+//     const float wheelslip_start = 4.0f;
+//     const float wheelslip_end = 8.0f;
+//     float is_wheelslip = (fabs(accel_diff) - wheelslip_start) / (wheelslip_end - wheelslip_start);
+// 	is_wheelslip = clampf(is_wheelslip, 0.0f, 1.0f);
 
-//     float wheelslip_prob = (fabs(accel_diff) - start) / (end - start);
-// 	wheelslip_prob = clampf(wheelslip_prob, 0.0f, 1.0f);
-//     mot->wheelslip_prob = wheelslip_prob;
+//     const float freespin_start = 16000.0f;
+//     const float freespin_end = 20000.0f;
+//     float is_freespin = (mot->abs_erpm - freespin_start) / (freespin_end - freespin_start);
+// 	is_freespin = clampf(is_freespin, 0.0f, 1.0f);
+
+//     mot->wheelslip_prob = fmaxf(is_wheelslip, is_freespin);
 // }
 
 static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
