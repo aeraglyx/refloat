@@ -39,18 +39,33 @@ void rate_limitf(float *value, float target, float step) {
     }
 }
 
-// void rate_limit_v02(float *interpolated, float target, float max_step, float ramp){
+// void rate_limit_v02(float *interpolated, float target, float max_step, float ramp) {
 //     float offset = target - *interpolated;
 //     float step = get_step(offset, max_step, ramp);
 //     smooth_value(interpolated, *interpolated + step, ramp * 0.05f, 800);
 //     // return *interpolated;
 // }
 
-float get_step(float offset, float step_max, float ramp) {
-    const float ramp_limited = fmaxf(ramp, 0.01f);
-    const float step_multiplier = clampf(offset / ramp_limited, -1.0f, 1.0f);
-    // const float step_multiplier = tanhf(offset / ramp_limited);
-    return step_max * step_multiplier;
+void rate_limit_v02(float *interpolated, float target, float step, float ramp) {
+    float offset = target - *interpolated;
+    float ramp_limited = fmaxf(ramp, 0.01f);
+    float step_multiplier = clampf(offset / ramp_limited, -1.0f, 1.0f);
+    float interpolated_new = *interpolated + step * step_multiplier;
+    smooth_value(interpolated, interpolated_new, ramp_limited * 0.05f, 800);
+    // *interpolated = interpolated_new;
+}
+
+// float get_step(float offset, float step_max, float ramp) {
+//     const float ramp_limited = fmaxf(ramp, 0.01f);
+//     const float step_multiplier = clampf(offset / ramp_limited, -1.0f, 1.0f);
+//     // const float step_multiplier = tanhf(offset / ramp_limited);
+//     return step_max * step_multiplier;
+// }
+
+float set_step(float interpolated, float target, float step_on, float step_off, float ramp) {
+    float offset = fabsf(target) - fabsf(interpolated);
+    float use_on = clampf(0.5f * (offset + ramp) / ramp, 0.0f, 1.0f);
+    return (1.0f - use_on) * step_off + use_on * step_on;
 }
 
 void angle_limitf(float *angle_in, float angle_limit) {
