@@ -52,16 +52,15 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfi
     dead_zonef(&target_offset, cfg->torquetilt_start_current);
     target_offset *= strength;
     angle_limitf(&target_offset, cfg->torquetilt_angle_limit);
-    
-    // float ramp = cfg->booster_angle;
-    // float offset = target_offset - tt->offset;
-    // float step_max = tt->on_step_size;
-    // float step = get_step(offset, step_max, ramp);
-    // smooth_value(&tt->step_smooth, step, ramp * 0.05f, cfg->hertz);
-    // tt->offset += tt->step_smooth;
 
-    float step = set_step(tt->offset, target_offset, tt->on_step_size, tt->off_step_size, 0.1f);
-    rate_limit_v02(&tt->offset, target_offset, step, cfg->booster_angle);
+    float ramp = cfg->booster_angle / 10.0f;
+    float half_time = cfg->booster_ramp / 50.0f;
+
+    // float step = set_step(tt->offset, target_offset, tt->on_step_size, tt->off_step_size, 0.25f * ramp);
+    // rate_limit_v02(&tt->offset, target_offset, step, ramp);
+    float step = set_step(tt->offset, target_offset, tt->on_step_size, tt->off_step_size);
+    float interpolated = rate_limit_v03(tt->offset, target_offset, step, ramp);
+    smooth_value(&tt->offset, interpolated, half_time, cfg->hertz);
 }
 
 void torque_tilt_winddown(TorqueTilt *tt) {

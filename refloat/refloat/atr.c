@@ -103,20 +103,17 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
     angle_limitf(&new_atr_target, cfg->atr_angle_limit);
     atr->target_offset = 0.95f * atr->target_offset + 0.05f * new_atr_target;
 
-    // float ramp = cfg->booster_angle;
+    float ramp = cfg->booster_angle / 10.0f;
+    float half_time = cfg->booster_ramp / 50.0f;
 
-    float step = set_step(atr->offset, atr->target_offset, atr->on_step_size, atr->off_step_size, 0.1f);
+    // float step = set_step(atr->offset, atr->target_offset, atr->on_step_size, atr->off_step_size, 0.25f * ramp);
+    float step = set_step(atr->offset, atr->target_offset, atr->on_step_size, atr->off_step_size);
     float response_boost = exp2f(cfg->atr_response_boost * fabsf(mot->erpm_smooth) / 10000);
     step *= response_boost;
 
-    // float offset = atr->target_offset - atr->offset;
-    // float step = get_step(offset, step_max, ramp);
-    // smooth_value(&atr->step_smooth, step, ramp * 0.05f, cfg->hertz);
-    // atr->offset += atr->step_smooth;
-
-    rate_limit_v02(&atr->offset, atr->target_offset, step, cfg->booster_angle);
-
-    // rate_limitf(&atr->offset, atr->target_offset, atr_step_size);
+    // rate_limit_v02(&atr->offset, atr->target_offset, step, ramp);
+    float interpolated = rate_limit_v03(atr->offset, atr->target_offset, step, ramp);
+    smooth_value(&atr->offset, interpolated, half_time, cfg->hertz);
 }
 
 static void braketilt_update(
