@@ -31,7 +31,7 @@ typedef struct {
 
     float target_offset;  // setpoint target offset
     float offset;  // rate-limited setpoint offset
-    // float step_smooth;
+    float step_smooth;
 
     float speed_boost_mult;
 

@@ -887,9 +887,10 @@ static void apply_noseangling(data *d) {
     float half_time = d->float_conf.booster_ramp / 50.0f;
 
     // rate_limit_v02(&d->noseangling_interpolated, noseangling_target, d->noseangling_step_size, d->float_conf.booster_angle);
-    float interpolated = rate_limit_v03(d->noseangling_interpolated, noseangling_target, d->noseangling_step_size, ramp);
-    smooth_value(&d->noseangling_interpolated, interpolated, half_time, d->float_conf.hertz);
-    d->setpoint += d->noseangling_interpolated;
+    float interpolated = rate_limit_v03(d->noseangling_interpolated, noseangling_target, d->noseangling_step_size, 0.1f);
+    // smooth_value(&d->noseangling_interpolated, interpolated, half_time, d->float_conf.hertz);
+    // d->setpoint += d->noseangling_interpolated;
+    d->setpoint += interpolated;
 }
 
 static void apply_inputtilt(data *d) {
@@ -1036,9 +1037,10 @@ static void apply_turntilt(data *d) {
     float half_time = d->float_conf.booster_ramp / 50.0f;
 
     // rate_limit_v02(&d->turntilt_interpolated, d->turntilt_target, d->turntilt_step_size, d->float_conf.booster_angle);
-    float interpolated = rate_limit_v03(d->turntilt_interpolated, d->turntilt_target, d->turntilt_step_size, ramp);
-    smooth_value(&d->turntilt_interpolated, interpolated, half_time, d->float_conf.hertz);
-    d->setpoint += d->turntilt_interpolated;
+    float interpolated = rate_limit_v03(d->turntilt_interpolated, d->turntilt_target, d->turntilt_step_size, 0.1f);
+    // smooth_value(&d->turntilt_interpolated, interpolated, half_time, d->float_conf.hertz);
+    // d->setpoint += d->turntilt_interpolated;
+    d->setpoint += interpolated;
 }
 
 static void brake(data *d) {

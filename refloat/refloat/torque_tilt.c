@@ -24,7 +24,7 @@
 
 void torque_tilt_reset(TorqueTilt *tt) {
     tt->offset = 0.0f;
-    // tt->step_smooth = 0.0f;
+    tt->step_smooth = 0.0f;
 }
 
 void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *cfg) {
@@ -58,9 +58,11 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfi
 
     // float step = set_step(tt->offset, target_offset, tt->on_step_size, tt->off_step_size, 0.25f * ramp);
     // rate_limit_v02(&tt->offset, target_offset, step, ramp);
+    // float interpolated = rate_limit_v03(tt->offset, target_offset, step, ramp);
     float step = set_step(tt->offset, target_offset, tt->on_step_size, tt->off_step_size);
-    float interpolated = rate_limit_v03(tt->offset, target_offset, step, ramp);
-    smooth_value(&tt->offset, interpolated, half_time, cfg->hertz);
+    float step_new = rate_limit_v04(tt->offset, target_offset, step, ramp);
+    smooth_value(&tt->step_smooth, step_new, half_time, cfg->hertz);
+    tt->offset += tt->step_smooth;
 }
 
 void torque_tilt_winddown(TorqueTilt *tt) {

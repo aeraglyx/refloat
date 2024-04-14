@@ -50,6 +50,7 @@ typedef struct {
     float atr_filtered_current;
     float current_filtered;
     // float atr_smoothing;
+    float filter_half_time;
 } MotorData;
 
 void motor_data_reset(MotorData *m);

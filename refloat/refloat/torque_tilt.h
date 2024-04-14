@@ -26,7 +26,7 @@ typedef struct {
     float off_step_size;
 
     float offset;  // rate-limited setpoint offset
-    // float step_smooth;
+    float step_smooth;
 } TorqueTilt;
 
 void torque_tilt_reset(TorqueTilt *tt);

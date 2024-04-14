@@ -49,6 +49,7 @@ void motor_data_configure(MotorData *m, float frequency) {
     } else {
         m->atr_filter_enabled = false;
     }
+    m->filter_half_time = 1.0f / (frequency * 800.0f);
     // m->atr_smoothing = get_smoothing_factor(1.0f / fmaxf(cfg->atr_filter, 1.0f), cfg->hertz);
 }
 
@@ -66,8 +67,8 @@ void motor_data_update(MotorData *m) {
     // smooth_value(&m->acceleration, current_acceleration, accel_half_time, 800);
     // smooth_value(&m->accel_clamped, current_accel_clamped, accel_half_time, 800);
     // float atr_smoothing = get_smoothing_factor(0.05f, 800);
-    smooth_value(&m->acceleration, current_acceleration, 0.1f, 800);
-    smooth_value(&m->accel_clamped, current_accel_clamped, 0.1f, 800);
+    smooth_value(&m->acceleration, current_acceleration, m->filter_half_time, 800);
+    smooth_value(&m->accel_clamped, current_accel_clamped, m->filter_half_time, 800);
     // m->acceleration = m->acceleration * 0.98f + current_acceleration * 0.02f;
     // m->accel_clamped = m->accel_clamped * 0.98f + current_accel_clamped * 0.02f;
     m->last_erpm = m->erpm;

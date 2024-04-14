@@ -61,6 +61,12 @@ float rate_limit_v03(float interpolated, float target, float step, float ramp) {
     return interpolated + step * step_multiplier;
 }
 
+float rate_limit_v04(float interpolated, float target, float step, float ramp) {
+    float offset = target - interpolated;
+    float step_multiplier = clampf(offset / fmaxf(ramp, 0.01f), -1.0f, 1.0f);
+    return step * step_multiplier;
+}
+
 // float get_step(float offset, float step_max, float ramp) {
 //     const float ramp_limited = fmaxf(ramp, 0.01f);
 //     const float step_multiplier = clampf(offset / ramp_limited, -1.0f, 1.0f);

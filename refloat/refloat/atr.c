@@ -29,7 +29,7 @@ void atr_reset(ATR *atr) {
     atr->offset = 0.0f;
     atr->braketilt_target_offset = 0.0f;
     atr->braketilt_offset = 0.0f;
-    // atr->step_smooth = 0.0f;
+    atr->step_smooth = 0.0f;
 }
 
 void atr_configure(ATR *atr, const RefloatConfig *cfg) {
@@ -72,18 +72,17 @@ void atr_configure(ATR *atr, const RefloatConfig *cfg) {
 static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
     float atr_threshold = mot->braking ? cfg->atr_threshold_down : cfg->atr_threshold_up;
     float accel_factor = cfg->atr_amps_accel_ratio;
-    // float accel_factor =
-    //     mot->braking ? cfg->atr_amps_decel_ratio : cfg->atr_amps_accel_ratio;
+    float offset_per_erpm = cfg->atr_amps_decel_ratio;
     // float measured_acc = clampf(mot->acceleration, -5.0f, 5.0f);
 
-    float amp_offset = 0.0002f * mot->erpm_smooth * accel_factor;
-    float amps_adjusted = mot->current_filtered - amp_offset;
-    float expected_acc = amps_adjusted / accel_factor;
-    // atr->accel_diff = expected_acc - mot->accel_clamped;
+    // float amp_offset = 0.00015f * mot->erpm_smooth * accel_factor;
+    // float amps_adjusted = mot->current_filtered - amp_offset;
+    float amp_offset = offset_per_erpm * mot->erpm_smooth;
+    float expected_acc = (mot->current_filtered - amp_offset) / accel_factor;
 
     float new_accel_diff = expected_acc - mot->accel_clamped;
-    float accel_diff_half_time = 0.1f * exp2f(-0.002f * mot->erpm_smooth);
-    smooth_value(&atr->accel_diff, new_accel_diff, accel_diff_half_time, 800);
+    float accel_diff_half_time = 0.125f * exp2f(-0.002f * mot->erpm_smooth);
+    smooth_value(&atr->accel_diff, new_accel_diff, accel_diff_half_time, cfg->hertz);
     // atr->accel_diff = 0.95f * atr->accel_diff + 0.05f * new_accel_diff;
 
     bool forward = mot->erpm_filtered > 0;
@@ -94,14 +93,14 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
     float atr_strength =
         forward == (atr->accel_diff > 0) ? cfg->atr_strength_up : cfg->atr_strength_down;
 
-    // atr->speed_boost = 0.0f;
     atr->speed_boost = exp2f(cfg->atr_speed_boost * fabsf(mot->erpm_smooth) / 10000);
 
     float new_atr_target = atr->accel_diff * atr_strength * atr->speed_boost;
 
     dead_zonef(&new_atr_target, atr_threshold);
     angle_limitf(&new_atr_target, cfg->atr_angle_limit);
-    atr->target_offset = 0.95f * atr->target_offset + 0.05f * new_atr_target;
+    // atr->target_offset = 0.95f * atr->target_offset + 0.05f * new_atr_target;
+    atr->target_offset = new_atr_target;
 
     float ramp = cfg->booster_angle / 10.0f;
     float half_time = cfg->booster_ramp / 50.0f;
@@ -112,8 +111,10 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
     step *= response_boost;
 
     // rate_limit_v02(&atr->offset, atr->target_offset, step, ramp);
-    float interpolated = rate_limit_v03(atr->offset, atr->target_offset, step, ramp);
-    smooth_value(&atr->offset, interpolated, half_time, cfg->hertz);
+    // smooth_value(&atr->offset, interpolated, half_time, cfg->hertz);
+    float step_new = rate_limit_v04(atr->offset, atr->target_offset, step, ramp);
+    smooth_value(&atr->step_smooth, step_new, half_time, cfg->hertz);
+    atr->offset += atr->step_smooth;
 }
 
 static void braketilt_update(
