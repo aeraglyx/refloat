@@ -81,7 +81,7 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
     float expected_acc = (mot->current_filtered - amp_offset) / accel_factor;
 
     float new_accel_diff = expected_acc - mot->accel_clamped;
-    float accel_diff_half_time = 0.125f * exp2f(-0.002f * mot->erpm_smooth);
+    float accel_diff_half_time = 0.15f * exp2f(-0.003f * mot->erpm_smooth);
     smooth_value(&atr->accel_diff, new_accel_diff, accel_diff_half_time, cfg->hertz);
     // atr->accel_diff = 0.95f * atr->accel_diff + 0.05f * new_accel_diff;
 
