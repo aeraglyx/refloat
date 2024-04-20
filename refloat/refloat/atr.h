@@ -1,3 +1,4 @@
+
 // Copyright 2022 Dado Mista
 // Copyright 2024 Lukas Hrazky
 //
@@ -23,14 +24,15 @@
 
 // includes braketilt as well, at least for now
 typedef struct {
-    float on_step_size;
-    float off_step_size;
+    float step_size_on;
+    float step_size_off;
 
     float accel_diff;
     float speed_boost;
 
-    float target_offset;  // setpoint target offset
-    float offset;  // rate-limited setpoint offset
+    float target;
+    float interpolated;
+    float step_smooth;
 
     float speed_boost_mult;
 

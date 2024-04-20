@@ -22,13 +22,16 @@
 #include "vesc_c_if.h"
 
 #include "atr.h"
+#include "torque_tilt.h"
+#include "turn_tilt.h"
+
 #include "charging.h"
 #include "footpad_sensor.h"
 #include "lcm.h"
 #include "leds.h"
 #include "motor_data.h"
+#include "imu_data.h"
 #include "state.h"
-#include "torque_tilt.h"
 #include "utils.h"
 
 #include "conf/buffer.h"
@@ -79,6 +82,7 @@ typedef struct {
     MotorData motor;
     TorqueTilt torque_tilt;
     ATR atr;
+    TurnTilt turn_tilt;
 
     // Beeper
     int beep_num_left;
@@ -114,6 +118,7 @@ typedef struct {
     BalanceFilterData balance_filter;
 
     // Runtime values read from elsewhere
+    IMUData imu;
     float pitch, roll;
     float balance_pitch;
     float gyro[3];
@@ -256,6 +261,7 @@ static void reconfigure(data *d) {
     balance_filter_configure(&d->balance_filter, &d->float_conf);
     torque_tilt_configure(&d->torque_tilt, &d->float_conf);
     atr_configure(&d->atr, &d->float_conf);
+    turn_tilt_configure(&d->turn_tilt, &d->float_conf);
 }
 
 static void configure(data *d) {
@@ -360,12 +366,14 @@ static void configure(data *d) {
 
 static void reset_vars(data *d) {
     motor_data_reset(&d->motor);
+    imu_data_reset(&d->imu);
     atr_reset(&d->atr);
     torque_tilt_reset(&d->torque_tilt);
+    turn_tilt_reset(&d->turn_tilt);
 
     // Set values for startup
-    d->setpoint = d->balance_pitch;
-    d->setpoint_target_interpolated = d->balance_pitch;
+    d->setpoint = d->imu.pitch_balance;
+    d->setpoint_target_interpolated = d->imu.pitch_balance;
     d->setpoint_target = 0;
     d->applied_booster_current = 0;
     d->noseangling_interpolated = 0;
@@ -540,7 +548,7 @@ static bool check_faults(data *d) {
             // Rolling forward (not backwards!)
             d->motor.erpm > (d->float_conf.fault_adc_half_erpm * 2) &&
             // Not tipped over
-            fabsf(d->roll) < 40;
+            fabsf(d->imu.roll) < 40;
 
         // Check switch
         // Switch fully open
@@ -561,8 +569,8 @@ static bool check_faults(data *d) {
                 }
             }
 
-            if (d->motor.abs_erpm < 200 && fabsf(d->pitch) > 14 &&
-                fabsf(d->inputtilt_interpolated) < 30 && sign(d->pitch) == d->motor.erpm_sign) {
+            if (d->motor.abs_erpm < 200 && fabsf(d->imu.pitch) > 14 &&
+                fabsf(d->inputtilt_interpolated) < 30 && sign(d->imu.pitch) == d->motor.erpm_sign) {
                 state_stop(&d->state, STOP_QUICKSTOP);
                 return true;
             }
@@ -577,17 +585,17 @@ static bool check_faults(data *d) {
                 state_stop(&d->state, STOP_SWITCH_FULL);
                 return true;
             }
-            if (fabsf(d->pitch) > 15) {
+            if (fabsf(d->imu.pitch) > 15) {
                 state_stop(&d->state, STOP_REVERSE_STOP);
                 return true;
             }
             // Above 10 degrees for a half a second? Switch it off
-            if (fabsf(d->pitch) > 10 && d->current_time - d->reverse_timer > .5) {
+            if (fabsf(d->imu.pitch) > 10 && d->current_time - d->reverse_timer > .5) {
                 state_stop(&d->state, STOP_REVERSE_STOP);
                 return true;
             }
             // Above 5 degrees for a full second? Switch it off
-            if (fabsf(d->pitch) > 5 && d->current_time - d->reverse_timer > 1) {
+            if (fabsf(d->imu.pitch) > 5 && d->current_time - d->reverse_timer > 1) {
                 state_stop(&d->state, STOP_REVERSE_STOP);
                 return true;
             }
@@ -595,7 +603,7 @@ static bool check_faults(data *d) {
                 state_stop(&d->state, STOP_REVERSE_STOP);
                 return true;
             }
-            if (fabsf(d->pitch) < 5) {
+            if (fabsf(d->imu.pitch) < 5) {
                 d->reverse_timer = d->current_time;
             }
         }
@@ -614,7 +622,7 @@ static bool check_faults(data *d) {
         }
 
         // Check roll angle
-        if (fabsf(d->roll) > d->float_conf.fault_roll) {
+        if (fabsf(d->imu.roll) > d->float_conf.fault_roll) {
             if ((1000.0 * (d->current_time - d->fault_angle_roll_timer)) >
                 d->float_conf.fault_delay_roll) {
                 state_stop(&d->state, STOP_ROLL);
@@ -624,7 +632,7 @@ static bool check_faults(data *d) {
             d->fault_angle_roll_timer = d->current_time;
 
             if (d->float_conf.fault_darkride_enabled) {
-                if (fabsf(d->roll) > 100 && fabsf(d->roll) < 135) {
+                if (fabsf(d->imu.roll) > 100 && fabsf(d->imu.roll) < 135) {
                     state_stop(&d->state, STOP_ROLL);
                     return true;
                 }
@@ -639,7 +647,7 @@ static bool check_faults(data *d) {
     }
 
     // Check pitch angle
-    if (fabsf(d->pitch) > d->float_conf.fault_pitch && fabsf(d->inputtilt_interpolated) < 30) {
+    if (fabsf(d->imu.pitch) > d->float_conf.fault_pitch && fabsf(d->inputtilt_interpolated) < 30) {
         if ((1000.0 * (d->current_time - d->fault_angle_pitch_timer)) >
             d->float_conf.fault_delay_pitch) {
             state_stop(&d->state, STOP_PITCH);
@@ -842,6 +850,12 @@ static void calculate_setpoint_interpolated(data *d) {
     }
 }
 
+void aggregate_tiltbacks(data *d){
+    d->setpoint += d->atr.offset + d->atr.braketilt_offset;
+    d->setpoint += d->torque_tilt.offset;
+    d->setpoint += d->turn_tilt.interpolated;
+}
+
 static void add_surge(data *d) {
     if (d->surge_enable) {
         float surge_now = 0;
@@ -954,88 +968,6 @@ static void apply_inputtilt(data *d) {
     d->setpoint += d->inputtilt_interpolated;
 }
 
-static void apply_turntilt(data *d) {
-    if (d->float_conf.turntilt_strength == 0) {
-        return;
-    }
-
-    float abs_yaw_aggregate = fabsf(d->yaw_aggregate);
-
-    // incremental turn increment since the last iteration
-    float turn_increment = d->abs_yaw_change;
-
-    // Minimum threshold based on
-    // a) minimum degrees per second (yaw/turn increment)
-    // b) minimum yaw aggregate (to filter out wiggling on uneven road)
-    if (abs_yaw_aggregate < d->float_conf.turntilt_start_angle || turn_increment < 0.04) {
-        d->turntilt_target = 0;
-    } else {
-        // Calculate desired angle
-        float turn_change = d->abs_yaw_change;
-        d->turntilt_target = turn_change * d->float_conf.turntilt_strength;
-
-        // Apply speed scaling
-        float boost;
-        if (d->motor.abs_erpm < d->float_conf.turntilt_erpm_boost_end) {
-            boost = 1.0 + d->motor.abs_erpm * d->turntilt_boost_per_erpm;
-        } else {
-            boost = 1.0 + (float) d->float_conf.turntilt_erpm_boost / 100.0;
-        }
-        d->turntilt_target *= boost;
-
-        // Increase turntilt based on aggregate yaw change (at most: double it)
-        float aggregate_damper = 1.0;
-        if (d->motor.abs_erpm < 2000) {
-            aggregate_damper = 0.5;
-        }
-        boost = 1 + aggregate_damper * abs_yaw_aggregate / d->yaw_aggregate_target;
-        boost = fminf(boost, 2);
-        d->turntilt_target *= boost;
-
-        // Limit angle to max angle
-        if (d->turntilt_target > 0) {
-            d->turntilt_target = fminf(d->turntilt_target, d->float_conf.turntilt_angle_limit);
-        } else {
-            d->turntilt_target = fmaxf(d->turntilt_target, -d->float_conf.turntilt_angle_limit);
-        }
-
-        // Disable below erpm threshold otherwise add directionality
-        if (d->motor.abs_erpm < d->float_conf.turntilt_start_erpm) {
-            d->turntilt_target = 0;
-        } else {
-            d->turntilt_target *= d->motor.erpm_sign;
-        }
-
-        // ATR interference: Reduce turntilt_target during moments of high torque response
-        float atr_min = 2;
-        float atr_max = 5;
-        if (sign(d->atr.target_offset) != sign(d->turntilt_target)) {
-            // further reduced turntilt during moderate to steep downhills
-            atr_min = 1;
-            atr_max = 4;
-        }
-        if (fabsf(d->atr.target_offset) > atr_min) {
-            // Start scaling turntilt when ATR>2, down to 0 turntilt for ATR > 5 degrees
-            float atr_scaling = (atr_max - fabsf(d->atr.target_offset)) / (atr_max - atr_min);
-            if (atr_scaling < 0) {
-                atr_scaling = 0;
-                // during heavy torque response clear the yaw aggregate too
-                d->yaw_aggregate = 0;
-            }
-            d->turntilt_target *= atr_scaling;
-        }
-        if (fabsf(d->balance_pitch - d->noseangling_interpolated) > 4) {
-            // no setpoint changes during heavy acceleration or braking
-            d->turntilt_target = 0;
-            d->yaw_aggregate = 0;
-        }
-    }
-
-    // Move towards target limited by max speed
-    rate_limitf(&d->turntilt_interpolated, d->turntilt_target, d->turntilt_step_size);
-    d->setpoint += d->turntilt_interpolated;
-}
-
 static void brake(data *d) {
     // Brake timeout logic
     float brake_timeout_length = 1;  // Brake Timeout hard-coded to 1s
@@ -1073,40 +1005,38 @@ static void refloat_thd(void *arg) {
         charging_timeout(&d->charging, &d->state);
 
         d->current_time = VESC_IF->system_time();
-
-        d->pitch = rad2deg(VESC_IF->imu_get_pitch());
-        d->roll = rad2deg(VESC_IF->imu_get_roll());
-        d->balance_pitch = rad2deg(balance_filter_get_pitch(&d->balance_filter));
+        
+        imu_data_update(&d->imu, &d->balance_filter);
 
         // Darkride:
-        if (d->float_conf.fault_darkride_enabled) {
-            float abs_roll = fabsf(d->roll);
-            if (d->state.darkride) {
-                if (abs_roll < 120) {
-                    d->state.darkride = false;
-                }
-            } else if (d->enable_upside_down) {
-                if (abs_roll > 150) {
-                    d->state.darkride = true;
-                    d->is_upside_down_started = false;
-                }
-            }
-        }
+        // if (d->float_conf.fault_darkride_enabled) {
+        //     float abs_roll = fabsf(d->imu.roll);
+        //     if (d->state.darkride) {
+        //         if (abs_roll < 120) {
+        //             d->state.darkride = false;
+        //         }
+        //     } else if (d->enable_upside_down) {
+        //         if (abs_roll > 150) {
+        //             d->state.darkride = true;
+        //             d->is_upside_down_started = false;
+        //         }
+        //     }
+        // }
 
-        if (d->state.mode == MODE_FLYWHEEL) {
-            // flip sign and use offsets
-            d->pitch = d->flywheel_pitch_offset - d->pitch;
-            d->balance_pitch = d->pitch;
-            d->roll -= d->flywheel_roll_offset;
-            if (d->roll < -200) {
-                d->roll += 360;
-            } else if (d->roll > 200) {
-                d->roll -= 360;
-            }
-        } else if (d->state.darkride) {
-            d->balance_pitch = -d->balance_pitch - d->darkride_setpoint_correction;
-            d->pitch = -d->pitch - d->darkride_setpoint_correction;
-        }
+        // if (d->state.mode == MODE_FLYWHEEL) {
+        //     // flip sign and use offsets
+        //     d->imu.pitch = d->flywheel_pitch_offset - d->imu.pitch;
+        //     d->imu.pitch_balance = d->imu.pitch;
+        //     d->imu.roll -= d->flywheel_roll_offset;
+        //     if (d->imu.roll < -200) {
+        //         d->imu.roll += 360;
+        //     } else if (d->imu.roll > 200) {
+        //         d->imu.roll -= 360;
+        //     }
+        // } else if (d->state.darkride) {
+        //     d->imu.pitch_balance = -d->imu.pitch_balance - d->darkride_setpoint_correction;
+        //     d->imu.pitch = -d->imu.pitch - d->darkride_setpoint_correction;
+        // }
 
         VESC_IF->imu_get_gyro(d->gyro);
 
@@ -1147,32 +1077,32 @@ static void refloat_thd(void *arg) {
 
         d->throttle_val = servo_val;
 
-        // Turn Tilt:
-        d->yaw_angle = VESC_IF->imu_get_yaw() * 180.0f / M_PI;
-        float new_change = d->yaw_angle - d->last_yaw_angle;
-        bool unchanged = false;
-        if ((new_change == 0)  // Exact 0's only happen when the IMU is not updating between loops
-            || (fabsf(new_change) > 100))  // yaw flips signs at 180, ignore those changes
-        {
-            new_change = d->last_yaw_change;
-            unchanged = true;
-        }
-        d->last_yaw_change = new_change;
-        d->last_yaw_angle = d->yaw_angle;
+        // // Turn Tilt:
+        // d->yaw_angle = VESC_IF->imu_get_yaw() * 180.0f / M_PI;
+        // float new_change = d->yaw_angle - d->last_yaw_angle;
+        // bool unchanged = false;
+        // if ((new_change == 0)  // Exact 0's only happen when the IMU is not updating between loops
+        //     || (fabsf(new_change) > 100))  // yaw flips signs at 180, ignore those changes
+        // {
+        //     new_change = d->last_yaw_change;
+        //     unchanged = true;
+        // }
+        // d->last_yaw_change = new_change;
+        // d->last_yaw_angle = d->yaw_angle;
 
-        // To avoid overreactions at low speed, limit change here:
-        new_change = fminf(new_change, 0.10);
-        new_change = fmaxf(new_change, -0.10);
-        d->yaw_change = d->yaw_change * 0.8 + 0.2 * (new_change);
-        // Clear the aggregate yaw whenever we change direction
-        if (sign(d->yaw_change) != sign(d->yaw_aggregate)) {
-            d->yaw_aggregate = 0;
-        }
-        d->abs_yaw_change = fabsf(d->yaw_change);
-        // don't count tiny yaw changes towards aggregate
-        if ((d->abs_yaw_change > 0.04) && !unchanged) {
-            d->yaw_aggregate += d->yaw_change;
-        }
+        // // To avoid overreactions at low speed, limit change here:
+        // new_change = fminf(new_change, 0.10);
+        // new_change = fmaxf(new_change, -0.10);
+        // d->yaw_change = d->yaw_change * 0.8 + 0.2 * (new_change);
+        // // Clear the aggregate yaw whenever we change direction
+        // if (sign(d->yaw_change) != sign(d->yaw_aggregate)) {
+        //     d->yaw_aggregate = 0;
+        // }
+        // d->abs_yaw_change = fabsf(d->yaw_change);
+        // // don't count tiny yaw changes towards aggregate
+        // if ((d->abs_yaw_change > 0.04) && !unchanged) {
+        //     d->yaw_aggregate += d->yaw_change;
+        // }
 
         footpad_sensor_update(&d->footpad_sensor, &d->float_conf);
 
@@ -1243,21 +1173,25 @@ static void refloat_thd(void *arg) {
                     atr_and_braketilt_winddown(&d->atr);
                 } else {
                     apply_noseangling(d);
-                    apply_turntilt(d);
+                    // apply_turntilt(d);
                     torque_tilt_update(&d->torque_tilt, &d->motor, &d->float_conf);
+                    turn_tilt_update(&d->turn_tilt, &d->motor, &d->imu, &d->atr, &d->float_conf);
                     atr_and_braketilt_update(&d->atr, &d->motor, &d->float_conf, d->proportional);
                 }
+
+                aggregate_tiltbacks(d);
 
                 // aggregated torque tilts:
                 // if signs match between torque tilt and ATR + brake tilt, use the more significant
                 // one if signs do not match, they are simply added together
-                float ab_offset = d->atr.offset + d->atr.braketilt_offset;
-                if (sign(ab_offset) == sign(d->torque_tilt.offset)) {
-                    d->setpoint +=
-                        sign(ab_offset) * fmaxf(fabsf(ab_offset), fabsf(d->torque_tilt.offset));
-                } else {
-                    d->setpoint += ab_offset + d->torque_tilt.offset;
-                }
+                // float ab_offset = d->atr.offset + d->atr.braketilt_offset;
+                // if (sign(ab_offset) == sign(d->torque_tilt.offset)) {
+                //     d->setpoint +=
+                //         sign(ab_offset) * fmaxf(fabsf(ab_offset), fabsf(d->torque_tilt.offset));
+                // } else {
+                //     d->setpoint += ab_offset + d->torque_tilt.offset;
+                // }
+                // d->setpoint += d->turn_tilt.interpolated
             }
 
             // Prepare Brake Scaling (ramp scale values as needed for smooth transitions)
@@ -1286,7 +1220,7 @@ static void refloat_thd(void *arg) {
             }
 
             // Do PID maths
-            d->proportional = d->setpoint - d->balance_pitch;
+            d->proportional = d->setpoint - d->imu.pitch_balance;
             bool tail_down = sign(d->proportional) != d->motor.erpm_sign;
 
             // Resume real PID maths
@@ -1331,7 +1265,7 @@ static void refloat_thd(void *arg) {
 
                 // Apply Booster (Now based on True Pitch)
                 // Braketilt excluded to allow for soft brakes that strengthen when near tail-drag
-                float true_proportional = d->setpoint - d->atr.braketilt_offset - d->pitch;
+                float true_proportional = d->setpoint - d->atr.braketilt_offset - d->imu.pitch;
                 float abs_proportional = fabsf(true_proportional);
 
                 float booster_current, booster_angle, booster_ramp;
@@ -1422,7 +1356,7 @@ static void refloat_thd(void *arg) {
                 }
             }
 
-            if (d->state.mode != MODE_FLYWHEEL && d->pitch > 75 && d->pitch < 105) {
+            if (d->state.mode != MODE_FLYWHEEL && d->imu.pitch > 75 && d->imu.pitch < 105) {
                 if (konami_check(&d->flywheel_konami, &d->footpad_sensor, d->current_time)) {
                     unsigned char enabled[6] = {0x82, 0, 0, 0, 0, 1};
                     cmd_flywheel_toggle(d, enabled, 6);
@@ -1463,16 +1397,16 @@ static void refloat_thd(void *arg) {
             check_odometer(d);
 
             // Check for valid startup position and switch state
-            if (fabsf(d->balance_pitch) < d->startup_pitch_tolerance &&
-                fabsf(d->roll) < d->float_conf.startup_roll_tolerance && is_engaged(d)) {
+            if (fabsf(d->imu.pitch_balance) < d->startup_pitch_tolerance &&
+                fabsf(d->imu.roll) < d->float_conf.startup_roll_tolerance && is_engaged(d)) {
                 reset_vars(d);
                 break;
             }
             // Ignore roll for the first second while it's upside down
-            if (d->state.darkride && (fabsf(d->balance_pitch) < d->startup_pitch_tolerance)) {
+            if (d->state.darkride && (fabsf(d->imu.pitch_balance) < d->startup_pitch_tolerance)) {
                 if ((d->current_time - d->disengage_timer) > 1) {
                     // after 1 second:
-                    if (fabsf(fabsf(d->roll) - 180) < d->float_conf.startup_roll_tolerance) {
+                    if (fabsf(fabsf(d->imu.roll) - 180) < d->float_conf.startup_roll_tolerance) {
                         reset_vars(d);
                         break;
                     }
@@ -1488,7 +1422,7 @@ static void refloat_thd(void *arg) {
             // Push-start aka dirty landing Part II
             if (d->float_conf.startup_pushstart_enabled && d->motor.abs_erpm > 1000 &&
                 is_engaged(d)) {
-                if ((fabsf(d->balance_pitch) < 45) && (fabsf(d->roll) < 45)) {
+                if ((fabsf(d->imu.pitch_balance) < 45) && (fabsf(d->imu.roll) < 45)) {
                     // 45 to prevent board engaging when upright or laying sideways
                     // 45 degree tolerance is more than plenty for tricks / extreme mounts
                     reset_vars(d);
@@ -1658,8 +1592,8 @@ static void send_realtime_data(data *d) {
 
     // RT Data
     buffer_append_float32_auto(buffer, d->pid_value, &ind);
-    buffer_append_float32_auto(buffer, d->balance_pitch, &ind);
-    buffer_append_float32_auto(buffer, d->roll, &ind);
+    buffer_append_float32_auto(buffer, d->imu.pitch_balance, &ind);
+    buffer_append_float32_auto(buffer, d->imu.roll, &ind);
 
     uint8_t state = (state_compat(&d->state) & 0xF);
     buffer[ind++] = (state & 0xF) + (sat_compat(&d->state) << 4);
@@ -1680,7 +1614,7 @@ static void send_realtime_data(data *d) {
     buffer_append_float32_auto(buffer, d->inputtilt_interpolated, &ind);
 
     // DEBUG
-    buffer_append_float32_auto(buffer, d->pitch, &ind);
+    buffer_append_float32_auto(buffer, d->imu.pitch, &ind);
     buffer_append_float32_auto(buffer, d->motor.atr_filtered_current, &ind);
     buffer_append_float32_auto(buffer, d->atr.accel_diff, &ind);
     if (d->state.charging) {
@@ -1712,8 +1646,8 @@ static void cmd_send_all_data(data *d, unsigned char mode) {
 
         // RT Data
         buffer_append_float16(buffer, d->pid_value, 10, &ind);
-        buffer_append_float16(buffer, d->balance_pitch, 10, &ind);
-        buffer_append_float16(buffer, d->roll, 10, &ind);
+        buffer_append_float16(buffer, d->imu.pitch_balance, 10, &ind);
+        buffer_append_float16(buffer, d->imu.roll, 10, &ind);
 
         uint8_t state = (state_compat(&d->state) & 0xF) + (sat_compat(&d->state) << 4);
         buffer[ind++] = state;
@@ -1737,7 +1671,7 @@ static void cmd_send_all_data(data *d, unsigned char mode) {
         buffer[ind++] = d->turntilt_interpolated * 5 + 128;
         buffer[ind++] = d->inputtilt_interpolated * 5 + 128;
 
-        buffer_append_float16(buffer, d->pitch, 10, &ind);
+        buffer_append_float16(buffer, d->imu.pitch, 10, &ind);
         buffer[ind++] = d->applied_booster_current + 128;
 
         // Now send motor stuff:
@@ -2238,13 +2172,13 @@ static void cmd_flywheel_toggle(data *d, unsigned char *cfg, int len) {
     if (d->state.mode == MODE_FLYWHEEL) {
         if ((d->flywheel_pitch_offset == 0) || (command == 2)) {
             // accidental button press?? board isn't evn close to being upright
-            if (fabsf(d->pitch) < 70) {
+            if (fabsf(d->imu.pitch) < 70) {
                 d->state.mode = MODE_NORMAL;
                 return;
             }
 
-            d->flywheel_pitch_offset = d->pitch;
-            d->flywheel_roll_offset = d->roll;
+            d->flywheel_pitch_offset = d->imu.pitch;
+            d->flywheel_roll_offset = d->imu.roll;
             beep_alert(d, 1, 1);
         } else {
             beep_alert(d, 3, 0);
@@ -2365,9 +2299,9 @@ static void send_realtime_data2(data *d) {
 
     buffer[ind++] = d->beep_reason;
 
-    buffer_append_float32_auto(buffer, d->pitch, &ind);
-    buffer_append_float32_auto(buffer, d->balance_pitch, &ind);
-    buffer_append_float32_auto(buffer, d->roll, &ind);
+    buffer_append_float32_auto(buffer, d->imu.pitch, &ind);
+    buffer_append_float32_auto(buffer, d->imu.pitch_balance, &ind);
+    buffer_append_float32_auto(buffer, d->imu.roll, &ind);
 
     buffer_append_float32_auto(buffer, d->footpad_sensor.adc1, &ind);
     buffer_append_float32_auto(buffer, d->footpad_sensor.adc2, &ind);
@@ -2549,7 +2483,7 @@ static void on_command_received(unsigned char *buffer, unsigned int len) {
     }
     case COMMAND_LCM_POLL: {
         lcm_poll_request(&d->lcm, &buffer[2], len - 2);
-        lcm_poll_response(&d->lcm, &d->state, d->footpad_sensor.state, &d->motor, d->pitch);
+        lcm_poll_response(&d->lcm, &d->state, d->footpad_sensor.state, &d->motor, d->imu.pitch);
         return;
     }
     case COMMAND_LCM_LIGHT_INFO: {

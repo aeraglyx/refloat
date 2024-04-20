@@ -1,3 +1,4 @@
+c
 // Copyright 2022 Dado Mista
 // Copyright 2024 Lukas Hrazky
 //
@@ -23,46 +24,48 @@
 #include <math.h>
 
 void torque_tilt_reset(TorqueTilt *tt) {
-    tt->offset = 0;
+    tt->interpolated = 0.0f;
+    tt->step_smooth = 0.0f;
 }
 
-void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *config) {
-    tt->on_step_size = config->torquetilt_on_speed / config->hertz;
-    tt->off_step_size = config->torquetilt_off_speed / config->hertz;
+void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *cfg) {
+    tt->step_size_on = cfg->torquetilt_on_speed / cfg->hertz;
+    tt->step_size_off = cfg->torquetilt_off_speed / cfg->hertz;
 }
 
-void torque_tilt_update(TorqueTilt *tt, const MotorData *motor, const RefloatConfig *config) {
+void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfig *cfg) {
     float strength =
-        motor->braking ? config->torquetilt_strength_regen : config->torquetilt_strength;
+        mot->braking ? cfg->torquetilt_strength_regen : cfg->torquetilt_strength;
+    float accel_factor = cfg->atr_amps_accel_ratio;
 
-    // Take abs motor current, subtract start offset, and take the max of that
-    // with 0 to get the current above our start threshold (absolute). Then
-    // multiply it by "power" to get our desired angle, and min with the limit
-    // to respect boundaries. Finally multiply it by motor current sign to get
-    // directionality back.
-    float target_offset =
-        fminf(
-            fmaxf((fabsf(motor->atr_filtered_current) - config->torquetilt_start_current), 0) *
-                strength,
-            config->torquetilt_angle_limit
-        ) *
-        sign(motor->atr_filtered_current);
+    // float amp_offset_speed = 0.00022f * mot->erpm_smooth * accel_factor;
+    // float amp_offset_atr = accel_diff * accel_factor;
+    // float amps_adjusted = mot->atr_filtered_current - amp_offset_speed - amp_offset_atr;
 
-    float step_size = 0;
-    if ((tt->offset - target_offset > 0 && target_offset > 0) ||
-        (tt->offset - target_offset < 0 && target_offset < 0)) {
-        step_size = tt->off_step_size;
-    } else {
-        step_size = tt->on_step_size;
-    }
+    float current = mot->current_filtered;
+    float current_based_on_accel = mot->accel_clamped * accel_factor;
+    // float acceleration = clampf(mot->acceleration, -5.0f, 5.0f);
+    // float current_based_on_accel = acceleration * accel_factor;
 
-    if (motor->abs_erpm < 500) {
-        step_size /= 2;
-    }
+    float method = cfg->brkbooster_angle;
+    float target = (1.0f - method) * current + method * current_based_on_accel;
 
-    rate_limitf(&tt->offset, target_offset, step_size);
+    dead_zonef(&target, cfg->torquetilt_start_current);
+    target *= strength;
+    angle_limitf(&target, cfg->torquetilt_angle_limit);
+
+    float ramp = cfg->booster_angle / 10.0f;
+    float half_time = cfg->booster_ramp / 50.0f;
+
+    // float step = set_step(tt->interpolated, target, tt->on_step_size, tt->off_step_size, 0.25f * ramp);
+    // rate_limit_v02(&tt->interpolated, target, step, ramp);
+    // float interpolated = rate_limit_v03(tt->interpolated, target, step, ramp);
+    float step = set_step(tt->interpolated, target, tt->step_size_on, tt->step_size_off);
+    float step_new = rate_limit_v04(tt->interpolated, target, step, ramp);
+    smooth_value(&tt->step_smooth, step_new, half_time, cfg->hertz);
+    tt->interpolated += tt->step_smooth;
 }
 
 void torque_tilt_winddown(TorqueTilt *tt) {
-    tt->offset *= 0.995;
+    tt->interpolated *= 0.995;
 }

@@ -1,3 +1,4 @@
+
 // Copyright 2024 Lukas Hrazky
 //
 // This file is part of the Refloat VESC package.
@@ -97,3 +98,22 @@ float clampf(float value, float min, float max);
  * @param step A maximum unit of change of @p value.
  */
 void rate_limitf(float *value, float target, float step);
+// float get_step(float offset, float step_max, float ramp);
+void smooth_value(float *value_smooth, float value_current, float half_time_sec, uint16_t hertz);
+// void rate_limit_v02(float *interpolated, float target, float max_step, float ramp);
+float rate_limit_v03(float interpolated, float target, float max_step, float ramp);
+float rate_limit_v04(float interpolated, float target, float max_step, float ramp);
+float set_step(float interpolated, float target, float step_on, float step_off);
+// float set_step(float interpolated, float target, float step_on, float step_off, float ramp);
+// void rate_limit_smooth(float *value, float target, float max_step, float ramp);
+// void limit_speed(float *value, float target, float speed, float max_speed, uint16_t freq);
+
+void angle_limitf(float *angle_in, float angle_limit);
+
+void dead_zonef(float *value, float threshold);
+
+// float sigmoid(float x, float radius);
+// float sigmoid_norm(float x, float radius);
+
+// float remap(float x, float a, float b);
+// float remap_norm(float x, float a, float b);

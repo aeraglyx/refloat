@@ -20,19 +20,19 @@
 
 #include "conf/datatypes.h"
 #include "motor_data.h"
+#include "imu_data.h"
+#include "atr.h"
 
 typedef struct {
-    float step_size_on;
-    float step_size_off;
+    float step_size;
+    float target;
+    float interpolated;
+} TurnTilt;
 
-    float interpolated;  // rate-limited setpoint offset
-    float step_smooth;
-} TorqueTilt;
+void turn_tilt_reset(TurnTilt *tt);
 
-void torque_tilt_reset(TorqueTilt *tt);
+void turn_tilt_configure(TurnTilt *tt, const RefloatConfig *config);
 
-void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *config);
+void turn_tilt_update(TurnTilt *tt, const MotorData *motor, IMUData *imu, ATR *atr, const RefloatConfig *config);
 
-void torque_tilt_update(TorqueTilt *tt, const MotorData *motor, const RefloatConfig *config);
-
-void torque_tilt_winddown(TorqueTilt *tt);
+// void torque_tilt_winddown(TurnTilt *tt);

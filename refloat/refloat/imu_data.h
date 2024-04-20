@@ -1,4 +1,3 @@
-
 // Copyright 2024 Lukas Hrazky
 //
 // This file is part of the Refloat VESC package.
@@ -18,44 +17,33 @@
 
 #pragma once
 
-#include "biquad.h"
+#include "balance_filter.h"
+#include "conf/datatypes.h"
 
 #include <stdbool.h>
 #include <stdint.h>
 
-#define ACCEL_ARRAY_SIZE 40
-
 typedef struct {
-    float erpm;
-    float erpm_filtered;
-    float abs_erpm;
-    float last_erpm;
-    int8_t erpm_sign;
-    // float erpm_last;
-    float erpm_smooth;
+    float pitch;
+    float roll;
+    float yaw;
 
-    float current;
-    bool braking;
-    // float gas_factor;
+    // float pitch_diff;
+    // float roll_diff;
+    float yaw_diff;
+    // float yaw_diff_abs;
 
-    float duty_cycle;
-    float duty_smooth;
+    // float pitch_last;
+    // float roll_last;
+    float yaw_last;
 
-    float acceleration;
-    float accel_clamped;
-    // float accel_history[ACCEL_ARRAY_SIZE];
-    // uint8_t accel_idx;
+    float pitch_balance;
+    // float roll_balance;
+    // float yaw_balance;
+} IMUData;
 
-    bool atr_filter_enabled;
-    Biquad atr_current_biquad;
-    float atr_filtered_current;
-    float current_filtered;
-    // float atr_smoothing;
-    float filter_half_time;
-} MotorData;
+void imu_data_reset(IMUData *imu);
 
-void motor_data_reset(MotorData *m);
+// void motor_data_configure(MotorData *m, float frequency);
 
-void motor_data_configure(MotorData *m, float frequency);
-
-void motor_data_update(MotorData *m);
+void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter);
