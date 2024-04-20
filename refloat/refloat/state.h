@@ -29,8 +29,7 @@ typedef enum {
 
 typedef enum {
     MODE_NORMAL = 0,
-    MODE_HANDTEST = 1,
-    MODE_FLYWHEEL = 2
+    MODE_HANDTEST = 1
 } Mode;
 
 typedef enum {
@@ -62,7 +61,6 @@ typedef struct {
     StopCondition stop_condition;
     bool charging;
     bool wheelslip;
-    bool darkride;
 } State;
 
 void state_init(State *state, bool disable);

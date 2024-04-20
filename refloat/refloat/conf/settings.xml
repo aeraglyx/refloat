@@ -526,7 +526,7 @@ p, li { white-space: pre-wrap; }
             <cDefine>CFG_DFLT_FAULT_MOVING_FAULT_DISABLED</cDefine>
             <valInt>0</valInt>
         </fault_moving_fault_disabled>
-        <fault_darkride_enabled>
+        <!-- <fault_darkride_enabled>
             <longName>Enable Darkride</longName>
             <type>5</type>
             <transmittable>1</transmittable>
@@ -539,7 +539,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;*DISCLAIMER: Requires correct speed calibration!! The board &lt;/span&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;WILL&lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; ghost for sure if your normal speeds are negative!!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
             <cDefine>CFG_DFLT_FAULT_DARKRIDE_ENABLED</cDefine>
             <valInt>0</valInt>
-        </fault_darkride_enabled>
+        </fault_darkride_enabled> -->
         <fault_reversestop_enabled>
             <longName>Enable Reverse Stop</longName>
             <type>5</type>
@@ -3400,7 +3400,7 @@ p, li { white-space: pre-wrap; }
             <cDefine>CFG_DFLT_HARDWARE_LEDS_REAR_REVERSE</cDefine>
             <valInt>0</valInt>
         </hardware.leds.rear.reverse>
-        <dark_pitch_offset>
+        <!-- <dark_pitch_offset>
             <longName>Darkride Pitch Offset</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -3421,7 +3421,7 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>10</vTxDoubleScale>
             <suffix> °</suffix>
             <vTx>7</vTx>
-        </dark_pitch_offset>
+        </dark_pitch_offset> -->
         <is_beeper_enabled>
             <longName>Enable Beeper on Servo/PPM</longName>
             <type>5</type>
@@ -3471,7 +3471,7 @@ p, li { white-space: pre-wrap; }
         <ser>fault_adc_half_erpm</ser>
         <ser>fault_is_dual_switch</ser>
         <ser>fault_moving_fault_disabled</ser>
-        <ser>fault_darkride_enabled</ser>
+        <!-- <ser>fault_darkride_enabled</ser> -->
         <ser>fault_reversestop_enabled</ser>
         <ser>tiltback_duty_angle</ser>
         <ser>tiltback_duty_speed</ser>
@@ -3591,7 +3591,7 @@ p, li { white-space: pre-wrap; }
         <ser>hardware.leds.front.reverse</ser>
         <ser>hardware.leds.rear.count</ser>
         <ser>hardware.leds.rear.reverse</ser>
-        <ser>dark_pitch_offset</ser>
+        <!-- <ser>dark_pitch_offset</ser> -->
         <ser>is_beeper_enabled</ser>
         <ser>disabled</ser>
     </SerOrder>
@@ -3709,7 +3709,7 @@ p, li { white-space: pre-wrap; }
                     <param>fault_is_dual_switch</param>
                     <param>fault_moving_fault_disabled</param>
                     <param>::sep::Features</param>
-                    <param>fault_darkride_enabled</param>
+                    <!-- <param>fault_darkride_enabled</param> -->
                     <param>fault_reversestop_enabled</param>
                 </subgroupParams>
             </subgroup>
@@ -3814,7 +3814,7 @@ p, li { white-space: pre-wrap; }
                     <param>fault_adc2</param>
                     <param>is_footbeep_enabled</param>
                     <param>::sep::Miscellaneous</param>
-                    <param>dark_pitch_offset</param>
+                    <!-- <param>dark_pitch_offset</param> -->
                     <param>is_beeper_enabled</param>
                     <param>::sep::Leds (changes require reboot)</param>
                     <param>hardware.leds.type</param>

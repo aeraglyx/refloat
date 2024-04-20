@@ -16,7 +16,6 @@
 // this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "imu_data.h"
-
 #include "utils.h"
 
 #include "vesc_c_if.h"
@@ -40,6 +39,7 @@ void imu_data_reset(IMUData *imu) {
 // }
 
 void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter) {
+    // TODO rad2deg(VESC_IF->ahrs_get_pitch(&d->m_att_ref))
     imu->pitch = rad2deg(VESC_IF->imu_get_pitch());
     imu->roll = rad2deg(VESC_IF->imu_get_roll());
     imu->yaw = rad2deg(VESC_IF->imu_get_yaw());
@@ -60,5 +60,5 @@ void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter) {
     // imu->balance_roll = rad2deg(balance_filter_get_roll(&balance_filter));
     // imu->balance_yaw = rad2deg(balance_filter_get_yaw(&balance_filter));
     
-    // VESC_IF->imu_get_gyro(d->gyro);
+    VESC_IF->imu_get_gyro(imu->gyro);
 }

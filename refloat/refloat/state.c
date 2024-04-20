@@ -24,7 +24,6 @@ void state_init(State *state, bool disable) {
     state->stop_condition = STOP_NONE;
     state->charging = false;
     state->wheelslip = false;
-    state->darkride = false;
 }
 
 void state_stop(State *state, StopCondition stop_condition) {
@@ -74,10 +73,6 @@ uint8_t state_compat(const State *state) {
             return 2;  // RUNNING_TILTBACK
         } else if (state->wheelslip) {
             return 3;  // RUNNING_WHEELSLIP
-        } else if (state->darkride) {
-            return 4;  // RUNNING_UPSIDEDOWN
-        } else if (state->mode == MODE_FLYWHEEL) {
-            return 5;  // RUNNING_FLYWHEEL
         }
         return 1;  // RUNNING
     }

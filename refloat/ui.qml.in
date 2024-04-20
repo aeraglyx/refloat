@@ -298,7 +298,7 @@ Item {
         readonly property int c_GET_INFO: 0
         readonly property int c_RC_MOVE: 7
         readonly property int c_HANDTEST: 13
-        readonly property int c_FLYWHEEL: 22
+        // readonly property int c_FLYWHEEL: 22
         readonly property int c_GET_RT_DATA_2: 201
         readonly property int c_LIGHTS_CONTROL: 202
 
@@ -361,21 +361,6 @@ Item {
         function sendHandtest(on) {
             var data = createData(3, c_HANDTEST);
             data.setUint8(2, on); // on (1) / off (0)
-            vescCommands.sendCustomAppData(data.buffer);
-        }
-
-        function sendFlywheel(on) {
-            var data = createData(9, c_FLYWHEEL);
-
-            data.setUint8(2, on ? 130 : 128); // on, force calibration (130) / off (128)
-            if (on) {
-                data.setUint8(3, 0); // use default kp
-                data.setUint8(4, 0); // use default kp2
-                data.setUint8(5, 0); // use default duty angle
-                data.setUint8(6, 0); // use default duty start
-                data.setUint8(7, 1); // allow abort with footpads
-                data.setUint8(8, 0); // use default duty speed
-            }
             vescCommands.sendCustomAppData(data.buffer);
         }
 
@@ -740,15 +725,13 @@ Item {
         // package mode
         readonly property int m_Normal: 0
         readonly property int m_Handtest: 1
-        readonly property int m_Flywheel: 2
+        // readonly property int m_Flywheel: 2
 
         property int pkgMode: m_Normal
 
         property string pkgModeString: {
             if (pkgState != s_Disconnected) {
-                if (pkgMode == m_Flywheel) {
-                    return "FLYWHEEL";
-                } else if (pkgMode == m_Handtest) {
+                if (pkgMode == m_Handtest) {
                     return "HANDTEST";
                 }
             }
@@ -2951,7 +2934,8 @@ Item {
                         id: statusTextMode
                         anchors.bottom: parent.bottom
                         width: parent.width
-                        color: state.pkgMode == state.m_Flywheel ? Utility.getAppHexColor("lightAccent") : Utility.getAppHexColor("lightText")
+                        // color: state.pkgMode == state.m_Flywheel ? Utility.getAppHexColor("lightAccent") : Utility.getAppHexColor("lightText")
+                        color: state.pkgMode == Utility.getAppHexColor("lightText")
                         font.pixelSize: fontSizeSmall
                         font.family: "Exan"
                         horizontalAlignment: Text.AlignHCenter
@@ -3281,31 +3265,6 @@ Item {
                         from: -1
                         to: 1
                         value: 0
-                    }
-
-                    LText {
-                        anchors.horizontalCenter: parent.horizontalCenter
-
-                        font.pixelSize: fontSizeBig
-                        text: "Magic Flywheel"
-                    }
-
-                    LText {
-                        width: parent.width
-                        font.pixelSize: fontSizeNormal
-                        wrapMode: Text.WordWrap
-                        text: "Before enabling flywheel mode make sure that your board is nose up and perfectly balanced. To turn it off, you must disengage the board first."
-                    }
-
-                    Button {
-                        id: flywheelOnButton
-                        anchors.horizontalCenter: parent.horizontalCenter
-
-                        enabled: [state.m_Normal, state.m_Flywheel].includes(state.pkgMode)
-                        text: state.pkgMode === state.m_Flywheel ? "Off" : "On"
-                        onClicked: {
-                            commands.sendFlywheel(state.pkgMode === state.m_Normal);
-                        }
                     }
 
                     Item {

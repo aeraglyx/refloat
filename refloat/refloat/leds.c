@@ -380,7 +380,7 @@ static void status_animate(
     }
 
     float duty = 0;
-    if (leds->state.state == STATE_RUNNING && leds->state.mode != MODE_FLYWHEEL) {
+    if (leds->state.state == STATE_RUNNING) {
         duty = fminf(fabsf(VESC_IF->mc_get_duty_cycle_now() * 10.0f / 9.0f), 1.0f);
     }
 
@@ -549,7 +549,7 @@ static void reset_led_bars(
 }
 
 static bool headlights_should_be_on(const Leds *leds) {
-    return (leds->state.state == STATE_RUNNING && leds->state.mode != MODE_FLYWHEEL) &&
+    return (leds->state.state == STATE_RUNNING) &&
         leds->cfg->headlights_on;
 }
 
@@ -873,9 +873,6 @@ void leds_update(Leds *leds, const State *state, FootpadSensorState fs_state) {
     if (leds->state.state == STATE_RUNNING && leds->headlights_time <= 0.0f) {
         float distance = VESC_IF->mc_get_distance();
         float distance_diff = distance - leds->split_distance;
-        if (leds->state.darkride) {
-            distance_diff = -distance_diff;
-        }
         split = clampf(split + distance_diff * 2, -1.0f, 1.0f);
         leds->split_distance = distance;
         leds->dir_trans.split = split;

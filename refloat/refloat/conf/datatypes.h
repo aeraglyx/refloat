@@ -166,7 +166,7 @@ typedef struct {
     uint16_t fault_adc_half_erpm;
     bool fault_is_dual_switch;
     bool fault_moving_fault_disabled;
-    bool fault_darkride_enabled;
+    // bool fault_darkride_enabled;
     bool fault_reversestop_enabled;
     float tiltback_duty_angle;
     float tiltback_duty_speed;
@@ -236,7 +236,7 @@ typedef struct {
     uint16_t turntilt_erpm_boost;
     uint16_t turntilt_erpm_boost_end;
     int turntilt_yaw_aggregate;
-    float dark_pitch_offset;
+    // float dark_pitch_offset;
     bool is_beeper_enabled;
     bool is_dutybeep_enabled;
     bool is_footbeep_enabled;
