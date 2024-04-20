@@ -40,8 +40,6 @@
 #include "conf/confxml.h"
 #include "conf/datatypes.h"
 
-// #include "konami.h"
-
 #include <math.h>
 #include <string.h>
 
@@ -116,16 +114,10 @@ typedef struct {
     // IMU data for the balancing filter
     BalanceFilterData balance_filter;
 
-    // float gyro[3];
-
     float throttle_val;
     float max_duty_with_margin;
 
     FootpadSensor footpad_sensor;
-
-    // Feature: Turntilt
-    float last_yaw_angle, yaw_angle, abs_yaw_change, last_yaw_change, yaw_change, yaw_aggregate;
-    float turntilt_boost_per_erpm, yaw_aggregate_target;
 
     // Rumtime state values
     State state;
@@ -305,11 +297,6 @@ static void configure(data *d) {
     // Feature: Reverse Stop
     d->reverse_tolerance = 50000;
     d->reverse_stop_step_size = 100.0 / d->float_conf.hertz;
-
-    // Feature: Turntilt
-    d->yaw_aggregate_target = fmaxf(50, d->float_conf.turntilt_yaw_aggregate);
-    d->turntilt_boost_per_erpm = (float) d->float_conf.turntilt_erpm_boost / 100.0 /
-        (float) d->float_conf.turntilt_erpm_boost_end;
 
     // Allows smoothing of Remote Tilt
     d->inputtilt_ramped_step_size = 0;
@@ -748,6 +735,13 @@ void aggregate_tiltbacks(data *d){
     d->setpoint += d->atr.interpolated + d->atr.braketilt_interpolated;
     d->setpoint += d->torque_tilt.interpolated;
     d->setpoint += d->turn_tilt.interpolated;
+    // float ab_offset = d->atr.offset + d->atr.braketilt_offset;
+    // if (sign(ab_offset) == sign(d->torque_tilt.offset)) {
+    //     d->setpoint +=
+    //         sign(ab_offset) * fmaxf(fabsf(ab_offset), fabsf(d->torque_tilt.offset));
+    // } else {
+    //     d->setpoint += ab_offset + d->torque_tilt.offset;
+    // }
 }
 
 static void add_surge(data *d) {
@@ -780,28 +774,6 @@ static void add_surge(data *d) {
         }
     }
 }
-
-// static void apply_noseangling(data *d) {
-//     // Nose angle adjustment, add variable then constant tiltback
-//     float noseangling_target = 0;
-
-//     // Variable Tiltback looks at ERPM from the reference point of the set minimum ERPM
-//     float variable_erpm = fmaxf(0, d->motor.abs_erpm - d->float_conf.tiltback_variable_erpm);
-//     if (variable_erpm > d->tiltback_variable_max_erpm) {
-//         noseangling_target = d->float_conf.tiltback_variable_max * d->motor.erpm_sign;
-//     } else {
-//         noseangling_target = d->tiltback_variable * variable_erpm * d->motor.erpm_sign *
-//             sign(d->float_conf.tiltback_variable_max);
-//     }
-
-//     if (d->motor.abs_erpm > d->float_conf.tiltback_constant_erpm) {
-//         noseangling_target += d->float_conf.tiltback_constant * d->motor.erpm_sign;
-//     }
-
-//     rate_limitf(&d->noseangling_interpolated, noseangling_target, d->noseangling_step_size);
-
-//     d->setpoint += d->noseangling_interpolated;
-// }
 
 static void apply_noseangling(data *d) {
     // Variable Tiltback looks at ERPM from the reference point of the set minimum ERPM
@@ -958,24 +930,6 @@ static void refloat_thd(void *arg) {
 
         d->throttle_val = servo_val;
 
-        // // Turn Tilt:
-        // float new_change = d->yaw_angle - d->last_yaw_angle;
-        // bool unchanged = false;
-        // if ((new_change == 0)  // Exact 0's only happen when the IMU is not updating between loops
-        //     || (fabsf(new_change) > 100))  // yaw flips signs at 180, ignore those changes
-        // {
-        //     new_change = d->last_yaw_change;
-        //     unchanged = true;
-        // }
-        // d->last_yaw_change = new_change;
-        // d->last_yaw_angle = d->yaw_angle;
-
-        // // To avoid overreactions at low speed, limit change here:
-        // new_change = fminf(new_change, 0.10);
-        // new_change = fmaxf(new_change, -0.10);
-        // d->yaw_change = d->yaw_change * 0.8 + 0.2 * (new_change);
-        // d->abs_yaw_change = fabsf(d->yaw_change);
-
         footpad_sensor_update(&d->footpad_sensor, &d->float_conf);
 
         if (d->footpad_sensor.state == FS_NONE && d->state.state == STATE_RUNNING &&
@@ -1047,18 +1001,6 @@ static void refloat_thd(void *arg) {
             }
 
             aggregate_tiltbacks(d);
-
-            // aggregated torque tilts:
-            // if signs match between torque tilt and ATR + brake tilt, use the more significant
-            // one if signs do not match, they are simply added together
-            // float ab_offset = d->atr.offset + d->atr.braketilt_offset;
-            // if (sign(ab_offset) == sign(d->torque_tilt.offset)) {
-            //     d->setpoint +=
-            //         sign(ab_offset) * fmaxf(fabsf(ab_offset), fabsf(d->torque_tilt.offset));
-            // } else {
-            //     d->setpoint += ab_offset + d->torque_tilt.offset;
-            // }
-            // d->setpoint += d->turn_tilt.interpolated
 
             // Prepare Brake Scaling (ramp scale values as needed for smooth transitions)
             if (d->motor.abs_erpm < 500) {

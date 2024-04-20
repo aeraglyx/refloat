@@ -17,7 +17,6 @@
 // this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "turn_tilt.h"
-
 #include "utils.h"
 
 #include <math.h>
@@ -36,6 +35,12 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
     if (cfg->turntilt_strength == 0) {
         return;
     }
+
+    // // Turn Tilt:
+    // // To avoid overreactions at low speed, limit change here:
+    // new_change = fminf(new_change, 0.10);
+    // new_change = fmaxf(new_change, -0.10);
+    // d->yaw_change = d->yaw_change * 0.8 + 0.2 * (new_change);
 
     tt->target = fabsf(imu->yaw_diff) * cfg->turntilt_strength;
 

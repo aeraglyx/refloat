@@ -23,8 +23,6 @@
 #include <math.h>
 
 void imu_data_reset(IMUData *imu) {
-    // imu->pitch_last = 0.0f;
-    // imu->roll_last = 0.0f;
     imu->yaw_last = 0.0f;
     imu->yaw_diff = 0.0f;
 }

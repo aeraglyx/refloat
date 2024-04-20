@@ -17,7 +17,6 @@
 // this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "atr.h"
-
 #include "utils.h"
 
 #include <math.h>
@@ -35,11 +34,6 @@ void atr_reset(ATR *atr) {
 void atr_configure(ATR *atr, const RefloatConfig *cfg) {
     atr->step_size_on = cfg->atr_on_speed / cfg->hertz;
     atr->step_size_off = cfg->atr_off_speed / cfg->hertz;
-
-    atr->speed_boost_mult = 1.0f / 3000.0f;
-    if (fabsf(cfg->atr_speed_boost) > 0.4f) {
-        atr->speed_boost_mult = 1.0f / ((fabsf(cfg->atr_speed_boost) - 0.4f) * 5000.0f + 3000.0f);
-    }
 
     if (cfg->braketilt_strength == 0.0f) {
         atr->braketilt_factor = 0.0f;

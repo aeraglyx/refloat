@@ -17,7 +17,6 @@
 // this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "torque_tilt.h"
-
 #include "utils.h"
 
 #include <math.h>
@@ -36,10 +35,6 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfi
     float strength =
         mot->braking ? cfg->torquetilt_strength_regen : cfg->torquetilt_strength;
     float accel_factor = cfg->atr_amps_accel_ratio;
-
-    // float amp_offset_speed = 0.00022f * mot->erpm_smooth * accel_factor;
-    // float amp_offset_atr = accel_diff * accel_factor;
-    // float amps_adjusted = mot->atr_filtered_current - amp_offset_speed - amp_offset_atr;
 
     float current = mot->current_filtered;
     float current_based_on_accel = mot->accel_clamped * accel_factor;

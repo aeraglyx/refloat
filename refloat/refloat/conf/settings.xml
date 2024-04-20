@@ -526,20 +526,6 @@ p, li { white-space: pre-wrap; }
             <cDefine>CFG_DFLT_FAULT_MOVING_FAULT_DISABLED</cDefine>
             <valInt>0</valInt>
         </fault_moving_fault_disabled>
-        <!-- <fault_darkride_enabled>
-            <longName>Enable Darkride</longName>
-            <type>5</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Allows riding the board upside down without sensors. A primitive Reverse Stop (disengage when rolling backwards) is active when using Darkride to allow safe dismount and prevent ghosting.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;*DISCLAIMER: Requires correct speed calibration!! The board &lt;/span&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;WILL&lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; ghost for sure if your normal speeds are negative!!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_FAULT_DARKRIDE_ENABLED</cDefine>
-            <valInt>0</valInt>
-        </fault_darkride_enabled> -->
         <fault_reversestop_enabled>
             <longName>Enable Reverse Stop</longName>
             <type>5</type>
@@ -3400,28 +3386,6 @@ p, li { white-space: pre-wrap; }
             <cDefine>CFG_DFLT_HARDWARE_LEDS_REAR_REVERSE</cDefine>
             <valInt>0</valInt>
         </hardware.leds.rear.reverse>
-        <!-- <dark_pitch_offset>
-            <longName>Darkride Pitch Offset</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;How much to lift/lower the nose to make the board level when it's upside down for darkride. Shouldn't be needed with properly calibrated Gyro and Accelerometer&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_DARK_PITCH_OFFSET</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>10</maxDouble>
-            <minDouble>-10</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>0.5</stepDouble>
-            <valDouble>0</valDouble>
-            <vTxDoubleScale>10</vTxDoubleScale>
-            <suffix> °</suffix>
-            <vTx>7</vTx>
-        </dark_pitch_offset> -->
         <is_beeper_enabled>
             <longName>Enable Beeper on Servo/PPM</longName>
             <type>5</type>
@@ -3471,7 +3435,6 @@ p, li { white-space: pre-wrap; }
         <ser>fault_adc_half_erpm</ser>
         <ser>fault_is_dual_switch</ser>
         <ser>fault_moving_fault_disabled</ser>
-        <!-- <ser>fault_darkride_enabled</ser> -->
         <ser>fault_reversestop_enabled</ser>
         <ser>tiltback_duty_angle</ser>
         <ser>tiltback_duty_speed</ser>
@@ -3591,7 +3554,6 @@ p, li { white-space: pre-wrap; }
         <ser>hardware.leds.front.reverse</ser>
         <ser>hardware.leds.rear.count</ser>
         <ser>hardware.leds.rear.reverse</ser>
-        <!-- <ser>dark_pitch_offset</ser> -->
         <ser>is_beeper_enabled</ser>
         <ser>disabled</ser>
     </SerOrder>
@@ -3709,7 +3671,6 @@ p, li { white-space: pre-wrap; }
                     <param>fault_is_dual_switch</param>
                     <param>fault_moving_fault_disabled</param>
                     <param>::sep::Features</param>
-                    <!-- <param>fault_darkride_enabled</param> -->
                     <param>fault_reversestop_enabled</param>
                 </subgroupParams>
             </subgroup>
@@ -3814,7 +3775,6 @@ p, li { white-space: pre-wrap; }
                     <param>fault_adc2</param>
                     <param>is_footbeep_enabled</param>
                     <param>::sep::Miscellaneous</param>
-                    <!-- <param>dark_pitch_offset</param> -->
                     <param>is_beeper_enabled</param>
                     <param>::sep::Leds (changes require reboot)</param>
                     <param>hardware.leds.type</param>
