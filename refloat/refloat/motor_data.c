@@ -42,14 +42,16 @@ void motor_data_reset(MotorData *m) {
     m->current_filtered = 0.0f;
 }
 
-void motor_data_configure(MotorData *m, float frequency) {
+void motor_data_configure(MotorData *m, RefloatConfig *cfg) {
+    m->filter_half_time = 1.0f / cfg->atr_filter;
+
+    float frequency = cfg->atr_filter / cfg->hertz;
     if (frequency > 0) {
         biquad_configure(&m->atr_current_biquad, BQ_LOWPASS, frequency);
         m->atr_filter_enabled = true;
     } else {
         m->atr_filter_enabled = false;
     }
-    m->filter_half_time = 1.0f / (frequency * 800.0f);
     // m->atr_smoothing = get_smoothing_factor(1.0f / fmaxf(cfg->atr_filter, 1.0f), cfg->hertz);
 }
 

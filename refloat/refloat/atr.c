@@ -27,8 +27,8 @@ void atr_reset(ATR *atr) {
     atr->speed_boost = 0.0f;
     atr->target = 0.0f;
     atr->interpolated = 0.0f;
-    atr->braketilt_target_offset = 0.0f;
-    atr->braketilt_offset = 0.0f;
+    atr->braketilt_target = 0.0f;
+    atr->braketilt_interpolated = 0.0f;
     atr->step_smooth = 0.0f;
 }
 
@@ -127,18 +127,18 @@ static void braketilt_update(
                 (mot->erpm < -1000 && atr->accel_diff > 1)) {
                 downhill_damper += fabsf(atr->accel_diff) / 2;
             }
-            atr->braketilt_target_offset = proportional / atr->braketilt_factor / downhill_damper;
+            atr->braketilt_target = proportional / atr->braketilt_factor / downhill_damper;
             if (downhill_damper > 2) {
                 // steep downhills, we don't enable this feature at all!
-                atr->braketilt_target_offset = 0;
+                atr->braketilt_target = 0;
             }
         }
     } else {
-        atr->braketilt_target_offset = 0;
+        atr->braketilt_target = 0;
     }
 
     float braketilt_step_size = atr->step_size_off / cfg->braketilt_lingering;
-    if (fabsf(atr->braketilt_target_offset) > fabsf(atr->braketilt_offset)) {
+    if (fabsf(atr->braketilt_target) > fabsf(atr->braketilt_interpolated)) {
         braketilt_step_size = atr->step_size_on * 1.5;
     } else if (mot->abs_erpm < 800) {
         braketilt_step_size = atr->step_size_on;
@@ -148,7 +148,7 @@ static void braketilt_update(
         braketilt_step_size /= 2.0f;
     }
 
-    rate_limitf(&atr->braketilt_offset, atr->braketilt_target_offset, braketilt_step_size);
+    rate_limitf(&atr->braketilt_interpolated, atr->braketilt_target, braketilt_step_size);
 }
 
 void atr_and_braketilt_update(
@@ -161,6 +161,6 @@ void atr_and_braketilt_update(
 void atr_and_braketilt_winddown(ATR *atr) {
     atr->interpolated *= 0.995f;
     atr->target *= 0.99f;
-    atr->braketilt_offset *= 0.995f;
-    atr->braketilt_target_offset *= 0.99f;
+    atr->braketilt_interpolated *= 0.995f;
+    atr->braketilt_target *= 0.99f;
 }

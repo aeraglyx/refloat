@@ -40,6 +40,8 @@ typedef struct {
     float pitch_balance;
     // float roll_balance;
     // float yaw_balance;
+
+    // float gyro[3];
 } IMUData;
 
 void imu_data_reset(IMUData *imu);

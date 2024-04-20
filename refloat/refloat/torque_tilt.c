@@ -1,4 +1,3 @@
-c
 // Copyright 2022 Dado Mista
 // Copyright 2024 Lukas Hrazky
 //

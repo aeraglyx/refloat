@@ -59,4 +59,6 @@ void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter) {
     imu->pitch_balance = rad2deg(balance_filter_get_pitch(balance_filter));
     // imu->balance_roll = rad2deg(balance_filter_get_roll(&balance_filter));
     // imu->balance_yaw = rad2deg(balance_filter_get_yaw(&balance_filter));
+    
+    // VESC_IF->imu_get_gyro(d->gyro);
 }

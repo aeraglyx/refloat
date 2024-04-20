@@ -18,12 +18,13 @@
 
 #pragma once
 
+#include "conf/datatypes.h"
 #include "biquad.h"
 
 #include <stdbool.h>
 #include <stdint.h>
 
-#define ACCEL_ARRAY_SIZE 40
+// #define ACCEL_ARRAY_SIZE 40
 
 typedef struct {
     float erpm;
@@ -56,6 +57,6 @@ typedef struct {
 
 void motor_data_reset(MotorData *m);
 
-void motor_data_configure(MotorData *m, float frequency);
+void motor_data_configure(MotorData *m, RefloatConfig *cfg);
 
 void motor_data_update(MotorData *m);

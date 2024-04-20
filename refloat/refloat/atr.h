@@ -37,8 +37,8 @@ typedef struct {
     float speed_boost_mult;
 
     float braketilt_factor;
-    float braketilt_target_offset;  // braketilt setpoint target offset
-    float braketilt_offset;  // rate-limited braketilt setpoint offset
+    float braketilt_target;  // braketilt setpoint target offset
+    float braketilt_interpolated;  // rate-limited braketilt setpoint offset
 } ATR;
 
 void atr_reset(ATR *atr);

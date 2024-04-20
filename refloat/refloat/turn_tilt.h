@@ -27,12 +27,13 @@ typedef struct {
     float step_size;
     float target;
     float interpolated;
+    float step_smooth;
 } TurnTilt;
 
 void turn_tilt_reset(TurnTilt *tt);
 
 void turn_tilt_configure(TurnTilt *tt, const RefloatConfig *config);
 
-void turn_tilt_update(TurnTilt *tt, const MotorData *motor, IMUData *imu, ATR *atr, const RefloatConfig *config);
+void turn_tilt_update(TurnTilt *tt, const MotorData *motor, const IMUData *imu, const ATR *atr, const RefloatConfig *config);
 
 // void torque_tilt_winddown(TurnTilt *tt);

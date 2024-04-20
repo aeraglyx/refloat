@@ -25,58 +25,40 @@
 void turn_tilt_reset(TurnTilt *tt) {
     tt->target = 0.0f;
     tt->interpolated = 0.0f;
+    tt->step_smooth = 0.0f;
 }
 
-void turn_tilt_configure(TurnTilt *tt, const RefloatConfig *config) {
-    tt->step_size = config->turntilt_speed / config->hertz;
+void turn_tilt_configure(TurnTilt *tt, const RefloatConfig *cfg) {
+    tt->step_size = cfg->turntilt_speed / cfg->hertz;
 }
 
-void turn_tilt_update(TurnTilt *tt, const MotorData *motor, IMUData *imu, ATR *atr, const RefloatConfig *config) {
-    if (config->turntilt_strength == 0) {
+void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, const ATR *atr, const RefloatConfig *cfg) {
+    if (cfg->turntilt_strength == 0) {
         return;
     }
 
-    tt->target = fabsf(imu->yaw_diff) * config->turntilt_strength;
+    tt->target = fabsf(imu->yaw_diff) * cfg->turntilt_strength;
 
-    // Apply speed scaling
-    // float boost;
-    // if (motor->abs_erpm < config->turntilt_erpm_boost_end) {
-    //     boost = 1.0f + motor->abs_erpm * d->turntilt_boost_per_erpm;
-    // } else {
-    //     boost = 1.0f + (float) config->turntilt_erpm_boost / 100.0f;
-    // }
-    // tt->target *= boost;
-
-    // Limit angle to max angle
-    if (tt->target > 0.0f) {
-        tt->target = fminf(tt->target, config->turntilt_angle_limit);
-    } else {
-        tt->target = fmaxf(tt->target, -config->turntilt_angle_limit);
-    }
+    float turntilt_speed_boost = 1.0f;  // turntilt_erpm_boost
+    float speed_boost = exp2f(turntilt_speed_boost * fabsf(mot->erpm_smooth) / 10000);
+    tt->target *= speed_boost;
 
     // Disable below erpm threshold otherwise add directionality
-    if (motor->abs_erpm < config->turntilt_start_erpm) {
+    if (mot->abs_erpm < cfg->turntilt_start_erpm) {
         tt->target = 0.0f;
     } else {
-        tt->target *= motor->erpm_sign;
+        tt->target *= mot->erpm_sign;
     }
 
     // ATR interference: Reduce target during moments of high torque response
     float atr_min = 2;
     float atr_max = 5;
-    // if (sign(atr->target_offset) != sign(tt->target)) {
-    //     // further reduced turntilt during moderate to steep downhills
-    //     atr_min = 1;
-    //     atr_max = 4;
-    // }
-    if (fabsf(atr->target_offset) > atr_min){
+    if (fabsf(atr->target) > atr_min){
         // Start scaling turntilt when ATR>2, down to 0 turntilt for ATR > 5 degrees
-        float atr_scaling = (atr_max - fabsf(atr->target_offset)) / (atr_max - atr_min);
-        if (atr_scaling < 0)
-        {
+        float atr_scaling = (atr_max - fabsf(atr->target)) / (atr_max - atr_min);
+        if (atr_scaling < 0){
             atr_scaling = 0;
             // during heavy torque response clear the yaw aggregate too
-            // d->yaw_aggregate = 0;
         }
         tt->target *= atr_scaling;
     }
@@ -86,9 +68,15 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *motor, IMUData *imu, ATR *a
     //     d->yaw_aggregate = 0;
     // }
 
-    // Move towards target limited by max speed
+    angle_limitf(&tt->target, cfg->turntilt_angle_limit);
     rate_limitf(&tt->interpolated, tt->target, tt->step_size);
-    // d->setpoint += tt->interpolated;
+
+    float ramp = cfg->booster_angle / 10.0f;
+    float half_time = cfg->booster_ramp / 50.0f;
+
+    float step_new = rate_limit_v04(tt->interpolated, tt->target, tt->step_size, ramp);
+    smooth_value(&tt->step_smooth, step_new, half_time, cfg->hertz);
+    tt->interpolated += tt->step_smooth;
 }
 
 // void turn_tilt_winddown(TurnTilt *tt) {

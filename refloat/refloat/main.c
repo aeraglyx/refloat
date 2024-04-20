@@ -80,6 +80,8 @@ typedef struct {
     int fw_version_major, fw_version_minor, fw_version_beta;
 
     MotorData motor;
+    IMUData imu;
+
     TorqueTilt torque_tilt;
     ATR atr;
     TurnTilt turn_tilt;
@@ -117,10 +119,6 @@ typedef struct {
     // IMU data for the balancing filter
     BalanceFilterData balance_filter;
 
-    // Runtime values read from elsewhere
-    IMUData imu;
-    float pitch, roll;
-    float balance_pitch;
     float gyro[3];
 
     float throttle_val;
@@ -257,7 +255,7 @@ void beep_on(data *d, bool force) {
 }
 
 static void reconfigure(data *d) {
-    motor_data_configure(&d->motor, d->float_conf.atr_filter / d->float_conf.hertz);
+    motor_data_configure(&d->motor, &d->float_conf);
     balance_filter_configure(&d->balance_filter, &d->float_conf);
     torque_tilt_configure(&d->torque_tilt, &d->float_conf);
     atr_configure(&d->atr, &d->float_conf);
@@ -394,10 +392,6 @@ static void reset_vars(data *d) {
     d->kp2_brake_scale = 1.0;
     d->kp_accel_scale = 1.0;
     d->kp2_accel_scale = 1.0;
-
-    // Turntilt:
-    d->last_yaw_angle = 0;
-    d->yaw_aggregate = 0;
 
     // Feature: click on start
     d->start_counter_clicks = d->start_counter_clicks_max;
@@ -851,8 +845,8 @@ static void calculate_setpoint_interpolated(data *d) {
 }
 
 void aggregate_tiltbacks(data *d){
-    d->setpoint += d->atr.offset + d->atr.braketilt_offset;
-    d->setpoint += d->torque_tilt.offset;
+    d->setpoint += d->atr.interpolated + d->atr.braketilt_interpolated;
+    d->setpoint += d->torque_tilt.interpolated;
     d->setpoint += d->turn_tilt.interpolated;
 }
 
@@ -887,24 +881,46 @@ static void add_surge(data *d) {
     }
 }
 
-static void apply_noseangling(data *d) {
-    // Nose angle adjustment, add variable then constant tiltback
-    float noseangling_target = 0;
+// static void apply_noseangling(data *d) {
+//     // Nose angle adjustment, add variable then constant tiltback
+//     float noseangling_target = 0;
 
+//     // Variable Tiltback looks at ERPM from the reference point of the set minimum ERPM
+//     float variable_erpm = fmaxf(0, d->motor.abs_erpm - d->float_conf.tiltback_variable_erpm);
+//     if (variable_erpm > d->tiltback_variable_max_erpm) {
+//         noseangling_target = d->float_conf.tiltback_variable_max * d->motor.erpm_sign;
+//     } else {
+//         noseangling_target = d->tiltback_variable * variable_erpm * d->motor.erpm_sign *
+//             sign(d->float_conf.tiltback_variable_max);
+//     }
+
+//     if (d->motor.abs_erpm > d->float_conf.tiltback_constant_erpm) {
+//         noseangling_target += d->float_conf.tiltback_constant * d->motor.erpm_sign;
+//     }
+
+//     rate_limitf(&d->noseangling_interpolated, noseangling_target, d->noseangling_step_size);
+
+//     d->setpoint += d->noseangling_interpolated;
+// }
+
+static void apply_noseangling(data *d) {
     // Variable Tiltback looks at ERPM from the reference point of the set minimum ERPM
-    float variable_erpm = fmaxf(0, d->motor.abs_erpm - d->float_conf.tiltback_variable_erpm);
-    if (variable_erpm > d->tiltback_variable_max_erpm) {
-        noseangling_target = d->float_conf.tiltback_variable_max * d->motor.erpm_sign;
-    } else {
-        noseangling_target = d->tiltback_variable * variable_erpm * d->motor.erpm_sign *
-            sign(d->float_conf.tiltback_variable_max);
-    }
+    // float variable_erpm = fmaxf(0, d->motor.abs_erpm - d->float_conf.tiltback_variable_erpm);
+    float target = d->motor.erpm_smooth * d->tiltback_variable;
+    angle_limitf(&target, d->float_conf.tiltback_variable_max);
+
+    // if (variable_erpm > d->tiltback_variable_max_erpm) {
+    //     target = d->float_conf.tiltback_variable_max * d->motor.erpm_sign;
+    // } else {
+    //     target = d->tiltback_variable * variable_erpm * d->motor.erpm_sign *
+    //         sign(d->float_conf.tiltback_variable_max);
+    // }
 
     if (d->motor.abs_erpm > d->float_conf.tiltback_constant_erpm) {
-        noseangling_target += d->float_conf.tiltback_constant * d->motor.erpm_sign;
+        target += d->float_conf.tiltback_constant * d->motor.erpm_sign;
     }
 
-    rate_limitf(&d->noseangling_interpolated, noseangling_target, d->noseangling_step_size);
+    rate_limitf(&d->noseangling_interpolated, target, d->noseangling_step_size);
 
     d->setpoint += d->noseangling_interpolated;
 }
@@ -1173,7 +1189,6 @@ static void refloat_thd(void *arg) {
                     atr_and_braketilt_winddown(&d->atr);
                 } else {
                     apply_noseangling(d);
-                    // apply_turntilt(d);
                     torque_tilt_update(&d->torque_tilt, &d->motor, &d->float_conf);
                     turn_tilt_update(&d->turn_tilt, &d->motor, &d->imu, &d->atr, &d->float_conf);
                     atr_and_braketilt_update(&d->atr, &d->motor, &d->float_conf, d->proportional);
@@ -1265,7 +1280,7 @@ static void refloat_thd(void *arg) {
 
                 // Apply Booster (Now based on True Pitch)
                 // Braketilt excluded to allow for soft brakes that strengthen when near tail-drag
-                float true_proportional = d->setpoint - d->atr.braketilt_offset - d->imu.pitch;
+                float true_proportional = d->setpoint - d->atr.braketilt_interpolated - d->imu.pitch;
                 float abs_proportional = fabsf(true_proportional);
 
                 float booster_current, booster_angle, booster_ramp;
@@ -1545,7 +1560,7 @@ static float app_get_debug(int index) {
     case (5):
         return d->setpoint;
     case (6):
-        return d->atr.offset;
+        return d->atr.interpolated;
     case (7):
         return d->motor.erpm;
     case (8):
@@ -1607,9 +1622,9 @@ static void send_realtime_data(data *d) {
 
     // Setpoints
     buffer_append_float32_auto(buffer, d->setpoint, &ind);
-    buffer_append_float32_auto(buffer, d->atr.offset, &ind);
-    buffer_append_float32_auto(buffer, d->atr.braketilt_offset, &ind);
-    buffer_append_float32_auto(buffer, d->torque_tilt.offset, &ind);
+    buffer_append_float32_auto(buffer, d->atr.interpolated, &ind);
+    buffer_append_float32_auto(buffer, d->atr.braketilt_interpolated, &ind);
+    buffer_append_float32_auto(buffer, d->torque_tilt.interpolated, &ind);
     buffer_append_float32_auto(buffer, d->turntilt_interpolated, &ind);
     buffer_append_float32_auto(buffer, d->inputtilt_interpolated, &ind);
 
@@ -1665,9 +1680,9 @@ static void cmd_send_all_data(data *d, unsigned char mode) {
 
         // Setpoints (can be positive or negative)
         buffer[ind++] = d->setpoint * 5 + 128;
-        buffer[ind++] = d->atr.offset * 5 + 128;
-        buffer[ind++] = d->atr.braketilt_offset * 5 + 128;
-        buffer[ind++] = d->torque_tilt.offset * 5 + 128;
+        buffer[ind++] = d->atr.interpolated * 5 + 128;
+        buffer[ind++] = d->atr.braketilt_interpolated * 5 + 128;
+        buffer[ind++] = d->torque_tilt.interpolated * 5 + 128;
         buffer[ind++] = d->turntilt_interpolated * 5 + 128;
         buffer[ind++] = d->inputtilt_interpolated * 5 + 128;
 
@@ -2310,9 +2325,9 @@ static void send_realtime_data2(data *d) {
     if (d->state.state == STATE_RUNNING) {
         // Setpoints
         buffer_append_float32_auto(buffer, d->setpoint, &ind);
-        buffer_append_float32_auto(buffer, d->atr.offset, &ind);
-        buffer_append_float32_auto(buffer, d->atr.braketilt_offset, &ind);
-        buffer_append_float32_auto(buffer, d->torque_tilt.offset, &ind);
+        buffer_append_float32_auto(buffer, d->atr.interpolated, &ind);
+        buffer_append_float32_auto(buffer, d->atr.braketilt_interpolated, &ind);
+        buffer_append_float32_auto(buffer, d->torque_tilt.interpolated, &ind);
         buffer_append_float32_auto(buffer, d->turntilt_interpolated, &ind);
         buffer_append_float32_auto(buffer, d->inputtilt_interpolated, &ind);
 
