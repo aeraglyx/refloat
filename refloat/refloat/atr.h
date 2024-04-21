@@ -28,11 +28,9 @@ typedef struct {
     float step_size_off;
 
     float accel_diff;
-    float speed_boost;
-
+    float step_smooth;
     float target;
     float interpolated;
-    float step_smooth;
 
     float braketilt_factor;
     float braketilt_target;

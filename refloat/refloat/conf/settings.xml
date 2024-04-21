@@ -76,8 +76,8 @@ p, li { white-space: pre-wrap; }
             <maxDouble>3</maxDouble>
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>0.1</stepDouble>
-            <valDouble>0.6</valDouble>
+            <stepDouble>0.05</stepDouble>
+            <valDouble>0.8</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
@@ -352,7 +352,7 @@ p, li { white-space: pre-wrap; }
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
             <maxDouble>3.3</maxDouble>
-            <minDouble>0</minDouble>
+            <minDouble>0.1</minDouble>
             <showDisplay>1</showDisplay>
             <stepDouble>0.1</stepDouble>
             <valDouble>2</valDouble>
@@ -376,7 +376,7 @@ p, li { white-space: pre-wrap; }
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
             <maxDouble>3.3</maxDouble>
-            <minDouble>0</minDouble>
+            <minDouble>0.1</minDouble>
             <showDisplay>1</showDisplay>
             <stepDouble>0.1</stepDouble>
             <valDouble>2</valDouble>
@@ -472,7 +472,7 @@ p, li { white-space: pre-wrap; }
             <minInt>0</minInt>
             <showDisplay>0</showDisplay>
             <stepInt>50</stepInt>
-            <valInt>250</valInt>
+            <valInt>400</valInt>
             <suffix> ms</suffix>
             <vTx>3</vTx>
         </fault_delay_switch_full>
@@ -1352,146 +1352,76 @@ p, li { white-space: pre-wrap; }
             <suffix> A</suffix>
             <vTx>7</vTx>
         </ki_limit>
-        <booster_angle>
-            <longName>Start Angle</longName>
+        <torquetilt_strength>
+            <longName>Strength</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Angle (+/-) from which onward booster current is applied when accelerating, in relation to the setpoint.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;How much &lt;span style=&quot; font-weight:600;&quot;&gt;Nose&lt;/span&gt; &lt;span style=&quot; font-weight:600;&quot;&gt;Lift&lt;/span&gt; should be applied based on output current &lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;(Postive / Acceleration Current Only!)&lt;/span&gt;. Can be used alongside ATR to increase aggressiveness on flat and uphill acceleration, or on its own to ensure some uphill tiltback is applied in the absence of ATR.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;*NOTE: Based on True Pitch (uses Mahony KP 0.2), rather than Pitch filtered by your set Mahony KP (likely heavily filtered and inaccurate).&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_BOOSTER_ANGLE</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Values: 0 - 0.35&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_TORQUETILT_STRENGTH</cDefine>
+            <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxDouble>15</maxDouble>
+            <maxDouble>1</maxDouble>
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>0.5</stepDouble>
-            <valDouble>8</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> °</suffix>
+            <stepDouble>0.02</stepDouble>
+            <valDouble>0.1</valDouble>
+            <vTxDoubleScale>1000</vTxDoubleScale>
+            <suffix> °/A</suffix>
             <vTx>7</vTx>
-        </booster_angle>
-        <booster_ramp>
-            <longName>Ramp Up</longName>
+        </torquetilt_strength>
+        <torquetilt_strength_regen>
+            <longName>Strength (Regen)</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Degrees over which booster will ramp from 0A to the configured Current when accelerating, starting at Start Angle (i.e. Start Angle of 8° and Ramp Up of 4° means Booster will begin at 8° nose down and strengthen to max current as the board angle approaches 12° nose down from setpoint).&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;How much &lt;span style=&quot; font-weight:600;&quot;&gt;Nose Lowering&lt;/span&gt; should be applied based on output current &lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;(Negative / Regen Current Only!)&lt;/span&gt;. Can be used alongside ATR to increase aggressiveness on flat and downhill braking, or on its own to ensure some downhill nose lowering is applied in the absence of ATR.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;*NOTE: Based on True Pitch&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_BOOSTER_RAMP</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Values: 0 - 0.35&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_TORQUETILT_STRENGTH_REGEN</cDefine>
+            <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxDouble>20</maxDouble>
+            <maxDouble>1</maxDouble>
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>0.5</stepDouble>
-            <valDouble>4</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> °</suffix>
+            <stepDouble>0.02</stepDouble>
+            <valDouble>0.1</valDouble>
+            <vTxDoubleScale>1000</vTxDoubleScale>
+            <suffix> °/A</suffix>
             <vTx>7</vTx>
-        </booster_ramp>
-        <booster_current>
-            <longName>Current Boost</longName>
+        </torquetilt_strength_regen>
+        <torquetilt_method>
+            <longName>Method (Classic / Accel.)</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Extra current added to PID Loop, to be applied when accelerating when booster angle is reached (in relation to Setpoint). Can strengthen the board response at a desired specific angle when pushing the nose down.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_BOOSTER_CURRENT</cDefine>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;EXPERIMENTAL: 0.0 is the classic Amp based Torque Tilt, 1.0 uses measured ERPM acceleration instead. That way it doesn't interfere with setpoint when simply maintaining speed, but it could have some negative side effects (e.g. when wheel locks). Please be mindful when using 0.3 and higher.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_TORQUETILT_METHOD</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxDouble>100</maxDouble>
+            <maxDouble>1</maxDouble>
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>2</stepDouble>
+            <stepDouble>0.05</stepDouble>
             <valDouble>0</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> A</suffix>
+            <suffix></suffix>
             <vTx>7</vTx>
-        </booster_current>
-        <brkbooster_angle>
-            <longName>Start Angle</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Angle (+/-) from which onward booster regen current is applied when braking, in relation to the setpoint.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;*NOTE: Based on True Pitch&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_BRKBOOSTER_ANGLE</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>15</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>0.5</stepDouble>
-            <valDouble>8</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> °</suffix>
-            <vTx>7</vTx>
-        </brkbooster_angle>
-        <brkbooster_ramp>
-            <longName>Ramp Up</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Degrees over which brake-booster will ramp from 0A to the configured Regen Current, starting at Start Angle (i.e. Start Angle of 8° and Ramp Up of 4° means Brake Booster will begin at 8° nose up and strengthen to max current as the board angle approaches 12° nose up from setpoint).&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;*NOTE: Based on True Pitch&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_BRKBOOSTER_RAMP</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>20</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>0.5</stepDouble>
-            <valDouble>4</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> °</suffix>
-            <vTx>7</vTx>
-        </brkbooster_ramp>
-        <brkbooster_current>
-            <longName>Current Boost</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Extra current added to PID Loop, to be applied when braking when booster angle is reached (in relation to Setpoint). Can strengthen the braking intensity at a desired specific angle when raising the nose / lowering the tail.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_BRKBOOSTER_CURRENT</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>100</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>2</stepDouble>
-            <valDouble>0</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> A</suffix>
-            <vTx>7</vTx>
-        </brkbooster_current>
+        </torquetilt_method>
         <torquetilt_start_current>
             <longName>Start Current Threshold</longName>
             <type>1</type>
@@ -1580,78 +1510,28 @@ p, li { white-space: pre-wrap; }
             <suffix> °/s</suffix>
             <vTx>7</vTx>
         </torquetilt_off_speed>
-        <torquetilt_strength>
-            <longName>Strength</longName>
+        <torquetilt_ramp>
+            <longName>Speed Ramping</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;How much &lt;span style=&quot; font-weight:600;&quot;&gt;Nose&lt;/span&gt; &lt;span style=&quot; font-weight:600;&quot;&gt;Lift&lt;/span&gt; should be applied based on output current &lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;(Postive / Acceleration Current Only!)&lt;/span&gt;. Can be used alongside ATR to increase aggressiveness on flat and uphill acceleration, or on its own to ensure some uphill tiltback is applied in the absence of ATR.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Values: 0 - 0.35&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TORQUETILT_STRENGTH</cDefine>
-            <editorDecimalsDouble>2</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>1</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>0.05</stepDouble>
-            <valDouble>0</valDouble>
-            <vTxDoubleScale>1000</vTxDoubleScale>
-            <suffix> °/A</suffix>
-            <vTx>7</vTx>
-        </torquetilt_strength>
-        <torquetilt_strength_regen>
-            <longName>Strength (Regen)</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;How much &lt;span style=&quot; font-weight:600;&quot;&gt;Nose Lowering&lt;/span&gt; should be applied based on output current &lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;(Negative / Regen Current Only!)&lt;/span&gt;. Can be used alongside ATR to increase aggressiveness on flat and downhill braking, or on its own to ensure some downhill nose lowering is applied in the absence of ATR.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Values: 0 - 0.35&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TORQUETILT_STRENGTH_REGEN</cDefine>
-            <editorDecimalsDouble>2</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>1</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>0.05</stepDouble>
-            <valDouble>0</valDouble>
-            <vTxDoubleScale>1000</vTxDoubleScale>
-            <suffix> °/A</suffix>
-            <vTx>7</vTx>
-        </torquetilt_strength_regen>
-        <!-- <torquetilt_ramp>
-            <longName>Ramp Test</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;How much &lt;span style=&quot; font-weight:600;&quot;&gt;Nose Lowering&lt;/span&gt; should be applied based on output current &lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;(Negative / Regen Current Only!)&lt;/span&gt;. Can be used alongside ATR to increase aggressiveness on flat and downhill braking, or on its own to ensure some downhill nose lowering is applied in the absence of ATR.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Values: 0 - 0.35&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ramps down speed when close to target. If the offset exceeds this number, Max Tiltback Speed is used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
             <cDefine>CFG_DFLT_TORQUETILT_RAMP</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxDouble>0.25</maxDouble>
+            <maxDouble>1</maxDouble>
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>0.01</stepDouble>
-            <valDouble>0.05</valDouble>
-            <vTxDoubleScale>1000</vTxDoubleScale>
-            <suffix></suffix>
+            <stepDouble>0.05</stepDouble>
+            <valDouble>0.15</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
+            <suffix> °</suffix>
             <vTx>7</vTx>
-        </torquetilt_ramp> -->
+        </torquetilt_ramp>
         <atr_strength_up>
             <longName>ATR Uphill Strength</longName>
             <type>1</type>
@@ -1673,7 +1553,7 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>0.1</stepDouble>
-            <valDouble>0</valDouble>
+            <valDouble>1</valDouble>
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
@@ -1700,7 +1580,7 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>0.1</stepDouble>
-            <valDouble>0</valDouble>
+            <valDouble>1</valDouble>
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
@@ -1845,6 +1725,28 @@ p, li { white-space: pre-wrap; }
             <suffix> °/s</suffix>
             <vTx>7</vTx>
         </atr_off_speed>
+        <atr_ramp>
+            <longName>Speed Ramping</longName>
+            <type>1</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ramps down speed when close to target. If the offset exceeds this number, Max Tiltback Speed is used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_ATR_RAMP</cDefine>
+            <editorDecimalsDouble>2</editorDecimalsDouble>
+            <editorScale>1</editorScale>
+            <editAsPercentage>0</editAsPercentage>
+            <maxDouble>1</maxDouble>
+            <minDouble>0</minDouble>
+            <showDisplay>0</showDisplay>
+            <stepDouble>0.05</stepDouble>
+            <valDouble>0.25</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
+            <suffix> °</suffix>
+            <vTx>7</vTx>
+        </atr_ramp>
         <atr_response_boost>
             <longName>Tiltback Response Boost</longName>
             <type>1</type>
@@ -1943,7 +1845,7 @@ p, li { white-space: pre-wrap; }
             <suffix></suffix>
             <vTx>7</vTx>
         </atr_amps_accel_ratio>
-        <atr_amps_decel_ratio>
+        <atr_amp_offset_per_erpm>
             <longName>Amp Offset</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1951,14 +1853,14 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Determines how to effectively calculate Expected Deceleration (Braking) from amps. Higher values mean weaker response (lower Expected Acceleration).&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;It takes some Amps to maintain speed. This specifies the offset based on ERPM.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*NOTE: NOT MEANT TO BE MESSED WITH! This value should be kept constant and not taken advantage of for tuning, as it is meant to be used to account for motor efficiency, not weight or other factors.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; font-style:italic;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Recommended Hypercore Motor Value: 8&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Recommended Hypercore Motor Value: 0.0015&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; font-style:italic;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Recommended Values: 6-18&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_AMPS_DECEL_RATIO</cDefine>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Recommended Values: 0.001-0.002&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_ATR_AMP_OFFSET_PER_ERPM</cDefine>
             <editorDecimalsDouble>4</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1970,7 +1872,7 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100000</vTxDoubleScale>
             <suffix> A/ERPM</suffix>
             <vTx>7</vTx>
-        </atr_amps_decel_ratio>
+        </atr_amp_offset_per_erpm>
         <braketilt_strength>
             <longName>Brake Tilt Strength</longName>
             <type>1</type>
@@ -2129,6 +2031,28 @@ p, li { white-space: pre-wrap; }
             <suffix> °/s</suffix>
             <vTx>7</vTx>
         </turntilt_speed>
+        <turntilt_ramp>
+            <longName>Speed Ramping</longName>
+            <type>1</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ramps down speed when close to target. If the offset exceeds this number, Max Tiltback Speed is used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_TURNTILT_RAMP</cDefine>
+            <editorDecimalsDouble>2</editorDecimalsDouble>
+            <editorScale>1</editorScale>
+            <editAsPercentage>0</editAsPercentage>
+            <maxDouble>1</maxDouble>
+            <minDouble>0</minDouble>
+            <showDisplay>0</showDisplay>
+            <stepDouble>0.05</stepDouble>
+            <valDouble>0.20</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
+            <suffix> °</suffix>
+            <vTx>7</vTx>
+        </turntilt_ramp>
         <turntilt_erpm_boost>
             <longName>Speed Boost %</longName>
             <type>2</type>
@@ -2173,26 +2097,6 @@ p, li { white-space: pre-wrap; }
             <suffix> ERPM</suffix>
             <vTx>3</vTx>
         </turntilt_erpm_boost_end>
-        <turntilt_yaw_aggregate>
-            <longName>Turn Aggregate Target</longName>
-            <type>2</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The amount of turning (Yaw) required before reaching max carving strength. Higher values mean a turn must be maintained for longer in order to reach max carving strength.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TURNTILT_YAW_AGGREGATE</cDefine>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxInt>360</maxInt>
-            <minInt>50</minInt>
-            <showDisplay>0</showDisplay>
-            <stepInt>5</stepInt>
-            <valInt>90</valInt>
-            <suffix> °</suffix>
-            <vTx>1</vTx>
-        </turntilt_yaw_aggregate>
         <leds.on>
             <longName>LEDs On</longName>
             <type>5</type>
@@ -3473,27 +3377,22 @@ p, li { white-space: pre-wrap; }
         <ser>startup_dirtylandings_enabled</ser>
         <ser>brake_current</ser>
         <ser>ki_limit</ser>
-        <ser>booster_angle</ser>
-        <ser>booster_ramp</ser>
-        <ser>booster_current</ser>
-        <ser>brkbooster_angle</ser>
-        <ser>brkbooster_ramp</ser>
-        <ser>brkbooster_current</ser>
+        <ser>torquetilt_strength</ser>
+        <ser>torquetilt_strength_regen</ser>
+        <ser>torquetilt_method</ser>
         <ser>torquetilt_start_current</ser>
         <ser>torquetilt_angle_limit</ser>
         <ser>torquetilt_on_speed</ser>
         <ser>torquetilt_off_speed</ser>
-        <ser>torquetilt_strength</ser>
-        <ser>torquetilt_strength_regen</ser>
-        <!-- <ser>torquetilt_ramp</ser> -->
+        <ser>torquetilt_ramp</ser>
         <ser>turntilt_strength</ser>
         <ser>turntilt_angle_limit</ser>
         <ser>turntilt_start_angle</ser>
         <ser>turntilt_start_erpm</ser>
         <ser>turntilt_speed</ser>
+        <ser>turntilt_ramp</ser>
         <ser>turntilt_erpm_boost</ser>
         <ser>turntilt_erpm_boost_end</ser>
-        <ser>turntilt_yaw_aggregate</ser>
         <ser>atr_strength_up</ser>
         <ser>atr_strength_down</ser>
         <ser>atr_threshold_up</ser>
@@ -3502,11 +3401,12 @@ p, li { white-space: pre-wrap; }
         <ser>atr_angle_limit</ser>
         <ser>atr_on_speed</ser>
         <ser>atr_off_speed</ser>
+        <ser>atr_ramp</ser>
         <ser>atr_response_boost</ser>
         <ser>atr_transition_boost</ser>
         <ser>atr_filter</ser>
         <ser>atr_amps_accel_ratio</ser>
-        <ser>atr_amps_decel_ratio</ser>
+        <ser>atr_amp_offset_per_erpm</ser>
         <ser>braketilt_strength</ser>
         <ser>braketilt_lingering</ser>
         <ser>leds.on</ser>
@@ -3576,14 +3476,6 @@ p, li { white-space: pre-wrap; }
                     <param>::sep::Brake Scaling</param>
                     <param>kp_brake</param>
                     <param>kp2_brake</param>
-                    <param>::sep::Booster (Acceleration)</param>
-                    <param>booster_angle</param>
-                    <param>booster_ramp</param>
-                    <param>booster_current</param>
-                    <param>::sep::Booster (Braking)</param>
-                    <param>brkbooster_angle</param>
-                    <param>brkbooster_ramp</param>
-                    <param>brkbooster_current</param>
                 </subgroupParams>
             </subgroup>
             <subgroup>
@@ -3599,19 +3491,20 @@ p, li { white-space: pre-wrap; }
                     <param>::sep::Torque Tiltback</param>
                     <param>torquetilt_strength</param>
                     <param>torquetilt_strength_regen</param>
+                    <param>torquetilt_method</param>
                     <param>torquetilt_start_current</param>
                     <param>torquetilt_angle_limit</param>
                     <param>torquetilt_on_speed</param>
                     <param>torquetilt_off_speed</param>
-                    <!-- <param>torquetilt_ramp</param> -->
+                    <param>torquetilt_ramp</param>
                     <param>::sep::Turn Tiltback</param>
                     <param>turntilt_strength</param>
                     <param>turntilt_angle_limit</param>
                     <param>turntilt_start_erpm</param>
                     <param>turntilt_speed</param>
+                    <param>turntilt_ramp</param>
                     <param>turntilt_erpm_boost</param>
                     <param>turntilt_erpm_boost_end</param>
-                    <param>turntilt_yaw_aggregate</param>
                     <param>turntilt_start_angle</param>
                 </subgroupParams>
             </subgroup>
@@ -3628,11 +3521,12 @@ p, li { white-space: pre-wrap; }
                     <param>atr_angle_limit</param>
                     <param>atr_on_speed</param>
                     <param>atr_off_speed</param>
+                    <param>atr_ramp</param>
                     <param>atr_response_boost</param>
                     <param>atr_transition_boost</param>
                     <param>::sep::Advanced</param>
                     <param>atr_amps_accel_ratio</param>
-                    <param>atr_amps_decel_ratio</param>
+                    <param>atr_amp_offset_per_erpm</param>
                     <param>atr_filter</param>
                     <param>::sep:: Brake Tiltback</param>
                     <param>braketilt_strength</param>

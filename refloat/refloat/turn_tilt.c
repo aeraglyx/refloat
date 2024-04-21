@@ -70,14 +70,13 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
     // if (fabsf(d->balance_pitch - d->noseangling_interpolated) > 4) {
     //     // no setpoint changes during heavy acceleration or braking
     //     tt->target = 0;
-    //     d->yaw_aggregate = 0;
     // }
 
     angle_limitf(&tt->target, cfg->turntilt_angle_limit);
     rate_limitf(&tt->interpolated, tt->target, tt->step_size);
 
-    float ramp = cfg->booster_angle / 10.0f;
-    float half_time = cfg->booster_ramp / 50.0f;
+    float ramp = cfg->turntilt_ramp;
+    float half_time = ramp * 0.5f;
 
     float step_new = rate_limit_v04(tt->interpolated, tt->target, tt->step_size, ramp);
     smooth_value(&tt->step_smooth, step_new, half_time, cfg->hertz);

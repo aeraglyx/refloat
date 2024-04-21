@@ -211,7 +211,7 @@ Item {
                 "tiltback_lv",
                 "fault_adc1",
                 "fault_adc2",
-                "dark_pitch_offset",
+                // "dark_pitch_offset",
             ];
 
             var settings = [];
@@ -298,7 +298,6 @@ Item {
         readonly property int c_GET_INFO: 0
         readonly property int c_RC_MOVE: 7
         readonly property int c_HANDTEST: 13
-        // readonly property int c_FLYWHEEL: 22
         readonly property int c_GET_RT_DATA_2: 201
         readonly property int c_LIGHTS_CONTROL: 202
 
@@ -425,7 +424,7 @@ Item {
                 var sensorAndFlags = dv.getUint8(ind++);
                 state.fsState = sensorAndFlags >> 6;
                 state.wheelslip = sensorAndFlags & 0b00000001;
-                state.darkride = sensorAndFlags & 0b00000010;
+                // state.darkride = sensorAndFlags & 0b00000010;
                 state.charging = sensorAndFlags & 0b00100000;
 
                 var setpointAndStop = dv.getUint8(ind++);
@@ -453,8 +452,6 @@ Item {
                     debugRequestedCurrent.rValue = dv.getFloat32(ind); ind += 4;
                     debugFilteredCurrent.rValue = dv.getFloat32(ind); ind += 4;
                     debugAtrAccDiff.rValue = dv.getFloat32(ind); ind += 4;
-                    debugAtrSpeedBoost.value = Math.round(dv.getFloat32(ind) * 100); ind += 4;
-                    debugBoosterCurrent.rValue = dv.getFloat32(ind); ind += 4;
                 }
 
                 if (hasCharging) {
@@ -822,7 +819,6 @@ Item {
         property int stopCondition: sc_None
         property string stopConditionString: stopConditionToString.get(stopCondition) ?? "unknown (%1)".arg(stopCondition)
 
-        property bool darkride: false
         property bool wheelslip: false
         property bool charging: false
 
@@ -2888,7 +2884,6 @@ Item {
                     height: parent.height * 0.83
 
                     property bool red: state.pkgStateIsError
-                    property bool dark: state.darkride
                     property bool blue: state.pkgState == state.s_Running
 
                     states: [
@@ -2912,15 +2907,13 @@ Item {
 
                     Glow {
                         anchors.fill: statusTextState
-                        radius: Math.round((parent.dark ? 0.2 : 0.12) * unit)
+                        radius: Math.round(0.12 * unit)
                         samples: radius * 2 + 1
-                        spread: parent.red ? 0.6 : (parent.dark ? 0.7 : 0.5)
-                        opacity: parent.red || parent.dark || parent.blue ? 0.8 : 0.3
+                        spread: parent.red ? 0.6 : 0.5
+                        opacity: parent.red || parent.blue ? 0.8 : 0.3
                         color: {
                             if (parent.red) {
                                 return Utility.getAppHexColor("red");
-                            } else if (parent.dark) {
-                                return Utility.isDarkMode() ? Utility.getAppHexColor("black") : Utility.getAppHexColor("disabledText");
                             } else if (parent.blue) {
                                 return Utility.getAppHexColor("lightAccent");
                             } else {
@@ -3369,8 +3362,6 @@ Item {
                             RealValue {id: debugRequestedCurrent; label: "Requested current"; unit: "A";}
                             RealValue {id: debugFilteredCurrent; label: "Torque (filt. current)"; unit: "A";}
                             RealValue {id: debugAtrAccDiff; label: "ATR Accel. diff.";}
-                            Value {id: debugAtrSpeedBoost; label: "ATR Speed Boost"; unit: "%"; value: "0"}
-                            RealValue {id: debugBoosterCurrent; label: "Booster current"; unit: "A";}
                             Value {id: debugRemoteInput; label: "Remote input"; unit: "%";}
                         }
 

@@ -41,15 +41,15 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfi
     // float acceleration = clampf(mot->acceleration, -5.0f, 5.0f);
     // float current_based_on_accel = acceleration * accel_factor;
 
-    float method = cfg->brkbooster_angle;
+    float method = cfg->torquetilt_method;
     float target = (1.0f - method) * current + method * current_based_on_accel;
 
     dead_zonef(&target, cfg->torquetilt_start_current);
     target *= strength;
     angle_limitf(&target, cfg->torquetilt_angle_limit);
 
-    float ramp = cfg->booster_angle / 10.0f;
-    float half_time = cfg->booster_ramp / 50.0f;
+    float ramp = cfg->torquetilt_ramp;
+    float half_time = ramp * 0.5f;
 
     // float step = set_step(tt->interpolated, target, tt->on_step_size, tt->off_step_size, 0.25f * ramp);
     // rate_limit_v02(&tt->interpolated, target, step, ramp);
