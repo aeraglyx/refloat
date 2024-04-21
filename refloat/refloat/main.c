@@ -17,14 +17,13 @@
 // You should have received a copy of the GNU General Public License along with
 // this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "balance_filter.h"
-
 #include "vesc_c_if.h"
 
 #include "atr.h"
 #include "torque_tilt.h"
 #include "turn_tilt.h"
 
+#include "balance_filter.h"
 #include "charging.h"
 #include "footpad_sensor.h"
 #include "lcm.h"
@@ -1289,7 +1288,7 @@ enum {
     COMMAND_RC_MOVE = 7,  // move motor while board is idle
     // COMMAND_BOOSTER = 8,  // change booster settings
     COMMAND_PRINT_INFO = 9,  // print verbose info
-    COMMAND_GET_ALLDATA = 10,  // send all data, compact
+    // COMMAND_GET_ALLDATA = 10,  // send all data, compact
     // COMMAND_EXPERIMENT = 11,  // generic cmd for sending data, used for testing/tuning new features
     COMMAND_LOCK = 12,
     COMMAND_HANDTEST = 13,
@@ -1299,100 +1298,6 @@ enum {
     COMMAND_GET_RTDATA_2 = 201,
     COMMAND_LIGHTS_CONTROL = 202,
 } Commands;
-
-static void cmd_send_all_data(data *d, unsigned char mode) {
-    static const int bufsize = 60;
-    uint8_t buffer[bufsize];
-    int32_t ind = 0;
-
-    buffer[ind++] = 101;  // Package ID
-    buffer[ind++] = COMMAND_GET_ALLDATA;
-
-    mc_fault_code fault = VESC_IF->mc_get_fault();
-    if (fault != FAULT_CODE_NONE) {
-        buffer[ind++] = 69;
-        buffer[ind++] = fault;
-    } else {
-        buffer[ind++] = mode;
-
-        // RT Data
-        buffer_append_float16(buffer, d->pid_value, 10, &ind);
-        buffer_append_float16(buffer, d->imu.pitch_balance, 10, &ind);
-        buffer_append_float16(buffer, d->imu.roll, 10, &ind);
-
-        uint8_t state = (state_compat(&d->state) & 0xF) + (sat_compat(&d->state) << 4);
-        buffer[ind++] = state;
-
-        // passed switch-state includes bit3 for handtest, and bits4..7 for beep reason
-        state = footpad_sensor_state_to_switch_compat(d->footpad_sensor.state);
-        if (d->state.mode == MODE_HANDTEST) {
-            state |= 0x8;
-        }
-        buffer[ind++] = (state & 0xF) + (d->beep_reason << 4);
-        d->beep_reason = BEEP_NONE;
-
-        buffer[ind++] = d->footpad_sensor.adc1 * 50;
-        buffer[ind++] = d->footpad_sensor.adc2 * 50;
-
-        // Setpoints (can be positive or negative)
-        buffer[ind++] = d->setpoint * 5 + 128;
-        buffer[ind++] = d->atr.interpolated * 5 + 128;
-        buffer[ind++] = d->atr.braketilt_interpolated * 5 + 128;
-        buffer[ind++] = d->torque_tilt.interpolated * 5 + 128;
-        buffer[ind++] = d->turn_tilt.interpolated * 5 + 128;
-        buffer[ind++] = d->inputtilt_interpolated * 5 + 128;
-
-        buffer_append_float16(buffer, d->imu.pitch, 10, &ind);
-        buffer[ind++] = 0.0f + 128;
-
-        // Now send motor stuff:
-        buffer_append_float16(buffer, VESC_IF->mc_get_input_voltage_filtered(), 10, &ind);
-        buffer_append_int16(buffer, VESC_IF->mc_get_rpm(), &ind);
-        buffer_append_float16(buffer, VESC_IF->mc_get_speed(), 10, &ind);
-        buffer_append_float16(buffer, VESC_IF->mc_get_tot_current(), 10, &ind);
-        buffer_append_float16(buffer, VESC_IF->mc_get_tot_current_in(), 10, &ind);
-        buffer[ind++] = VESC_IF->mc_get_duty_cycle_now() * 100 + 128;
-        if (VESC_IF->foc_get_id != NULL) {
-            buffer[ind++] = fabsf(VESC_IF->foc_get_id()) * 3;
-        } else {
-            // using 222 as magic number to avoid false positives with 255
-            buffer[ind++] = 222;
-            // ind = 35
-        }
-
-        if (mode >= 2) {
-            // data not required as fast as possible
-            buffer_append_float32_auto(buffer, VESC_IF->mc_get_distance_abs(), &ind);
-            buffer[ind++] = fmaxf(0, VESC_IF->mc_temp_fet_filtered() * 2);
-            buffer[ind++] = fmaxf(0, VESC_IF->mc_temp_motor_filtered() * 2);
-            buffer[ind++] = 0;  // fmaxf(VESC_IF->mc_batt_temp() * 2);
-            // ind = 42
-        }
-        if (mode >= 3) {
-            // data required even less frequently
-            buffer_append_uint32(buffer, VESC_IF->mc_get_odometer(), &ind);
-            buffer_append_float16(buffer, VESC_IF->mc_get_amp_hours(false), 10, &ind);
-            buffer_append_float16(buffer, VESC_IF->mc_get_amp_hours_charged(false), 10, &ind);
-            buffer_append_float16(buffer, VESC_IF->mc_get_watt_hours(false), 1, &ind);
-            buffer_append_float16(buffer, VESC_IF->mc_get_watt_hours_charged(false), 1, &ind);
-            buffer[ind++] = fmaxf(0, fminf(125, VESC_IF->mc_get_battery_level(NULL))) * 2;
-            // ind = 55
-        }
-        if (mode >= 4) {
-            // make charge current and voltage available in mode 4
-            buffer_append_float16(buffer, d->charging.current, 10, &ind);
-            buffer_append_float16(buffer, d->charging.voltage, 10, &ind);
-            // ind = 59
-        }
-    }
-
-    SEND_APP_DATA(buffer, bufsize, ind);
-}
-
-// static void split(unsigned char byte, int *h1, int *h2) {
-//     *h1 = byte & 0xF;
-//     *h2 = byte >> 4;
-// }
 
 static void cmd_print_info([[maybe_unused]] data *d) {
 }
@@ -1436,198 +1341,6 @@ static void cmd_handtest(data *d, unsigned char *cfg) {
         configure(d);
     }
 }
-
-/**
- * cmd_runtime_tune		Extract tune info from 20byte message but don't write to EEPROM!
- */
-// static void cmd_runtime_tune(data *d, unsigned char *cfg, int len) {
-//     int h1, h2;
-//     if (len >= 12) {
-//         split(cfg[0], &h1, &h2);
-//         d->float_conf.kp = h1 + 15;
-//         d->float_conf.kp2 = ((float) h2) / 10;
-
-//         split(cfg[1], &h1, &h2);
-//         d->float_conf.ki = h1;
-//         if (h1 == 1) {
-//             d->float_conf.ki = 0.005;
-//         } else if (h1 > 1) {
-//             d->float_conf.ki = ((float) (h1 - 1)) / 100;
-//         }
-//         d->float_conf.ki_limit = h2 + 19;
-//         if (h2 == 0) {
-//             d->float_conf.ki_limit = 0;
-//         }
-
-//         split(cfg[2], &h1, &h2);
-//         d->float_conf.booster_angle = h1 + 5;
-//         d->float_conf.booster_ramp = h2 + 2;
-
-//         split(cfg[3], &h1, &h2);
-//         if (h1 == 0) {
-//             d->float_conf.booster_current = 0;
-//         } else {
-//             d->float_conf.booster_current = 8 + h1 * 2;
-//         }
-//         d->float_conf.turntilt_strength = h2;
-
-//         split(cfg[4], &h1, &h2);
-//         d->float_conf.turntilt_angle_limit = (h1 & 0x3) + 2;
-//         d->float_conf.turntilt_start_erpm = (float) (h1 >> 2) * 500 + 1000;
-//         d->float_conf.mahony_kp = ((float) h2) / 10 + 1.5;
-
-//         split(cfg[5], &h1, &h2);
-//         if (h1 == 0) {
-//             d->float_conf.atr_strength_up = 0;
-//         } else {
-//             d->float_conf.atr_strength_up = ((float) h1) / 10.0 + 0.5;
-//         }
-//         if (h2 == 0) {
-//             d->float_conf.atr_strength_down = 0;
-//         } else {
-//             d->float_conf.atr_strength_down = ((float) h2) / 10.0 + 0.5;
-//         }
-
-//         split(cfg[6], &h1, &h2);
-//         d->float_conf.atr_speed_boost = ((float) (h2 * 5)) / 100;
-//         if (h1 != 0) {
-//             d->float_conf.atr_speed_boost *= -1;
-//         }
-
-//         split(cfg[7], &h1, &h2);
-//         d->float_conf.atr_angle_limit = h1 + 5;
-//         d->float_conf.atr_on_speed = (h2 & 0x3) + 3;
-//         d->float_conf.atr_off_speed = (h2 >> 2) + 2;
-
-//         split(cfg[8], &h1, &h2);
-//         d->float_conf.atr_response_boost = ((float) h1) / 10 + 1;
-//         d->float_conf.atr_transition_boost = ((float) h2) / 5 + 1;
-
-//         split(cfg[9], &h1, &h2);
-//         d->float_conf.atr_amps_accel_ratio = h1 + 5;
-//         d->float_conf.atr_amps_decel_ratio = h2 + 5;
-
-//         split(cfg[10], &h1, &h2);
-//         d->float_conf.braketilt_strength = h1;
-//         d->float_conf.braketilt_lingering = h2;
-
-//         split(cfg[11], &h1, &h2);
-//         d->mc_current_max = h1 * 5 + 55;
-//         d->mc_current_min = h2 * 5 + 55;
-//         if (h1 == 0) {
-//             d->mc_current_max = VESC_IF->get_cfg_float(CFG_PARAM_l_current_max);
-//         }
-//         if (h2 == 0) {
-//             d->mc_current_min = fabsf(VESC_IF->get_cfg_float(CFG_PARAM_l_current_min));
-//         }
-
-//         d->turntilt_step_size = d->float_conf.turntilt_speed / d->float_conf.hertz;
-//     }
-//     if (len >= 16) {
-//         split(cfg[12], &h1, &h2);
-//         float thup = h1;
-//         float thdown = h2;
-//         d->float_conf.atr_threshold_up = thup / 2;
-//         d->float_conf.atr_threshold_down = thdown / 2;
-
-//         split(cfg[13], &h1, &h2);
-//         float ttup = h1;
-//         float ttdn = h2;
-//         d->float_conf.torquetilt_strength = ttup / 10 * 0.3;
-//         d->float_conf.torquetilt_strength_regen = ttdn / 10 * 0.3;
-
-//         split(cfg[14], &h1, &h2);
-//         float maxangle = h1;
-//         d->float_conf.torquetilt_start_current = h2 + 15;
-//         d->float_conf.torquetilt_angle_limit = maxangle / 2;
-
-//         split(cfg[15], &h1, &h2);
-//         float onspd = h1;
-//         float offspd = h2;
-//         d->float_conf.torquetilt_on_speed = onspd / 2;
-//         d->float_conf.torquetilt_off_speed = offspd + 3;
-//     }
-//     if (len >= 17) {
-//         split(cfg[16], &h1, &h2);
-//         d->float_conf.kp_brake = ((float) h1 + 1) / 10;
-//         d->float_conf.kp2_brake = ((float) h2) / 10;
-//         beep_alert(d, 1, 1);
-//     }
-
-//     reconfigure(d);
-// }
-
-// static void cmd_tune_defaults(data *d) {
-//     d->float_conf.kp = CFG_DFLT_KP;
-//     d->float_conf.kp2 = CFG_DFLT_KP2;
-//     d->float_conf.ki = CFG_DFLT_KI;
-//     d->float_conf.mahony_kp = CFG_DFLT_MAHONY_KP;
-//     d->float_conf.mahony_kp_roll = CFG_DFLT_MAHONY_KP_ROLL;
-//     d->float_conf.mahony_kp_yaw = CFG_DFLT_MAHONY_KP_YAW;
-//     d->float_conf.bf_accel_confidence_decay = CFG_DFLT_BF_ACCEL_CONFIDENCE_DECAY;
-//     d->float_conf.kp_brake = CFG_DFLT_KP_BRAKE;
-//     d->float_conf.kp2_brake = CFG_DFLT_KP2_BRAKE;
-//     d->float_conf.ki_limit = CFG_DFLT_KI_LIMIT;
-//     d->float_conf.booster_angle = CFG_DFLT_BOOSTER_ANGLE;
-//     d->float_conf.booster_ramp = CFG_DFLT_BOOSTER_RAMP;
-//     d->float_conf.booster_current = CFG_DFLT_BOOSTER_CURRENT;
-//     d->float_conf.brkbooster_angle = CFG_DFLT_BRKBOOSTER_ANGLE;
-//     d->float_conf.brkbooster_ramp = CFG_DFLT_BRKBOOSTER_RAMP;
-//     d->float_conf.brkbooster_current = CFG_DFLT_BRKBOOSTER_CURRENT;
-//     d->float_conf.turntilt_strength = CFG_DFLT_TURNTILT_STRENGTH;
-//     d->float_conf.turntilt_angle_limit = CFG_DFLT_TURNTILT_ANGLE_LIMIT;
-//     d->float_conf.turntilt_start_angle = CFG_DFLT_TURNTILT_START_ANGLE;
-//     d->float_conf.turntilt_start_erpm = CFG_DFLT_TURNTILT_START_ERPM;
-//     d->float_conf.turntilt_speed = CFG_DFLT_TURNTILT_SPEED;
-//     d->float_conf.turntilt_erpm_boost = CFG_DFLT_TURNTILT_ERPM_BOOST;
-//     d->float_conf.turntilt_erpm_boost_end = CFG_DFLT_TURNTILT_ERPM_BOOST_END;
-//     d->float_conf.atr_strength_up = CFG_DFLT_ATR_UPHILL_STRENGTH;
-//     d->float_conf.atr_strength_down = CFG_DFLT_ATR_DOWNHILL_STRENGTH;
-//     d->float_conf.atr_threshold_up = CFG_DFLT_ATR_THRESHOLD_UP;
-//     d->float_conf.atr_threshold_down = CFG_DFLT_ATR_THRESHOLD_DOWN;
-//     d->float_conf.atr_speed_boost = CFG_DFLT_ATR_SPEED_BOOST;
-//     d->float_conf.atr_angle_limit = CFG_DFLT_ATR_ANGLE_LIMIT;
-//     d->float_conf.atr_on_speed = CFG_DFLT_ATR_ON_SPEED;
-//     d->float_conf.atr_off_speed = CFG_DFLT_ATR_OFF_SPEED;
-//     d->float_conf.atr_response_boost = CFG_DFLT_ATR_RESPONSE_BOOST;
-//     d->float_conf.atr_transition_boost = CFG_DFLT_ATR_TRANSITION_BOOST;
-//     d->float_conf.atr_filter = CFG_DFLT_ATR_FILTER;
-//     d->float_conf.atr_amps_accel_ratio = CFG_DFLT_ATR_AMPS_ACCEL_RATIO;
-//     d->float_conf.atr_amps_decel_ratio = CFG_DFLT_ATR_AMPS_DECEL_RATIO;
-//     d->float_conf.braketilt_strength = CFG_DFLT_BRAKETILT_STRENGTH;
-//     d->float_conf.braketilt_lingering = CFG_DFLT_BRAKETILT_LINGERING;
-
-//     d->float_conf.startup_pitch_tolerance = CFG_DFLT_STARTUP_PITCH_TOLERANCE;
-//     d->float_conf.startup_roll_tolerance = CFG_DFLT_STARTUP_ROLL_TOLERANCE;
-//     d->float_conf.startup_speed = CFG_DFLT_STARTUP_SPEED;
-//     d->float_conf.startup_click_current = CFG_DFLT_STARTUP_CLICK_CURRENT;
-//     d->float_conf.brake_current = CFG_DFLT_BRAKE_CURRENT;
-//     d->float_conf.is_beeper_enabled = CFG_DFLT_IS_BEEPER_ENABLED;
-//     d->float_conf.tiltback_constant = CFG_DFLT_TILTBACK_CONSTANT;
-//     d->float_conf.tiltback_constant_erpm = CFG_DFLT_TILTBACK_CONSTANT_ERPM;
-//     d->float_conf.tiltback_variable = CFG_DFLT_TILTBACK_VARIABLE;
-//     d->float_conf.tiltback_variable_max = CFG_DFLT_TILTBACK_VARIABLE_MAX;
-//     d->float_conf.noseangling_speed = CFG_DFLT_NOSEANGLING_SPEED;
-//     d->float_conf.startup_pushstart_enabled = CFG_DFLT_PUSHSTART_ENABLED;
-//     d->float_conf.startup_simplestart_enabled = CFG_DFLT_SIMPLESTART_ENABLED;
-//     d->float_conf.startup_dirtylandings_enabled = CFG_DFLT_DIRTYLANDINGS_ENABLED;
-
-//     // Update values normally done in configure()
-//     d->turntilt_step_size = d->float_conf.turntilt_speed / d->float_conf.hertz;
-
-//     d->startup_step_size = d->float_conf.startup_speed / d->float_conf.hertz;
-//     d->noseangling_step_size = d->float_conf.noseangling_speed / d->float_conf.hertz;
-//     d->startup_pitch_trickmargin = d->float_conf.startup_dirtylandings_enabled ? 10 : 0;
-//     d->tiltback_variable = d->float_conf.tiltback_variable / 1000;
-//     if (d->tiltback_variable > 0) {
-//         d->tiltback_variable_max_erpm =
-//             fabsf(d->float_conf.tiltback_variable_max / d->tiltback_variable);
-//     } else {
-//         d->tiltback_variable_max_erpm = 100000;
-//     }
-
-//     reconfigure(d);
-// }
 
 /**
  * cmd_runtime_tune_tilt: Extract settings from 20byte message but don't write to EEPROM!
@@ -1763,8 +1476,8 @@ void cmd_rc_move(data *d, unsigned char *cfg) {
     }
 }
 
-static void send_realtime_data2(data *d) {
-    static const int bufsize = 75;
+static void send_realtime_data(data *d) {
+    static const int bufsize = 67;
     uint8_t buffer[bufsize];
     int32_t ind = 0;
 
@@ -1804,6 +1517,7 @@ static void send_realtime_data2(data *d) {
     if (d->state.state == STATE_RUNNING) {
         // Setpoints
         buffer_append_float32_auto(buffer, d->setpoint, &ind);
+
         buffer_append_float32_auto(buffer, d->atr.interpolated, &ind);
         buffer_append_float32_auto(buffer, d->atr.braketilt_interpolated, &ind);
         buffer_append_float32_auto(buffer, d->torque_tilt.interpolated, &ind);
@@ -1875,123 +1589,123 @@ static void on_command_received(unsigned char *buffer, unsigned int len) {
     }
 
     switch (command) {
-    case COMMAND_GET_INFO: {
-        int32_t ind = 0;
-        uint8_t send_buffer[10];
-        send_buffer[ind++] = 101;  // magic nr.
-        send_buffer[ind++] = 0x0;  // command ID
-        send_buffer[ind++] = (uint8_t) (10 * PACKAGE_MAJOR_MINOR_VERSION);
-        send_buffer[ind++] = 1;  // build number
-        // Send the full type here. This is redundant with cmd_light_info. It
-        // likely shouldn't be here, as the type can be reconfigured and the
-        // app would need to reconnect to pick up the change from this command.
-        send_buffer[ind++] = d->float_conf.hardware.leds.type;
-        VESC_IF->send_app_data(send_buffer, ind);
-        return;
-    }
-    case COMMAND_GET_RTDATA_2: {
-        send_realtime_data2(d);
-        return;
-    }
-    // case COMMAND_RT_TUNE: {
-    //     cmd_runtime_tune(d, &buffer[2], len - 2);
-    //     return;
-    // }
-    case COMMAND_TUNE_OTHER: {
-        if (len >= 14) {
-            cmd_runtime_tune_other(d, &buffer[2], len - 2);
-        } else {
-            log_error("Command data length incorrect: %u", len);
+        case COMMAND_GET_INFO: {
+            int32_t ind = 0;
+            uint8_t send_buffer[10];
+            send_buffer[ind++] = 101;  // magic nr.
+            send_buffer[ind++] = 0x0;  // command ID
+            send_buffer[ind++] = (uint8_t) (10 * PACKAGE_MAJOR_MINOR_VERSION);
+            send_buffer[ind++] = 1;  // build number
+            // Send the full type here. This is redundant with cmd_light_info. It
+            // likely shouldn't be here, as the type can be reconfigured and the
+            // app would need to reconnect to pick up the change from this command.
+            send_buffer[ind++] = d->float_conf.hardware.leds.type;
+            VESC_IF->send_app_data(send_buffer, ind);
+            return;
         }
-        return;
-    }
-    case COMMAND_TUNE_TILT: {
-        if (len >= 10) {
-            cmd_runtime_tune_tilt(d, &buffer[2], len - 2);
-        } else {
-            log_error("Command data length incorrect: %u", len);
+        case COMMAND_GET_RTDATA_2: {
+            send_realtime_data(d);
+            return;
         }
-        return;
-    }
-    case COMMAND_RC_MOVE: {
-        if (len == 6) {
-            cmd_rc_move(d, &buffer[2]);
-        } else {
-            log_error("Command data length incorrect: %u", len);
+        // case COMMAND_RT_TUNE: {
+        //     cmd_runtime_tune(d, &buffer[2], len - 2);
+        //     return;
+        // }
+        case COMMAND_TUNE_OTHER: {
+            if (len >= 14) {
+                cmd_runtime_tune_other(d, &buffer[2], len - 2);
+            } else {
+                log_error("Command data length incorrect: %u", len);
+            }
+            return;
         }
-        return;
-    }
-    case COMMAND_CFG_RESTORE: {
-        read_cfg_from_eeprom(&d->float_conf);
-        return;
-    }
-    case COMMAND_CFG_SAVE: {
-        write_cfg_to_eeprom(d);
-        return;
-    }
-    // case COMMAND_TUNE_DEFAULTS: {
-    //     cmd_tune_defaults(d);
-    //     return;
-    // }
-    case COMMAND_PRINT_INFO: {
-        cmd_print_info(d);
-        return;
-    }
-    case COMMAND_GET_ALLDATA: {
-        if (len == 3) {
-            cmd_send_all_data(d, buffer[2]);
-        } else {
-            log_error("Command data length incorrect: %u", len);
+        case COMMAND_TUNE_TILT: {
+            if (len >= 10) {
+                cmd_runtime_tune_tilt(d, &buffer[2], len - 2);
+            } else {
+                log_error("Command data length incorrect: %u", len);
+            }
+            return;
         }
-        return;
-    }
-    // case COMMAND_EXPERIMENT: {
-    //     cmd_experiment(d, &buffer[2]);
-    //     return;
-    // }
-    case COMMAND_LOCK: {
-        cmd_lock(d, &buffer[2]);
-        return;
-    }
-    case COMMAND_HANDTEST: {
-        cmd_handtest(d, &buffer[2]);
-        return;
-    }
-    case COMMAND_LCM_POLL: {
-        lcm_poll_request(&d->lcm, &buffer[2], len - 2);
-        lcm_poll_response(&d->lcm, &d->state, d->footpad_sensor.state, &d->motor, d->imu.pitch);
-        return;
-    }
-    case COMMAND_LCM_LIGHT_INFO: {
-        lcm_light_info_response(&d->lcm);
-        return;
-    }
-    case COMMAND_LCM_LIGHT_CTRL: {
-        lcm_light_ctrl_request(&d->lcm, &buffer[2], len - 2);
-        return;
-    }
-    case COMMAND_LCM_DEVICE_INFO: {
-        lcm_device_info_response(&d->lcm);
-        return;
-    }
-    case COMMAND_LCM_GET_BATTERY: {
-        lcm_get_battery_response(&d->lcm);
-        return;
-    }
-    case COMMAND_CHARGING_STATE: {
-        charging_state_request(&d->charging, &buffer[2], len - 2, &d->state);
-        return;
-    }
-    case COMMAND_LIGHTS_CONTROL: {
-        lights_control_request(&d->float_conf.leds, &buffer[2], len - 2, &d->lcm);
-        lights_control_response(&d->float_conf.leds);
-        return;
-    }
-    default: {
-        if (!VESC_IF->app_is_output_disabled()) {
-            log_error("Unknown command received: %u", command);
+        case COMMAND_RC_MOVE: {
+            if (len == 6) {
+                cmd_rc_move(d, &buffer[2]);
+            } else {
+                log_error("Command data length incorrect: %u", len);
+            }
+            return;
         }
-    }
+        case COMMAND_CFG_RESTORE: {
+            read_cfg_from_eeprom(&d->float_conf);
+            return;
+        }
+        case COMMAND_CFG_SAVE: {
+            write_cfg_to_eeprom(d);
+            return;
+        }
+        // case COMMAND_TUNE_DEFAULTS: {
+        //     cmd_tune_defaults(d);
+        //     return;
+        // }
+        case COMMAND_PRINT_INFO: {
+            cmd_print_info(d);
+            return;
+        }
+        // case COMMAND_GET_ALLDATA: {
+        //     if (len == 3) {
+        //         cmd_send_all_data(d, buffer[2]);
+        //     } else {
+        //         log_error("Command data length incorrect: %u", len);
+        //     }
+        //     return;
+        // }
+        // case COMMAND_EXPERIMENT: {
+        //     cmd_experiment(d, &buffer[2]);
+        //     return;
+        // }
+        case COMMAND_LOCK: {
+            cmd_lock(d, &buffer[2]);
+            return;
+        }
+        case COMMAND_HANDTEST: {
+            cmd_handtest(d, &buffer[2]);
+            return;
+        }
+        case COMMAND_LCM_POLL: {
+            lcm_poll_request(&d->lcm, &buffer[2], len - 2);
+            lcm_poll_response(&d->lcm, &d->state, d->footpad_sensor.state, &d->motor, d->imu.pitch);
+            return;
+        }
+        case COMMAND_LCM_LIGHT_INFO: {
+            lcm_light_info_response(&d->lcm);
+            return;
+        }
+        case COMMAND_LCM_LIGHT_CTRL: {
+            lcm_light_ctrl_request(&d->lcm, &buffer[2], len - 2);
+            return;
+        }
+        case COMMAND_LCM_DEVICE_INFO: {
+            lcm_device_info_response(&d->lcm);
+            return;
+        }
+        case COMMAND_LCM_GET_BATTERY: {
+            lcm_get_battery_response(&d->lcm);
+            return;
+        }
+        case COMMAND_CHARGING_STATE: {
+            charging_state_request(&d->charging, &buffer[2], len - 2, &d->state);
+            return;
+        }
+        case COMMAND_LIGHTS_CONTROL: {
+            lights_control_request(&d->float_conf.leds, &buffer[2], len - 2, &d->lcm);
+            lights_control_response(&d->float_conf.leds);
+            return;
+        }
+        default: {
+            if (!VESC_IF->app_is_output_disabled()) {
+                log_error("Unknown command received: %u", command);
+            }
+        }
     }
 }
 

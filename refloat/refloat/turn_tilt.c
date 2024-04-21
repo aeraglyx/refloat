@@ -67,7 +67,7 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
         }
         tt->target *= atr_scaling;
     }
-    // if (fabsf(d->balance_pitch - d->noseangling_interpolated) > 4) {
+    // if (fabsf(d->imu.pitch_balance - d->noseangling_interpolated) > 4) {
     //     // no setpoint changes during heavy acceleration or braking
     //     tt->target = 0;
     // }

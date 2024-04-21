@@ -424,7 +424,7 @@ Item {
                 var sensorAndFlags = dv.getUint8(ind++);
                 state.fsState = sensorAndFlags >> 6;
                 state.wheelslip = sensorAndFlags & 0b00000001;
-                // state.darkride = sensorAndFlags & 0b00000010;
+                state.darkride = sensorAndFlags & 0b00000010;
                 state.charging = sensorAndFlags & 0b00100000;
 
                 var setpointAndStop = dv.getUint8(ind++);
@@ -443,6 +443,7 @@ Item {
 
                 if (hasRuntime) {
                     pitch.setpointValue = dv.getFloat32(ind); ind += 4;
+
                     debugAtrSetpoint.rValue = dv.getFloat32(ind); ind += 4;
                     debugBrakeTiltSetpoint.rValue = dv.getFloat32(ind); ind += 4;
                     debugTorqueTiltSetpoint.rValue = dv.getFloat32(ind); ind += 4;
@@ -2927,8 +2928,7 @@ Item {
                         id: statusTextMode
                         anchors.bottom: parent.bottom
                         width: parent.width
-                        // color: state.pkgMode == state.m_Flywheel ? Utility.getAppHexColor("lightAccent") : Utility.getAppHexColor("lightText")
-                        color: state.pkgMode == Utility.getAppHexColor("lightText")
+                        color: Utility.getAppHexColor("lightText")
                         font.pixelSize: fontSizeSmall
                         font.family: "Exan"
                         horizontalAlignment: Text.AlignHCenter
