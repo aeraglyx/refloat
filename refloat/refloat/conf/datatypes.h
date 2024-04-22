@@ -230,7 +230,7 @@ typedef struct {
     uint16_t turntilt_start_erpm;
     float turntilt_speed;
     float turntilt_ramp;
-    uint16_t turntilt_erpm_boost;
+    float turntilt_erpm_boost;
     uint16_t turntilt_erpm_boost_end;
     bool is_beeper_enabled;
     bool is_dutybeep_enabled;

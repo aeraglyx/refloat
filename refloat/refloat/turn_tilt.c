@@ -36,16 +36,9 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
         return;
     }
 
-    // // Turn Tilt:
-    // // To avoid overreactions at low speed, limit change here:
-    // new_change = fminf(new_change, 0.10);
-    // new_change = fmaxf(new_change, -0.10);
-    // d->yaw_change = d->yaw_change * 0.8 + 0.2 * (new_change);
-
     tt->target = fabsf(imu->yaw_diff) * cfg->turntilt_strength;
 
-    float turntilt_speed_boost = 1.0f;  // turntilt_erpm_boost
-    float speed_boost = exp2f(turntilt_speed_boost * fabsf(mot->erpm_smooth) / 10000);
+    float speed_boost = powf(cfg->turntilt_erpm_boost, fabsf(mot->erpm_smooth) * 0.0001f);
     tt->target *= speed_boost;
 
     // Disable below erpm threshold otherwise add directionality
@@ -83,6 +76,7 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
     tt->interpolated += tt->step_smooth;
 }
 
+// TODO
 // void turn_tilt_winddown(TurnTilt *tt) {
-//     tt->offset *= 0.995;
+//     tt->interpolated *= 0.995;
 // }

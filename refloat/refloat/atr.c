@@ -25,9 +25,9 @@ void atr_reset(ATR *atr) {
     atr->accel_diff = 0.0f;
     atr->target = 0.0f;
     atr->interpolated = 0.0f;
+    atr->step_smooth = 0.0f;
     atr->braketilt_target = 0.0f;
     atr->braketilt_interpolated = 0.0f;
-    atr->step_smooth = 0.0f;
 }
 
 void atr_configure(ATR *atr, const RefloatConfig *cfg) {
@@ -75,8 +75,7 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
 
     float uphill = sign(atr->accel_diff) == sign(mot->erpm_smooth);
     float strength = uphill ? cfg->atr_strength_up : cfg->atr_strength_down;
-
-    float speed_boost = exp2f(cfg->atr_speed_boost * fabsf(mot->erpm_smooth) / 10000);
+    float speed_boost = powf(cfg->atr_speed_boost, fabsf(mot->erpm_smooth) * 0.0001f);
 
     float new_atr_target = atr->accel_diff * strength * speed_boost;
 
@@ -85,7 +84,7 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
     atr->target = new_atr_target;
 
     float step = set_step(atr->interpolated, atr->target, atr->step_size_on, atr->step_size_off);
-    float response_boost = exp2f(cfg->atr_response_boost * fabsf(mot->erpm_smooth) / 10000);
+    float response_boost = powf(cfg->atr_response_boost, fabsf(mot->erpm_smooth) * 0.0001f);
     step *= response_boost;
 
     float ramp = cfg->atr_ramp;

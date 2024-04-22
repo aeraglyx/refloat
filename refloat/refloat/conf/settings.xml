@@ -1606,7 +1606,7 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>0.5</stepDouble>
-            <valDouble>1.5</valDouble>
+            <valDouble>1.0</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °</suffix>
             <vTx>7</vTx>
@@ -1632,13 +1632,13 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>0.5</stepDouble>
-            <valDouble>1.5</valDouble>
+            <valDouble>1.0</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °</suffix>
             <vTx>7</vTx>
         </atr_threshold_down>
         <atr_speed_boost>
-            <longName>Speed Boost</longName>
+            <longName>Strength at Speed</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -1647,16 +1647,16 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Defines how ATR response changes at higher speeds. Set to negative numbers to lower the response as speed increases.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
             <cDefine>CFG_DFLT_ATR_SPEED_BOOST</cDefine>
-            <editorDecimalsDouble>0</editorDecimalsDouble>
-            <editorScale>100</editorScale>
+            <editorDecimalsDouble>1</editorDecimalsDouble>
+            <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxDouble>1</maxDouble>
-            <minDouble>-1</minDouble>
+            <maxDouble>4.0</maxDouble>
+            <minDouble>0.1</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>10</stepDouble>
-            <valDouble>0.3</valDouble>
-            <vTxDoubleScale>10000</vTxDoubleScale>
-            <suffix> %</suffix>
+            <stepDouble>0.1</stepDouble>
+            <valDouble>1</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
+            <suffix>x</suffix>
             <vTx>7</vTx>
         </atr_speed_boost>
         <atr_angle_limit>
@@ -1755,46 +1755,20 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;React more quickly to ATR responses when at high speeds. When you're riding fast and ATR increases, then you also want it to respond faster. Boost is applied twice: at 2500 and 6000 ERPM.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*Note: ERPM = RPM * (Motor Poles / 2)&lt;br /&gt;For an 11&amp;quot; Tire on a Hypercore Motor (30 Poles):&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;2500 ERPM ≈ 5.5 mph ≈ 9 km/h&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;6000 ERPM ≈ 13 mph ≈ 21 km/h&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;ATR Tiltback Speed at 10000 ERPM.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
             <cDefine>CFG_DFLT_ATR_RESPONSE_BOOST</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
             <maxDouble>2</maxDouble>
-            <minDouble>1</minDouble>
+            <minDouble>0.5</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>0.1</stepDouble>
-            <valDouble>1.5</valDouble>
-            <vTxDoubleScale>1000</vTxDoubleScale>
+            <valDouble>1.0</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
             <suffix>x</suffix>
             <vTx>7</vTx>
         </atr_response_boost>
-        <atr_transition_boost>
-            <longName>Tiltback Transition Boost</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Release faster during transitions. When ATR reverses (dip or peak), the slow release speed can cause a long delay for the nose/tail to get back to normal. This should help resolve this.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_TRANSITION_BOOST</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>10</maxDouble>
-            <minDouble>1</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>0.5</stepDouble>
-            <valDouble>3</valDouble>
-            <vTxDoubleScale>1000</vTxDoubleScale>
-            <suffix>x</suffix>
-            <vTx>7</vTx>
-        </atr_transition_boost>
         <atr_filter>
             <longName>Current Filter</longName>
             <type>1</type>
@@ -2054,26 +2028,26 @@ p, li { white-space: pre-wrap; }
             <vTx>7</vTx>
         </turntilt_ramp>
         <turntilt_erpm_boost>
-            <longName>Speed Boost %</longName>
-            <type>2</type>
+            <longName>Strength at Speed</longName>
+            <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Increases the strength based on ERPM. Boost percent is added linearly from 0 ERPM (0% boost) to Max ERPM (Full configured boost % is applied).&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*Note: ERPM = RPM * (Motor Poles / 2)&lt;br /&gt;For an 11&amp;quot; Tire on a Hypercore Motor (30 Poles):&lt;br /&gt;1000 ERPM ≈ 2.2 mph ≈ 3.5 km/h&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Turn Tilt Strength at 10000 ERPM.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
             <cDefine>CFG_DFLT_TURNTILT_ERPM_BOOST</cDefine>
+            <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxInt>10000</maxInt>
-            <minInt>0</minInt>
+            <maxDouble>2.0</maxDouble>
+            <minDouble>0.5</minDouble>
             <showDisplay>0</showDisplay>
-            <stepInt>5</stepInt>
-            <valInt>200</valInt>
-            <suffix> %</suffix>
-            <vTx>3</vTx>
+            <stepDouble>0.1</stepDouble>
+            <valDouble>1</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
+            <suffix>x</suffix>
+            <vTx>7</vTx>
         </turntilt_erpm_boost>
         <turntilt_erpm_boost_end>
             <longName>Speed Boost Max ERPM</longName>
@@ -3403,7 +3377,6 @@ p, li { white-space: pre-wrap; }
         <ser>atr_off_speed</ser>
         <ser>atr_ramp</ser>
         <ser>atr_response_boost</ser>
-        <ser>atr_transition_boost</ser>
         <ser>atr_filter</ser>
         <ser>atr_amps_accel_ratio</ser>
         <ser>atr_amp_offset_per_erpm</ser>
@@ -3523,7 +3496,6 @@ p, li { white-space: pre-wrap; }
                     <param>atr_off_speed</param>
                     <param>atr_ramp</param>
                     <param>atr_response_boost</param>
-                    <param>atr_transition_boost</param>
                     <param>::sep::Advanced</param>
                     <param>atr_amps_accel_ratio</param>
                     <param>atr_amp_offset_per_erpm</param>

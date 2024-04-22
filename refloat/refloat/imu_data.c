@@ -48,6 +48,7 @@ void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter) {
     if ((yaw_diff_raw == 0) || (fabsf(yaw_diff_raw) > 90)) {
         yaw_diff_raw = 0.0f;
     }
+    yaw_diff_raw = clampf(yaw_diff_raw, -0.1f, 1.0f);
     imu->yaw_diff = 0.8f * imu->yaw_diff + 0.2f * yaw_diff_raw;
 
     // imu->pitch_last = imu->pitch;

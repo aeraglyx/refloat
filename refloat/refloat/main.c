@@ -73,12 +73,19 @@ typedef struct {
     // Firmware version, passed in from Lisp
     int fw_version_major, fw_version_minor, fw_version_beta;
 
+    State state;
+
+    // Board data
     MotorData motor;
     IMUData imu;
 
-    TorqueTilt torque_tilt;
+    // Tune modifiers
     ATR atr;
+    TorqueTilt torque_tilt;
     TurnTilt turn_tilt;
+
+    // IMU data for the balancing filter
+    BalanceFilterData balance_filter;
 
     // Beeper
     int beep_num_left;
@@ -109,16 +116,10 @@ typedef struct {
     bool surge_enable;
     bool duty_beeping;
 
-    // IMU data for the balancing filter
-    BalanceFilterData balance_filter;
-
     float throttle_val;
     float max_duty_with_margin;
 
     FootpadSensor footpad_sensor;
-
-    // Rumtime state values
-    State state;
 
     float proportional;
     float integral;
@@ -264,7 +265,7 @@ static void configure(data *d) {
     // Feature: Stealthy start vs normal start (noticeable click when engaging) - 0-20A
     d->start_counter_clicks_max = 3;
     // Feature: Soft Start
-    d->softstart_ramp_step_size = (float) 100 / d->float_conf.hertz;
+    d->softstart_ramp_step_size = (float) 200 / d->float_conf.hertz;
     // Feature: Dirty Landings
     d->startup_pitch_trickmargin = d->float_conf.startup_dirtylandings_enabled ? 10 : 0;
 
@@ -884,7 +885,6 @@ static void refloat_thd(void *arg) {
         d->current_time = VESC_IF->system_time();
         
         imu_data_update(&d->imu, &d->balance_filter);
-
         motor_data_update(&d->motor);
 
         bool remote_connected = false;
@@ -1383,7 +1383,6 @@ static void cmd_runtime_tune_other(data *d, unsigned char *cfg, int len) {
     d->beeper_enabled = ((flags & 0x2) == 2);
     d->float_conf.fault_reversestop_enabled = ((flags & 0x4) == 4);
     d->float_conf.fault_is_dual_switch = ((flags & 0x8) == 8);
-    // d->float_conf.fault_darkride_enabled = ((flags & 0x10) == 0x10);
     bool dirty_landings = ((flags & 0x20) == 0x20);
     d->float_conf.startup_simplestart_enabled = ((flags & 0x40) == 0x40);
     d->float_conf.startup_pushstart_enabled = ((flags & 0x80) == 0x80);
@@ -1607,10 +1606,6 @@ static void on_command_received(unsigned char *buffer, unsigned int len) {
             send_realtime_data(d);
             return;
         }
-        // case COMMAND_RT_TUNE: {
-        //     cmd_runtime_tune(d, &buffer[2], len - 2);
-        //     return;
-        // }
         case COMMAND_TUNE_OTHER: {
             if (len >= 14) {
                 cmd_runtime_tune_other(d, &buffer[2], len - 2);

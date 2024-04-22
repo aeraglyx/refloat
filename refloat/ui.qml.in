@@ -211,7 +211,6 @@ Item {
                 "tiltback_lv",
                 "fault_adc1",
                 "fault_adc2",
-                // "dark_pitch_offset",
             ];
 
             var settings = [];
@@ -424,7 +423,6 @@ Item {
                 var sensorAndFlags = dv.getUint8(ind++);
                 state.fsState = sensorAndFlags >> 6;
                 state.wheelslip = sensorAndFlags & 0b00000001;
-                state.darkride = sensorAndFlags & 0b00000010;
                 state.charging = sensorAndFlags & 0b00100000;
 
                 var setpointAndStop = dv.getUint8(ind++);
@@ -723,7 +721,6 @@ Item {
         // package mode
         readonly property int m_Normal: 0
         readonly property int m_Handtest: 1
-        // readonly property int m_Flywheel: 2
 
         property int pkgMode: m_Normal
 
