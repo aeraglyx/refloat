@@ -1379,7 +1379,7 @@ Item {
 
                         OptionDescription {
                             visible: prefSwapAdcs.checked
-                            text: "Note: This swaps only the sensor visualization. You should swap your ADC1/2 physical connection, as this way, for example, your Konamies (sensor tap codes that control the board) will be reversed as well."
+                            text: "Note: This swaps only the sensor visualization. You should swap your ADC1/2 physical connection."
                         }
 
                         RightSwitch {
