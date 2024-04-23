@@ -28,18 +28,11 @@ typedef struct {
     float roll;
     float yaw;
 
-    // float pitch_diff;
-    // float roll_diff;
     float yaw_diff;
-    // float yaw_diff_abs;
-
-    // float pitch_last;
-    // float roll_last;
+    float yaw_diff_clean;
     float yaw_last;
 
     float pitch_balance;
-    // float roll_balance;
-    // float yaw_balance;
 
     float gyro[3];
 } IMUData;

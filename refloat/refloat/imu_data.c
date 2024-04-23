@@ -23,8 +23,9 @@
 #include <math.h>
 
 void imu_data_reset(IMUData *imu) {
-    imu->yaw_last = 0.0f;
+    imu->yaw_last = rad2deg(VESC_IF->imu_get_yaw());
     imu->yaw_diff = 0.0f;
+    imu->yaw_diff_clean = 0.0f;
 }
 
 // void imu_data_configure(IMUData *imu, float frequency) {
@@ -42,22 +43,24 @@ void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter) {
     imu->roll = rad2deg(VESC_IF->imu_get_roll());
     imu->yaw = rad2deg(VESC_IF->imu_get_yaw());
 
-    // imu->pitch_diff = imu->pitch - imu->pitch_last;
-    // imu->roll_diff = imu->roll - imu->roll_last;
     float yaw_diff_raw = imu->yaw - imu->yaw_last;
-    if ((yaw_diff_raw == 0) || (fabsf(yaw_diff_raw) > 90)) {
-        yaw_diff_raw = 0.0f;
+    if (yaw_diff_raw != 0.0f) {
+        imu->yaw_diff_clean = yaw_diff_raw;
+        if (fabsf(yaw_diff_raw) > 180.0f) {
+            if (yaw_diff_raw < 0.0f) {
+                imu->yaw_diff_clean += 360.0f;
+            } else {
+                imu->yaw_diff_clean -= 360.0f;
+            }
+        }
     }
-    yaw_diff_raw = clampf(yaw_diff_raw, -0.1f, 1.0f);
-    imu->yaw_diff = 0.8f * imu->yaw_diff + 0.2f * yaw_diff_raw;
 
-    // imu->pitch_last = imu->pitch;
-    // imu->roll_last = imu->roll;
+    float yaw_diff_clamped = clampf(imu->yaw_diff_clean, -0.1f, 0.1f);
+    imu->yaw_diff = imu->yaw_diff * 0.9f + yaw_diff_clamped * 0.1f;
     imu->yaw_last = imu->yaw;
 
     imu->pitch_balance = rad2deg(balance_filter_get_pitch(balance_filter));
-    // imu->balance_roll = rad2deg(balance_filter_get_roll(&balance_filter));
-    // imu->balance_yaw = rad2deg(balance_filter_get_yaw(&balance_filter));
     
     VESC_IF->imu_get_gyro(imu->gyro);
+    // TODO accel?
 }
