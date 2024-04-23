@@ -66,7 +66,7 @@ void motor_data_update(MotorData *m) {
     m->last_erpm = m->erpm;
 
     m->current = VESC_IF->mc_get_tot_current_directional_filtered();
-    smooth_value(&m->current_filtered, m->current, 0.1f, 800);
+    smooth_value(&m->current_filtered, m->current, m->filter_half_time, 800);
 
     if (m->atr_filter_enabled) {
         m->atr_filtered_current = biquad_process(&m->atr_current_biquad, m->current);
