@@ -37,6 +37,7 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
     }
 
     tt->target = fabsf(imu->yaw_diff) * cfg->turntilt_strength;
+    // TODO try using filtered gyro instead?
 
     float speed_boost = powf(cfg->turntilt_erpm_boost, fabsf(mot->erpm_smooth) * 0.0001f);
     tt->target *= speed_boost;
@@ -56,7 +57,6 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
         float atr_scaling = (atr_max - fabsf(atr->target)) / (atr_max - atr_min);
         if (atr_scaling < 0){
             atr_scaling = 0;
-            // during heavy torque response clear the yaw aggregate too
         }
         tt->target *= atr_scaling;
     }

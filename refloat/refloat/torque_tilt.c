@@ -51,9 +51,6 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfi
     float ramp = cfg->torquetilt_ramp;
     float half_time = ramp * 0.5f;
 
-    // float step = set_step(tt->interpolated, target, tt->on_step_size, tt->off_step_size, 0.25f * ramp);
-    // rate_limit_v02(&tt->interpolated, target, step, ramp);
-    // float interpolated = rate_limit_v03(tt->interpolated, target, step, ramp);
     float step = set_step(tt->interpolated, target, tt->step_size_on, tt->step_size_off);
     float step_new = rate_limit_v04(tt->interpolated, target, step, ramp);
     smooth_value(&tt->step_smooth, step_new, half_time, cfg->hertz);

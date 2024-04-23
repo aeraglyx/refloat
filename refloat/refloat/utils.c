@@ -40,28 +40,6 @@ void rate_limitf(float *value, float target, float step) {
     }
 }
 
-// void rate_limit_v02(float *interpolated, float target, float max_step, float ramp) {
-//     float offset = target - *interpolated;
-//     float step = get_step(offset, max_step, ramp);
-//     smooth_value(interpolated, *interpolated + step, ramp * 0.05f, 800);
-//     // return *interpolated;
-// }
-
-// void rate_limit_v02(float *interpolated, float target, float step, float ramp) {
-//     float offset = target - *interpolated;
-//     float ramp_limited = fmaxf(ramp, 0.01f);
-//     float step_multiplier = clampf(offset / ramp_limited, -1.0f, 1.0f);
-//     float interpolated_new = *interpolated + step * step_multiplier;
-//     smooth_value(interpolated, interpolated_new, ramp_limited * 0.05f, 800);
-//     // *interpolated = interpolated_new;
-// }
-
-float rate_limit_v03(float interpolated, float target, float step, float ramp) {
-    float offset = target - interpolated;
-    float step_multiplier = clampf(offset / fmaxf(ramp, 0.01f), -1.0f, 1.0f);
-    return interpolated + step * step_multiplier;
-}
-
 float rate_limit_v04(float interpolated, float target, float step, float ramp) {
     float offset = target - interpolated;
     float step_multiplier = clampf(offset / fmaxf(ramp, 0.01f), -1.0f, 1.0f);

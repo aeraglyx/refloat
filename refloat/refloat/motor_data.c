@@ -33,11 +33,6 @@ void motor_data_reset(MotorData *m) {
 
     m->duty_smooth = 0.0f;
 
-    // m->accel_idx = 0;
-    // for (int i = 0; i < ACCEL_ARRAY_SIZE; i++) {
-    //     m->accel_history[i] = 0;
-    // }
-
     biquad_reset(&m->atr_current_biquad);
     m->current_filtered = 0.0f;
 }
@@ -52,7 +47,6 @@ void motor_data_configure(MotorData *m, RefloatConfig *cfg) {
     } else {
         m->atr_filter_enabled = false;
     }
-    // m->atr_smoothing = get_smoothing_factor(1.0f / fmaxf(cfg->atr_filter, 1.0f), cfg->hertz);
 }
 
 void motor_data_update(MotorData *m) {
@@ -65,10 +59,6 @@ void motor_data_update(MotorData *m) {
     float current_acceleration = m->erpm - m->last_erpm;
     float current_accel_clamped = clampf(current_acceleration, -5.0f, 5.0f);
 
-    // float accel_half_time = 0.05f + 0.2f * exp2f(-0.001f * m->erpm_smooth);
-    // smooth_value(&m->acceleration, current_acceleration, accel_half_time, 800);
-    // smooth_value(&m->accel_clamped, current_accel_clamped, accel_half_time, 800);
-    // float atr_smoothing = get_smoothing_factor(0.05f, 800);
     smooth_value(&m->acceleration, current_acceleration, m->filter_half_time, 800);
     smooth_value(&m->accel_clamped, current_accel_clamped, m->filter_half_time, 800);
     // m->acceleration = m->acceleration * 0.98f + current_acceleration * 0.02f;
@@ -91,8 +81,4 @@ void motor_data_update(MotorData *m) {
     m->duty_cycle = fabsf(VESC_IF->mc_get_duty_cycle_now());
     m->duty_smooth = m->duty_smooth * 0.9f + m->duty_cycle * 0.1f;
     // smooth_value(&m->duty_smooth, duty_cycle, 0.01f, 800);
-
-    // m->acceleration += (current_acceleration - m->accel_history[m->accel_idx]) / ACCEL_ARRAY_SIZE;
-    // m->accel_history[m->accel_idx] = current_acceleration;
-    // m->accel_idx = (m->accel_idx + 1) % ACCEL_ARRAY_SIZE;
 }
