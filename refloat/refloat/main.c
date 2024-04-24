@@ -22,6 +22,7 @@
 #include "atr.h"
 #include "torque_tilt.h"
 #include "turn_tilt.h"
+#include "speed_tilt.h"
 
 #include "pid.h"
 #include "balance_filter.h"
@@ -80,13 +81,14 @@ typedef struct {
     IMUData imu;
     MotorData motor;
 
+    // IMU data for the balancing filter
+    BalanceFilterData balance_filter;
+
     // Tune modifiers
     ATR atr;
     TorqueTilt torque_tilt;
     TurnTilt turn_tilt;
-
-    // IMU data for the balancing filter
-    BalanceFilterData balance_filter;
+    SpeedTilt speed_tilt;
 
     // Beeper
     int beep_num_left;
@@ -96,8 +98,6 @@ typedef struct {
     bool beeper_enabled;
 
     Leds leds;
-
-    // Lights Control Module - external lights control
     LcmData lcm;
 
     Charging charging;
@@ -108,8 +108,7 @@ typedef struct {
     float startup_step_size;
     float tiltback_duty_step_size, tiltback_hv_step_size, tiltback_lv_step_size,
         tiltback_return_step_size;
-    float tiltback_variable, tiltback_variable_max_erpm, noseangling_step_size,
-        inputtilt_ramped_step_size, inputtilt_step_size;
+    float inputtilt_ramped_step_size, inputtilt_step_size;
     float mc_max_temp_fet, mc_max_temp_mot;
     float mc_current_max, mc_current_min;
     float surge_angle, surge_angle2, surge_angle3, surge_adder;
@@ -124,7 +123,7 @@ typedef struct {
     PID pid;
 
     float setpoint, setpoint_target, setpoint_target_interpolated;
-    float noseangling_interpolated, inputtilt_interpolated;
+    float inputtilt_interpolated;
     float current_time;
     float disengage_timer, nag_timer;
     float idle_voltage;
@@ -134,7 +133,6 @@ typedef struct {
     float brake_timeout;
     float wheelslip_timer, tb_highvoltage_timer;
     float switch_warn_beep_erpm;
-    bool traction_control;
 
     // Feature: Reverse Stop
     float reverse_stop_step_size, reverse_tolerance, reverse_total_erpm;
@@ -222,6 +220,7 @@ static void reconfigure(data *d) {
     atr_configure(&d->atr, &d->float_conf);
     torque_tilt_configure(&d->torque_tilt, &d->float_conf);
     turn_tilt_configure(&d->turn_tilt, &d->float_conf);
+    speed_tilt_configure(&d->speed_tilt, &d->float_conf);
 
     pid_configure(&d->pid, &d->float_conf);
 }
@@ -241,12 +240,12 @@ static void configure(data *d) {
     d->motor_timeout_s = 20.0f / d->float_conf.hertz;
 
     d->startup_step_size = d->float_conf.startup_speed / d->float_conf.hertz;
+    d->inputtilt_step_size = d->float_conf.inputtilt_speed / d->float_conf.hertz;
+
     d->tiltback_duty_step_size = d->float_conf.tiltback_duty_speed / d->float_conf.hertz;
     d->tiltback_hv_step_size = d->float_conf.tiltback_hv_speed / d->float_conf.hertz;
     d->tiltback_lv_step_size = d->float_conf.tiltback_lv_speed / d->float_conf.hertz;
     d->tiltback_return_step_size = d->float_conf.tiltback_return_speed / d->float_conf.hertz;
-    d->noseangling_step_size = d->float_conf.noseangling_speed / d->float_conf.hertz;
-    d->inputtilt_step_size = d->float_conf.inputtilt_speed / d->float_conf.hertz;
 
     d->surge_angle = d->float_conf.surge_angle;
     d->surge_angle2 = d->float_conf.surge_angle * 2;
@@ -287,15 +286,6 @@ static void configure(data *d) {
     // Speed above which to warn users about an impending full switch fault
     d->switch_warn_beep_erpm = d->float_conf.is_footbeep_enabled ? 2000 : 100000;
 
-    // Variable nose angle adjustment / tiltback (setting is per 1000erpm, convert to per erpm)
-    d->tiltback_variable = d->float_conf.tiltback_variable / 1000;
-    if (d->tiltback_variable > 0) {
-        d->tiltback_variable_max_erpm =
-            fabsf(d->float_conf.tiltback_variable_max / d->tiltback_variable);
-    } else {
-        d->tiltback_variable_max_erpm = 100000;
-    }
-
     d->beeper_enabled = d->float_conf.is_beeper_enabled;
 
     reconfigure(d);
@@ -314,6 +304,7 @@ static void reset_vars(data *d) {
     atr_reset(&d->atr);
     torque_tilt_reset(&d->torque_tilt);
     turn_tilt_reset(&d->turn_tilt);
+    speed_tilt_reset(&d->speed_tilt);
 
     pid_reset(&d->pid);
 
@@ -321,7 +312,6 @@ static void reset_vars(data *d) {
     d->setpoint = d->imu.pitch_balance;
     d->setpoint_target_interpolated = d->imu.pitch_balance;
     d->setpoint_target = 0;
-    d->noseangling_interpolated = 0;
     d->inputtilt_interpolated = 0;
     d->brake_timeout = 0;
 
@@ -566,17 +556,12 @@ static void calculate_setpoint_target(data *d) {
         d->state.sat = SAT_NONE;
         d->wheelslip_timer = d->current_time;
     } else if (d->state.wheelslip) {
-        if (fabsf(d->motor.acceleration) < 10) {
-            // acceleration is slowing down, traction control seems to have worked
-            d->traction_control = false;
-        }
         // Remain in wheelslip state for at least 500ms to avoid any overreactions
         if (d->motor.duty_cycle > d->max_duty_with_margin) {
             d->wheelslip_timer = d->current_time;
         } else if (d->current_time - d->wheelslip_timer > 0.2) {
             if (d->motor.duty_cycle < 0.7) {
                 // Leave wheelslip state only if duty < 70%
-                d->traction_control = false;
                 d->state.wheelslip = false;
             }
         }
@@ -705,6 +690,7 @@ void aggregate_tiltbacks(data *d){
     d->setpoint += d->atr.interpolated + d->atr.braketilt_interpolated;
     d->setpoint += d->torque_tilt.interpolated;
     d->setpoint += d->turn_tilt.interpolated;
+    d->setpoint += d->speed_tilt.interpolated;
     // float ab_offset = d->atr.offset + d->atr.braketilt_offset;
     // if (sign(ab_offset) == sign(d->torque_tilt.offset)) {
     //     d->setpoint +=
@@ -743,28 +729,6 @@ static void add_surge(data *d) {
             d->setpoint -= d->surge_adder;
         }
     }
-}
-
-static void apply_noseangling(data *d) {
-    // Variable Tiltback looks at ERPM from the reference point of the set minimum ERPM
-    // float variable_erpm = fmaxf(0, d->motor.abs_erpm - d->float_conf.tiltback_variable_erpm);
-    float target = d->motor.erpm_smooth * d->tiltback_variable;
-    angle_limitf(&target, d->float_conf.tiltback_variable_max);
-
-    // if (variable_erpm > d->tiltback_variable_max_erpm) {
-    //     target = d->float_conf.tiltback_variable_max * d->motor.erpm_sign;
-    // } else {
-    //     target = d->tiltback_variable * variable_erpm * d->motor.erpm_sign *
-    //         sign(d->float_conf.tiltback_variable_max);
-    // }
-
-    if (d->motor.abs_erpm > d->float_conf.tiltback_constant_erpm) {
-        target += d->float_conf.tiltback_constant * d->motor.erpm_sign;
-    }
-
-    rate_limitf(&d->noseangling_interpolated, target, d->noseangling_step_size);
-
-    d->setpoint += d->noseangling_interpolated;
 }
 
 static void apply_inputtilt(data *d) {
@@ -959,13 +923,13 @@ static void refloat_thd(void *arg) {
             add_surge(d);
             apply_inputtilt(d);
             if (d->state.wheelslip) {
-                torque_tilt_winddown(&d->torque_tilt);
                 atr_and_braketilt_winddown(&d->atr);
+                torque_tilt_winddown(&d->torque_tilt);
             } else {
-                apply_noseangling(d);
+                atr_and_braketilt_update(&d->atr, &d->motor, &d->float_conf, d->pid.proportional);
                 torque_tilt_update(&d->torque_tilt, &d->motor, &d->float_conf);
                 turn_tilt_update(&d->turn_tilt, &d->motor, &d->imu, &d->atr, &d->float_conf);
-                atr_and_braketilt_update(&d->atr, &d->motor, &d->float_conf, d->pid.proportional);
+                speed_tilt_update(&d->speed_tilt, &d->motor, &d->float_conf);
             }
 
             aggregate_tiltbacks(d);
@@ -1214,107 +1178,107 @@ static void cmd_handtest(data *d, unsigned char *cfg) {
 /**
  * cmd_runtime_tune_tilt: Extract settings from 20byte message but don't write to EEPROM!
  */
-static void cmd_runtime_tune_tilt(data *d, unsigned char *cfg, int len) {
-    unsigned int flags = cfg[0];
-    bool duty_beep = flags & 0x1;
-    d->float_conf.is_dutybeep_enabled = duty_beep;
-    float retspeed = cfg[1];
-    if (retspeed > 0) {
-        d->float_conf.tiltback_return_speed = retspeed / 10;
-        d->tiltback_return_step_size = d->float_conf.tiltback_return_speed / d->float_conf.hertz;
-    }
-    d->float_conf.tiltback_duty = (float) cfg[2] / 100.0;
-    d->float_conf.tiltback_duty_angle = (float) cfg[3] / 10.0;
-    d->float_conf.tiltback_duty_speed = (float) cfg[4] / 10.0;
+// static void cmd_runtime_tune_tilt(data *d, unsigned char *cfg, int len) {
+//     unsigned int flags = cfg[0];
+//     bool duty_beep = flags & 0x1;
+//     d->float_conf.is_dutybeep_enabled = duty_beep;
+//     float retspeed = cfg[1];
+//     if (retspeed > 0) {
+//         d->float_conf.tiltback_return_speed = retspeed / 10;
+//         d->tiltback_return_step_size = d->float_conf.tiltback_return_speed / d->float_conf.hertz;
+//     }
+//     d->float_conf.tiltback_duty = (float) cfg[2] / 100.0;
+//     d->float_conf.tiltback_duty_angle = (float) cfg[3] / 10.0;
+//     d->float_conf.tiltback_duty_speed = (float) cfg[4] / 10.0;
 
-    if (len >= 6) {
-        float surge_duty_start = cfg[5];
-        if (surge_duty_start > 0) {
-            d->float_conf.surge_duty_start = surge_duty_start / 100.0;
-            d->float_conf.surge_angle = (float) cfg[6] / 20.0;
-            d->surge_angle = d->float_conf.surge_angle;
-            d->surge_angle2 = d->float_conf.surge_angle * 2;
-            d->surge_angle3 = d->float_conf.surge_angle * 3;
-            d->surge_enable = d->surge_angle > 0;
-        }
-        beep_alert(d, 1, 1);
-    } else {
-        beep_alert(d, 3, 0);
-    }
-}
+//     if (len >= 6) {
+//         float surge_duty_start = cfg[5];
+//         if (surge_duty_start > 0) {
+//             d->float_conf.surge_duty_start = surge_duty_start / 100.0;
+//             d->float_conf.surge_angle = (float) cfg[6] / 20.0;
+//             d->surge_angle = d->float_conf.surge_angle;
+//             d->surge_angle2 = d->float_conf.surge_angle * 2;
+//             d->surge_angle3 = d->float_conf.surge_angle * 3;
+//             d->surge_enable = d->surge_angle > 0;
+//         }
+//         beep_alert(d, 1, 1);
+//     } else {
+//         beep_alert(d, 3, 0);
+//     }
+// }
 
 /**
  * cmd_runtime_tune_other		Extract settings from 20byte message but don't write to
  * EEPROM!
  */
-static void cmd_runtime_tune_other(data *d, unsigned char *cfg, int len) {
-    unsigned int flags = cfg[0];
-    d->beeper_enabled = ((flags & 0x2) == 2);
-    d->float_conf.fault_reversestop_enabled = ((flags & 0x4) == 4);
-    d->float_conf.fault_is_dual_switch = ((flags & 0x8) == 8);
-    bool dirty_landings = ((flags & 0x20) == 0x20);
-    d->float_conf.startup_simplestart_enabled = ((flags & 0x40) == 0x40);
-    d->float_conf.startup_pushstart_enabled = ((flags & 0x80) == 0x80);
+// static void cmd_runtime_tune_other(data *d, unsigned char *cfg, int len) {
+//     unsigned int flags = cfg[0];
+//     d->beeper_enabled = ((flags & 0x2) == 2);
+//     d->float_conf.fault_reversestop_enabled = ((flags & 0x4) == 4);
+//     d->float_conf.fault_is_dual_switch = ((flags & 0x8) == 8);
+//     bool dirty_landings = ((flags & 0x20) == 0x20);
+//     d->float_conf.startup_simplestart_enabled = ((flags & 0x40) == 0x40);
+//     d->float_conf.startup_pushstart_enabled = ((flags & 0x80) == 0x80);
 
-    d->float_conf.is_beeper_enabled = d->beeper_enabled;
-    d->startup_pitch_trickmargin = dirty_landings ? 10 : 0;
-    d->float_conf.startup_dirtylandings_enabled = dirty_landings;
+//     d->float_conf.is_beeper_enabled = d->beeper_enabled;
+//     d->startup_pitch_trickmargin = dirty_landings ? 10 : 0;
+//     d->float_conf.startup_dirtylandings_enabled = dirty_landings;
 
-    // startup
-    float ctrspeed = cfg[1];
-    float pitchtolerance = cfg[2];
-    float rolltolerance = cfg[3];
-    float brakecurrent = cfg[4];
-    float clickcurrent = cfg[5];
+//     // startup
+//     float ctrspeed = cfg[1];
+//     float pitchtolerance = cfg[2];
+//     float rolltolerance = cfg[3];
+//     float brakecurrent = cfg[4];
+//     float clickcurrent = cfg[5];
 
-    d->startup_step_size = ctrspeed / d->float_conf.hertz;
-    d->float_conf.startup_speed = ctrspeed;
-    d->float_conf.startup_pitch_tolerance = pitchtolerance / 10;
-    d->float_conf.startup_roll_tolerance = rolltolerance;
-    d->float_conf.brake_current = brakecurrent / 2;
-    d->float_conf.startup_click_current = clickcurrent;
+//     d->startup_step_size = ctrspeed / d->float_conf.hertz;
+//     d->float_conf.startup_speed = ctrspeed;
+//     d->float_conf.startup_pitch_tolerance = pitchtolerance / 10;
+//     d->float_conf.startup_roll_tolerance = rolltolerance;
+//     d->float_conf.brake_current = brakecurrent / 2;
+//     d->float_conf.startup_click_current = clickcurrent;
 
-    // nose angling
-    float tiltconst = cfg[6] - 100;
-    float tiltspeed = cfg[7];
-    int tilterpm = cfg[8] * 100;
-    float tiltvarrate = cfg[9];
-    float tiltvarmax = cfg[10];
+//     // nose angling
+//     float tiltconst = cfg[6] - 100;
+//     float tiltspeed = cfg[7];
+//     int tilterpm = cfg[8] * 100;
+//     float tiltvarrate = cfg[9];
+//     float tiltvarmax = cfg[10];
 
-    if (fabsf(tiltconst) <= 20) {
-        d->float_conf.tiltback_constant = tiltconst / 2;
-        d->float_conf.tiltback_constant_erpm = tilterpm;
-        if (tiltspeed > 0) {
-            d->noseangling_step_size = tiltspeed / 10 / d->float_conf.hertz;
-            d->float_conf.noseangling_speed = tiltspeed / 10;
-        }
-        d->float_conf.tiltback_variable = tiltvarrate / 100;
-        d->float_conf.tiltback_variable_max = tiltvarmax / 10;
+//     if (fabsf(tiltconst) <= 20) {
+//         d->float_conf.tiltback_constant = tiltconst / 2;
+//         d->float_conf.tiltback_constant_erpm = tilterpm;
+//         if (tiltspeed > 0) {
+//             d->noseangling_step_size = tiltspeed / 10 / d->float_conf.hertz;
+//             d->float_conf.noseangling_speed = tiltspeed / 10;
+//         }
+//         d->float_conf.tiltback_variable = tiltvarrate / 100;
+//         d->float_conf.tiltback_variable_max = tiltvarmax / 10;
 
-        d->startup_step_size = d->float_conf.startup_speed / d->float_conf.hertz;
-        d->noseangling_step_size = d->float_conf.noseangling_speed / d->float_conf.hertz;
-        d->tiltback_variable = d->float_conf.tiltback_variable / 1000;
-        if (d->tiltback_variable > 0) {
-            d->tiltback_variable_max_erpm =
-                fabsf(d->float_conf.tiltback_variable_max / d->tiltback_variable);
-        } else {
-            d->tiltback_variable_max_erpm = 100000;
-        }
-        d->float_conf.tiltback_variable_erpm = cfg[11] * 100;
-    }
+//         d->startup_step_size = d->float_conf.startup_speed / d->float_conf.hertz;
+//         d->noseangling_step_size = d->float_conf.noseangling_speed / d->float_conf.hertz;
+//         d->tiltback_variable = d->float_conf.tiltback_variable / 1000;
+//         if (d->tiltback_variable > 0) {
+//             d->tiltback_variable_max_erpm =
+//                 fabsf(d->float_conf.tiltback_variable_max / d->tiltback_variable);
+//         } else {
+//             d->tiltback_variable_max_erpm = 100000;
+//         }
+//         d->float_conf.tiltback_variable_erpm = cfg[11] * 100;
+//     }
 
-    if (len >= 14) {
-        int inputtilt = cfg[12] & 0x3;
-        if (inputtilt <= INPUTTILT_PPM) {
-            d->float_conf.inputtilt_remote_type = inputtilt;
-            if (inputtilt > 0) {
-                d->float_conf.inputtilt_angle_limit = cfg[12] >> 2;
-                d->float_conf.inputtilt_speed = cfg[13];
-                d->inputtilt_step_size = d->float_conf.inputtilt_speed / d->float_conf.hertz;
-            }
-        }
-    }
-}
+//     if (len >= 14) {
+//         int inputtilt = cfg[12] & 0x3;
+//         if (inputtilt <= INPUTTILT_PPM) {
+//             d->float_conf.inputtilt_remote_type = inputtilt;
+//             if (inputtilt > 0) {
+//                 d->float_conf.inputtilt_angle_limit = cfg[12] >> 2;
+//                 d->float_conf.inputtilt_speed = cfg[13];
+//                 d->inputtilt_step_size = d->float_conf.inputtilt_speed / d->float_conf.hertz;
+//             }
+//         }
+//     }
+// }
 
 void cmd_rc_move(data *d, unsigned char *cfg) {
     int ind = 0;
