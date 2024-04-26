@@ -45,23 +45,23 @@ void pid_update(PID *pid, const IMUData *imu, const MotorData *mot, const Refloa
     if (mot->abs_erpm < 500) {
         // All scaling should roll back to 1.0x when near a stop for a smooth stand-still
         // and back-forth transition
-        pid->kp_brake_scale = 0.01 + 0.99 * pid->kp_brake_scale;
-        pid->kp2_brake_scale = 0.01 + 0.99 * pid->kp2_brake_scale;
-        pid->kp_accel_scale = 0.01 + 0.99 * pid->kp_accel_scale;
-        pid->kp2_accel_scale = 0.01 + 0.99 * pid->kp2_accel_scale;
+        pid->kp_brake_scale = 0.01f + 0.99f * pid->kp_brake_scale;
+        pid->kp2_brake_scale = 0.01f + 0.99f * pid->kp2_brake_scale;
+        pid->kp_accel_scale = 0.01f + 0.99f * pid->kp_accel_scale;
+        pid->kp2_accel_scale = 0.01f + 0.99f * pid->kp2_accel_scale;
     } else if (mot->erpm > 0) {
         // Once rolling forward, brakes should transition to scaled values
-        pid->kp_brake_scale = 0.01 * cfg->kp_brake + 0.99 * pid->kp_brake_scale;
-        pid->kp2_brake_scale = 0.01 * cfg->kp2_brake + 0.99 * pid->kp2_brake_scale;
-        pid->kp_accel_scale = 0.01 + 0.99 * pid->kp_accel_scale;
-        pid->kp2_accel_scale = 0.01 + 0.99 * pid->kp2_accel_scale;
+        pid->kp_brake_scale = 0.01f * cfg->kp_brake + 0.99f * pid->kp_brake_scale;
+        pid->kp2_brake_scale = 0.01f * cfg->kp2_brake + 0.99f * pid->kp2_brake_scale;
+        pid->kp_accel_scale = 0.01f + 0.99f * pid->kp_accel_scale;
+        pid->kp2_accel_scale = 0.01f + 0.99f * pid->kp2_accel_scale;
     } else {
         // Once rolling backward, the NEW brakes (we will use kp_accel) should transition to
         // scaled values
-        pid->kp_brake_scale = 0.01 + 0.99 * pid->kp_brake_scale;
-        pid->kp2_brake_scale = 0.01 + 0.99 * pid->kp2_brake_scale;
-        pid->kp_accel_scale = 0.01 * cfg->kp_brake + 0.99 * pid->kp_accel_scale;
-        pid->kp2_accel_scale = 0.01 * cfg->kp2_brake + 0.99 * pid->kp2_accel_scale;
+        pid->kp_brake_scale = 0.01f + 0.99f * pid->kp_brake_scale;
+        pid->kp2_brake_scale = 0.01f + 0.99f * pid->kp2_brake_scale;
+        pid->kp_accel_scale = 0.01f * cfg->kp_brake + 0.99f * pid->kp_accel_scale;
+        pid->kp2_accel_scale = 0.01f * cfg->kp2_brake + 0.99f * pid->kp2_accel_scale;
     }
 
     pid->proportional = setpoint - imu->pitch_balance;
@@ -77,7 +77,7 @@ void pid_update(PID *pid, const IMUData *imu, const MotorData *mot, const Refloa
 
     // Apply P Brake Scaling
     float scaled_kp;
-    if (pid->proportional < 0) {
+    if (pid->proportional < 0.0f) {
         scaled_kp = cfg->kp * pid->kp_brake_scale;
     } else {
         scaled_kp = cfg->kp * pid->kp_accel_scale;
@@ -89,7 +89,7 @@ void pid_update(PID *pid, const IMUData *imu, const MotorData *mot, const Refloa
     float rate_prop = -imu->gyro[1];
 
     float scaled_rate_p;
-    if (rate_prop < 0) {
+    if (rate_prop < 0.0f) {
         scaled_rate_p = cfg->kp2 * pid->kp2_brake_scale;
     } else {
         scaled_rate_p = cfg->kp2 * pid->kp2_accel_scale;
@@ -114,5 +114,5 @@ void pid_update(PID *pid, const IMUData *imu, const MotorData *mot, const Refloa
         new_pid_value = sign(new_pid_value) * current_limit;
     }
 
-    pid->pid_value = pid->pid_value * 0.8 + new_pid_value * 0.2;
+    pid->pid_value = pid->pid_value * 0.8f + new_pid_value * 0.2f;
 }
