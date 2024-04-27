@@ -47,6 +47,10 @@ void motor_data_configure(MotorData *m, RefloatConfig *cfg) {
     } else {
         m->atr_filter_enabled = false;
     }
+
+    m->current_max = VESC_IF->get_cfg_float(CFG_PARAM_l_current_max);
+    // min current is a positive value here!
+    m->current_min = fabsf(VESC_IF->get_cfg_float(CFG_PARAM_l_current_min));
 }
 
 void motor_data_update(MotorData *m) {

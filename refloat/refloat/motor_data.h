@@ -53,6 +53,9 @@ typedef struct {
     float current_filtered;
     // float atr_smoothing;
     float filter_half_time;
+
+    float current_min;
+    float current_max;
 } MotorData;
 
 void motor_data_reset(MotorData *m);
