@@ -73,7 +73,7 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
     smooth_value(&atr->accel_diff, accel_diff_raw, accel_diff_half_time, cfg->hertz);
     // atr->accel_diff = 0.95f * atr->accel_diff + 0.05f * accel_diff_raw;
 
-    float uphill = sign(atr->accel_diff) == sign(mot->erpm_smooth);
+    bool uphill = sign(atr->accel_diff) == sign(mot->erpm_smooth);
     float strength = uphill ? cfg->atr_strength_up : cfg->atr_strength_down;
     float speed_boost = powf(cfg->atr_speed_boost, fabsf(mot->erpm_smooth) * 0.0001f);
 
