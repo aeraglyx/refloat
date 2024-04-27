@@ -71,12 +71,12 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
     float strength = uphill ? cfg->atr_strength_up : cfg->atr_strength_down;
     float speed_boost = powf(cfg->atr_speed_boost, fabsf(mot->erpm_smooth) * 0.0001f);
 
-    float new_atr_target = atr->accel_diff * strength * speed_boost;
+    float target_new = atr->accel_diff * strength * speed_boost;
 
-    float atr_threshold = mot->braking ? cfg->atr_threshold_down : cfg->atr_threshold_up;
-    dead_zonef(&new_atr_target, atr_threshold);
-    angle_limitf(&new_atr_target, cfg->atr_angle_limit);
-    atr->target = new_atr_target;
+    float threshold = mot->braking ? cfg->atr_threshold_down : cfg->atr_threshold_up;
+    dead_zonef(&target_new, threshold);
+    angle_limitf(&target_new, cfg->atr_angle_limit);
+    atr->target = target_new;
     
     float offset = fabsf(atr->target) - fabsf(atr->interpolated);
     float step = (offset < 0.0f) ? atr->step_size_off : atr->step_size_on;
