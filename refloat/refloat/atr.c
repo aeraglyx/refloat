@@ -78,7 +78,6 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
     angle_limitf(&new_atr_target, cfg->atr_angle_limit);
     atr->target = new_atr_target;
     
-    // float step = set_step(atr->interpolated, atr->target, atr->step_size_on, atr->step_size_off);
     float offset = fabsf(atr->target) - fabsf(atr->interpolated);
     float step = (offset < 0.0f) ? atr->step_size_off : atr->step_size_on;
 
@@ -87,7 +86,6 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
 
     float ramp = cfg->atr_ramp;
     float half_time = ramp * 0.5f;
-
 
     float step_new = rate_limit_v04(atr->interpolated, atr->target, step, ramp);
     smooth_value(&atr->step_smooth, step_new, half_time, cfg->hertz);
