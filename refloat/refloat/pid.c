@@ -64,10 +64,20 @@ void pid_update(PID *pid, const IMUData *imu, const MotorData *mot, const Refloa
         pid->kp2_accel_scale = 0.01f * cfg->kp2_brake + 0.99f * pid->kp2_accel_scale;
     }
 
-    pid->proportional = setpoint - imu->pitch_balance;
-    pid->integral = pid->integral + pid->proportional * cfg->ki;
+    const float pitch_offset = setpoint - imu->pitch_balance;
 
-    if (cfg->ki_limit > 0 && fabsf(pid->integral) > cfg->ki_limit) {
+    // PROPORTIONAL
+    float kp_scale;
+    if (pitch_offset < 0.0f) {
+        kp_scale = cfg->kp * pid->kp_brake_scale;
+    } else {
+        kp_scale = cfg->kp * pid->kp_accel_scale;
+    }
+    pid->proportional = pitch_offset * kp_scale;
+
+    // INTEGRAL
+    pid->integral += pitch_offset * cfg->ki;
+    if (cfg->ki_limit > 0.0f && fabsf(pid->integral) > cfg->ki_limit) {
         pid->integral = cfg->ki_limit * sign(pid->integral);
     }
     // Quickly ramp down integral component during reverse stop
@@ -75,41 +85,27 @@ void pid_update(PID *pid, const IMUData *imu, const MotorData *mot, const Refloa
     //     pid->integral = pid->integral * 0.9;
     // }
 
-    // Apply P Brake Scaling
-    float scaled_kp;
-    if (pid->proportional < 0.0f) {
-        scaled_kp = cfg->kp * pid->kp_brake_scale;
-    } else {
-        scaled_kp = cfg->kp * pid->kp_accel_scale;
-    }
-
-    float new_pid_value = scaled_kp * pid->proportional + pid->integral;
-
-    // Rate P (Angle + Rate, rather than Angle-Rate Cascading)
-    float rate_prop = -imu->gyro[1];
-
-    float scaled_rate_p;
+    // RATE P
+    const float rate_prop = -imu->gyro[1];  // TODO filter gyro?
+    float rate_p_scale;
     if (rate_prop < 0.0f) {
-        scaled_rate_p = cfg->kp2 * pid->kp2_brake_scale;
+        rate_p_scale = cfg->kp2 * pid->kp2_brake_scale;
     } else {
-        scaled_rate_p = cfg->kp2 * pid->kp2_accel_scale;
+        rate_p_scale = cfg->kp2 * pid->kp2_accel_scale;
     }
+    pid->rate_p = rate_prop * rate_p_scale;
 
-    pid->rate_p = scaled_rate_p * rate_prop;
+    // AGGREGATE
+    float new_pid_value = pid->proportional + pid->integral + pid->rate_p;
 
-    // Braketilt excluded to allow for soft brakes that strengthen when near tail-drag
-    // float true_proportional = d->setpoint - d->atr.braketilt_interpolated - d->imu.pitch;
-    // float abs_proportional = fabsf(true_proportional);
-
-    if (pid->softstart_pid_limit < d->mc_current_max) {
+    // SOFT START
+    if (pid->softstart_pid_limit < mot->current_max) {
         pid->rate_p = fminf(fabs(pid->rate_p), pid->softstart_pid_limit) * sign(pid->rate_p);
         pid->softstart_pid_limit += pid->softstart_ramp_step_size;
     }
 
-    new_pid_value += pid->rate_p;
-
-    // Current Limiting!
-    float current_limit = mot->braking ? d->mc_current_min : d->mc_current_max;
+    // CURRENT LIMITING
+    float current_limit = mot->braking ? mot->current_min : mot->current_max;
     if (fabsf(new_pid_value) > current_limit) {
         new_pid_value = sign(new_pid_value) * current_limit;
     }
