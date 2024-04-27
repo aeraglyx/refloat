@@ -1117,7 +1117,7 @@ enum {
     // COMMAND_TUNE_DEFAULTS = 3,  // set tune to defaults (no eeprom)
     COMMAND_CFG_SAVE = 4,  // save config to eeprom
     COMMAND_CFG_RESTORE = 5,  // restore config from eeprom
-    COMMAND_TUNE_OTHER = 6,  // make runtime changes to startup/etc
+    // COMMAND_TUNE_OTHER = 6,  // make runtime changes to startup/etc
     COMMAND_RC_MOVE = 7,  // move motor while board is idle
     // COMMAND_BOOSTER = 8,  // change booster settings
     COMMAND_PRINT_INFO = 9,  // print verbose info
@@ -1125,7 +1125,7 @@ enum {
     // COMMAND_EXPERIMENT = 11,  // generic cmd for sending data, used for testing/tuning new features
     COMMAND_LOCK = 12,
     COMMAND_HANDTEST = 13,
-    COMMAND_TUNE_TILT = 14,
+    // COMMAND_TUNE_TILT = 14,
 
     // commands above 200 are unstable and can change protocol at any time
     COMMAND_GET_RTDATA_2 = 201,
@@ -1439,22 +1439,22 @@ static void on_command_received(unsigned char *buffer, unsigned int len) {
             send_realtime_data(d);
             return;
         }
-        case COMMAND_TUNE_OTHER: {
-            if (len >= 14) {
-                cmd_runtime_tune_other(d, &buffer[2], len - 2);
-            } else {
-                log_error("Command data length incorrect: %u", len);
-            }
-            return;
-        }
-        case COMMAND_TUNE_TILT: {
-            if (len >= 10) {
-                cmd_runtime_tune_tilt(d, &buffer[2], len - 2);
-            } else {
-                log_error("Command data length incorrect: %u", len);
-            }
-            return;
-        }
+        // case COMMAND_TUNE_OTHER: {
+        //     if (len >= 14) {
+        //         cmd_runtime_tune_other(d, &buffer[2], len - 2);
+        //     } else {
+        //         log_error("Command data length incorrect: %u", len);
+        //     }
+        //     return;
+        // }
+        // case COMMAND_TUNE_TILT: {
+        //     if (len >= 10) {
+        //         cmd_runtime_tune_tilt(d, &buffer[2], len - 2);
+        //     } else {
+        //         log_error("Command data length incorrect: %u", len);
+        //     }
+        //     return;
+        // }
         case COMMAND_RC_MOVE: {
             if (len == 6) {
                 cmd_rc_move(d, &buffer[2]);
