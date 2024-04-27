@@ -60,18 +60,12 @@ void atr_configure(ATR *atr, const RefloatConfig *cfg) {
 // }
 
 static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
-    float atr_threshold = mot->braking ? cfg->atr_threshold_down : cfg->atr_threshold_up;
-    float accel_factor = cfg->atr_amps_accel_ratio;
-    float offset_per_erpm = cfg->atr_amp_offset_per_erpm;
-    // float measured_acc = clampf(mot->acceleration, -5.0f, 5.0f);
-
-    float amp_offset = offset_per_erpm * mot->erpm_smooth;
-    float accel_expected = (mot->current_filtered - amp_offset) / accel_factor;
+    float amp_offset = cfg->atr_amp_offset_per_erpm * mot->erpm_smooth;
+    float accel_expected = (mot->current_filtered - amp_offset) / cfg->atr_amps_accel_ratio;
 
     float accel_diff_raw = accel_expected - mot->accel_clamped;
     float accel_diff_half_time = 0.15f * exp2f(-0.003f * mot->erpm_smooth);
     smooth_value(&atr->accel_diff, accel_diff_raw, accel_diff_half_time, cfg->hertz);
-    // atr->accel_diff = 0.95f * atr->accel_diff + 0.05f * accel_diff_raw;
 
     bool uphill = sign(atr->accel_diff) == sign(mot->erpm_smooth);
     float strength = uphill ? cfg->atr_strength_up : cfg->atr_strength_down;
@@ -79,16 +73,21 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
 
     float new_atr_target = atr->accel_diff * strength * speed_boost;
 
+    float atr_threshold = mot->braking ? cfg->atr_threshold_down : cfg->atr_threshold_up;
     dead_zonef(&new_atr_target, atr_threshold);
     angle_limitf(&new_atr_target, cfg->atr_angle_limit);
     atr->target = new_atr_target;
+    
+    // float step = set_step(atr->interpolated, atr->target, atr->step_size_on, atr->step_size_off);
+    float offset = fabsf(atr->target) - fabsf(atr->interpolated);
+    float step = (offset < 0.0f) ? atr->step_size_off : atr->step_size_on;
 
-    float step = set_step(atr->interpolated, atr->target, atr->step_size_on, atr->step_size_off);
     float response_boost = powf(cfg->atr_response_boost, fabsf(mot->erpm_smooth) * 0.0001f);
     step *= response_boost;
 
     float ramp = cfg->atr_ramp;
     float half_time = ramp * 0.5f;
+
 
     float step_new = rate_limit_v04(atr->interpolated, atr->target, step, ramp);
     smooth_value(&atr->step_smooth, step_new, half_time, cfg->hertz);

@@ -33,7 +33,7 @@ void speed_tilt_configure(SpeedTilt *st, const RefloatConfig *cfg) {
     st->tiltback_variable = cfg->tiltback_variable / 1000;
     if (st->tiltback_variable > 0) {
         st->tiltback_variable_max_erpm =
-            fabsf(d->float_conf.tiltback_variable_max / st->tiltback_variable);
+            fabsf(cfg->tiltback_variable_max / st->tiltback_variable);
     } else {
         st->tiltback_variable_max_erpm = 100000;
     }
