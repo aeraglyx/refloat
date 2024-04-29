@@ -24,11 +24,11 @@
 void turn_tilt_reset(TurnTilt *tt) {
     tt->target = 0.0f;
     tt->interpolated = 0.0f;
-    tt->step_smooth = 0.0f;
+    // tt->step_smooth = 0.0f;
 }
 
 void turn_tilt_configure(TurnTilt *tt, const RefloatConfig *cfg) {
-    tt->step_size = cfg->turntilt_speed / cfg->hertz;
+    tt->step_size = cfg->turntilt_speed_max / cfg->hertz;
 }
 
 void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, const ATR *atr, const RefloatConfig *cfg) {
@@ -39,11 +39,11 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
     tt->target = fabsf(imu->yaw_diff) * cfg->turntilt_strength;
     // TODO try using filtered gyro instead?
 
-    float speed_boost = powf(cfg->turntilt_erpm_boost, fabsf(mot->erpm_smooth) * 0.0001f);
+    float speed_boost = powf(cfg->turntilt_erpm_boost, mot->erpm_abs_10k);
     tt->target *= speed_boost;
 
     // Disable below erpm threshold otherwise add directionality
-    if (mot->abs_erpm < cfg->turntilt_start_erpm) {
+    if (mot->erpm_abs < cfg->turntilt_start_erpm) {
         tt->target = 0.0f;
     } else {
         tt->target *= mot->erpm_sign;
@@ -66,17 +66,20 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
     // }
 
     angle_limitf(&tt->target, cfg->turntilt_angle_limit);
-    rate_limitf(&tt->interpolated, tt->target, tt->step_size);
+    // TODO turntilt_start_angle
 
-    float ramp = cfg->turntilt_ramp;
-    float half_time = ramp * 0.5f;
+    // float ramp = cfg->turntilt_ramp;
+    // float half_time = ramp * 0.5f;
 
-    float step_new = rate_limit_v04(tt->interpolated, tt->target, tt->step_size, ramp);
-    smooth_value(&tt->step_smooth, step_new, half_time, cfg->hertz);
-    tt->interpolated += tt->step_smooth;
+    float speed = tilt_speed(tt->interpolated, tt->target, cfg->turntilt_speed, cfg->turntilt_speed_max);
+    // float step_new = rate_limit_v04(tt->interpolated, tt->target, tt->step_size, ramp);
+    // smooth_value(&tt->step_smooth, step_new, half_time, cfg->hertz);
+    // tt->interpolated += tt->step_smooth;
+    float interpolated_new = tt->interpolated + speed / cfg->hertz;
+    smooth_value(&tt->interpolated, interpolated_new, cfg->tiltback_filter, cfg->hertz);
 }
 
 // TODO
-// void turn_tilt_winddown(TurnTilt *tt) {
-//     tt->interpolated *= 0.995;
-// }
+void turn_tilt_winddown(TurnTilt *tt) {
+    tt->interpolated *= 0.998;
+}

@@ -23,38 +23,40 @@
 
 void torque_tilt_reset(TorqueTilt *tt) {
     tt->interpolated = 0.0f;
-    tt->step_smooth = 0.0f;
+    // tt->speed_smooth = 0.0f;
 }
 
 void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *cfg) {
-    tt->step_size_on = cfg->torquetilt_on_speed / cfg->hertz;
-    tt->step_size_off = cfg->torquetilt_off_speed / cfg->hertz;
+    tt->step_size_on = cfg->torquetilt_speed_max_on / cfg->hertz;
+    // tt->step_size_off = cfg->torquetilt_speed_max_off / cfg->hertz;
 }
 
 void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfig *cfg) {
-    float strength =
-        mot->braking ? cfg->torquetilt_strength_regen : cfg->torquetilt_strength;
-    float accel_factor = cfg->atr_amps_accel_ratio;
-
     float current = mot->current_filtered;
+    float accel_factor = cfg->atr_amps_accel_ratio;
     float current_based_on_accel = mot->accel_clamped * accel_factor;
 
     float method = cfg->torquetilt_method;
     float target = (1.0f - method) * current + method * current_based_on_accel;
 
     dead_zonef(&target, cfg->torquetilt_start_current);
+    float strength =
+        mot->braking ? cfg->torquetilt_strength_regen : cfg->torquetilt_strength;
     target *= strength;
     angle_limitf(&target, cfg->torquetilt_angle_limit);
 
-    float ramp = cfg->torquetilt_ramp;
-    float half_time = ramp * 0.5f;
+    // float ramp = cfg->torquetilt_ramp;
+    // float half_time = ramp * 0.5f;
 
-    float offset = fabsf(target) - fabsf(tt->interpolated);
-    float step_max = (offset < 0.0f) ? tt->step_size_off : tt->step_size_on;
+    // float offset = fabsf(target) - fabsf(tt->interpolated);
+    // float step_max = (offset < 0.0f) ? tt->step_size_off : tt->step_size_on;
 
-    float step_new = rate_limit_v04(tt->interpolated, target, step_max, ramp);
-    smooth_value(&tt->step_smooth, step_new, half_time, cfg->hertz);
-    tt->interpolated += tt->step_smooth;
+    float speed = tilt_speed(tt->interpolated, target, cfg->torquetilt_speed, cfg->torquetilt_speed_max_on);
+
+    float interpolated_new = tt->interpolated + speed / cfg->hertz;
+    // smooth_value(&tt->speed_smooth, speed, cfg->tiltback_filter, cfg->hertz);
+    smooth_value(&tt->interpolated, interpolated_new, cfg->tiltback_filter, cfg->hertz);
+    // tt->interpolated += tt->speed_smooth / cfg->hertz;
 }
 
 void torque_tilt_winddown(TorqueTilt *tt) {

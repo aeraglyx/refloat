@@ -29,11 +29,12 @@
 typedef struct {
     float erpm;
     float erpm_filtered;
-    float abs_erpm;
+    float erpm_abs;
     float last_erpm;
     int8_t erpm_sign;
     // float erpm_last;
     float erpm_smooth;
+    float erpm_abs_10k;
 
     float current;
     bool braking;

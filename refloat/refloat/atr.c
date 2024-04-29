@@ -25,20 +25,14 @@ void atr_reset(ATR *atr) {
     atr->accel_diff = 0.0f;
     atr->target = 0.0f;
     atr->interpolated = 0.0f;
-    atr->step_smooth = 0.0f;
-    atr->braketilt_target = 0.0f;
-    atr->braketilt_interpolated = 0.0f;
+    atr->speed = 0.0f;
+    atr->debug = 0.0f;
+    // atr->speed_smooth = 0.0f;
 }
 
 void atr_configure(ATR *atr, const RefloatConfig *cfg) {
-    atr->step_size_on = cfg->atr_on_speed / cfg->hertz;
-    atr->step_size_off = cfg->atr_off_speed / cfg->hertz;
-
-    if (cfg->braketilt_strength == 0.0f) {
-        atr->braketilt_factor = 0.0f;
-    } else {
-        atr->braketilt_factor = -(0.5f + (20 - cfg->braketilt_strength) / 5.0f);
-    }
+    atr->step_size_on = cfg->atr_speed_max_on / cfg->hertz;
+    // atr->step_size_off = cfg->atr_speed_max_off / cfg->hertz;
 }
 
 // static void get_wheelslip_probability(MotorData *mot, const RefloatConfig *cfg) {
@@ -53,13 +47,13 @@ void atr_configure(ATR *atr, const RefloatConfig *cfg) {
 
 //     const float freespin_start = 16000.0f;
 //     const float freespin_end = 20000.0f;
-//     float is_freespin = (mot->abs_erpm - freespin_start) / (freespin_end - freespin_start);
+//     float is_freespin = (mot->erpm_abs - freespin_start) / (freespin_end - freespin_start);
 // 	is_freespin = clampf(is_freespin, 0.0f, 1.0f);
 
 //     mot->wheelslip_prob = fmaxf(is_wheelslip, is_freespin);
 // }
 
-static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
+void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
     float amp_offset = cfg->atr_amp_offset_per_erpm * mot->erpm_smooth;
     float accel_expected = (mot->current_filtered - amp_offset) / cfg->atr_amps_accel_ratio;
 
@@ -69,77 +63,41 @@ static void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg)
 
     bool uphill = sign(atr->accel_diff) == sign(mot->erpm_smooth);
     float strength = uphill ? cfg->atr_strength_up : cfg->atr_strength_down;
-    float speed_boost = powf(cfg->atr_speed_boost, fabsf(mot->erpm_smooth) * 0.0001f);
+    float speed_boost = powf(cfg->atr_speed_boost, mot->erpm_abs_10k);
+    strength *= speed_boost;
+    // atr->target = atr->accel_diff * strength * speed_boost;
+    atr->target = atr->accel_diff * strength;
 
-    float target_new = atr->accel_diff * strength * speed_boost;
-
-    float threshold = mot->braking ? cfg->atr_threshold_down : cfg->atr_threshold_up;
-    dead_zonef(&target_new, threshold);
-    angle_limitf(&target_new, cfg->atr_angle_limit);
-    atr->target = target_new;
+    // float threshold = mot->braking ? cfg->atr_threshold_down : cfg->atr_threshold_up;
+    // dead_zonef(&atr->target, threshold);
+    // angle_limitf(&atr->target, cfg->atr_angle_limit);
+    atr->target = clampf(atr->target, -cfg->atr_angle_limit, cfg->atr_angle_limit);
+    // atr->target = target_new;
     
-    float offset = fabsf(atr->target) - fabsf(atr->interpolated);
-    float step = (offset < 0.0f) ? atr->step_size_off : atr->step_size_on;
+    // float offset = fabsf(atr->target) - fabsf(atr->interpolated);
+    // float step = (offset < 0.0f) ? atr->step_size_off : atr->step_size_on;
 
-    float response_boost = powf(cfg->atr_response_boost, fabsf(mot->erpm_smooth) * 0.0001f);
-    step *= response_boost;
+    // step *= response_boost;
 
-    float ramp = cfg->atr_ramp;
-    float half_time = ramp * 0.5f;
+    // float ramp = cfg->atr_ramp;
+    // float speed = cfg->atr_speed;
+    // float half_time = ramp * 0.5f;
 
-    float step_new = rate_limit_v04(atr->interpolated, atr->target, step, ramp);
-    smooth_value(&atr->step_smooth, step_new, half_time, cfg->hertz);
-    atr->interpolated += atr->step_smooth;
+    // float step_new = rate_limit_v04(atr->interpolated, atr->target, step, ramp);
+    atr->speed = tilt_speed(atr->interpolated, atr->target, cfg->atr_speed, cfg->atr_speed_max_on);
+    // float response_boost = powf(cfg->atr_response_boost, mot->erpm_abs_10k);
+
+    // smooth_value(&atr->speed_smooth, speed * response_boost, 0.1f, cfg->hertz);
+    // atr->interpolated += atr->speed_smooth / cfg->hertz;
+
+    float interpolated_new = atr->interpolated + atr->speed / cfg->hertz;
+    // smooth_value(&atr->interpolated, interpolated_new, 0.1f, cfg->hertz);
+    smooth_value(&atr->interpolated, interpolated_new, cfg->tiltback_filter, cfg->hertz);
+    
+    // atr->debug = (1.0f - powf(0.5f, 1.0f / (cfg->tiltback_filter * cfg->hertz))) * 1000.0f;
 }
 
-static void braketilt_update(
-    ATR *atr, const MotorData *mot, const RefloatConfig *cfg, float proportional
-) {
-    // braking also should cause setpoint change lift, causing a delayed lingering nose lift
-    if (atr->braketilt_factor < 0 && mot->braking && mot->abs_erpm > 2000) {
-        // negative currents alone don't necessarily consitute active braking, look at proportional:
-        if (sign(proportional) != mot->erpm_sign) {
-            float downhill_damper = 1;
-            // if we're braking on a downhill we don't want braking to lift the setpoint quite as
-            // much
-            if ((mot->erpm > 1000 && atr->accel_diff < -1) ||
-                (mot->erpm < -1000 && atr->accel_diff > 1)) {
-                downhill_damper += fabsf(atr->accel_diff) / 2;
-            }
-            atr->braketilt_target = proportional / atr->braketilt_factor / downhill_damper;
-            if (downhill_damper > 2) {
-                // steep downhills, we don't enable this feature at all!
-                atr->braketilt_target = 0;
-            }
-        }
-    } else {
-        atr->braketilt_target = 0;
-    }
-
-    float braketilt_step_size = atr->step_size_off / cfg->braketilt_lingering;
-    if (fabsf(atr->braketilt_target) > fabsf(atr->braketilt_interpolated)) {
-        braketilt_step_size = atr->step_size_on * 1.5;
-    } else if (mot->abs_erpm < 800) {
-        braketilt_step_size = atr->step_size_on;
-    }
-
-    if (mot->abs_erpm < 500) {
-        braketilt_step_size /= 2.0f;
-    }
-
-    rate_limitf(&atr->braketilt_interpolated, atr->braketilt_target, braketilt_step_size);
-}
-
-void atr_and_braketilt_update(
-    ATR *atr, const MotorData *mot, const RefloatConfig *cfg, float proportional
-) {
-    atr_update(atr, mot, cfg);
-    braketilt_update(atr, mot, cfg, proportional);
-}
-
-void atr_and_braketilt_winddown(ATR *atr) {
+void atr_winddown(ATR *atr) {
     atr->interpolated *= 0.995f;
     atr->target *= 0.99f;
-    atr->braketilt_interpolated *= 0.995f;
-    atr->braketilt_target *= 0.99f;
 }

@@ -23,7 +23,7 @@
 
 void speed_tilt_reset(SpeedTilt *st) {
     st->interpolated = 0.0f;
-    st->step_smooth = 0.0f;
+    // st->step_smooth = 0.0f;
 }
 
 void speed_tilt_configure(SpeedTilt *st, const RefloatConfig *cfg) {
@@ -41,7 +41,7 @@ void speed_tilt_configure(SpeedTilt *st, const RefloatConfig *cfg) {
 
 void speed_tilt_update(SpeedTilt *st, const MotorData *mot, const RefloatConfig *cfg) {
     // Variable Tiltback looks at ERPM from the reference point of the set minimum ERPM
-    // float variable_erpm = fmaxf(0, d->motor.abs_erpm - d->float_conf.tiltback_variable_erpm);
+    // float variable_erpm = fmaxf(0, d->motor.erpm_abs - d->float_conf.tiltback_variable_erpm);
     float target = mot->erpm_smooth * st->tiltback_variable;
     angle_limitf(&target, cfg->tiltback_variable_max);
 
@@ -53,18 +53,23 @@ void speed_tilt_update(SpeedTilt *st, const MotorData *mot, const RefloatConfig 
     // }
 
     // TODO constant
-    // if (d->motor.abs_erpm > d->float_conf.tiltback_constant_erpm) {
+    // if (d->motor.erpm_abs > d->float_conf.tiltback_constant_erpm) {
     //     target += d->float_conf.tiltback_constant * d->motor.erpm_sign;
     // }
 
-    float ramp = 0.1f;  // TODO
-    float half_time = ramp * 0.5f;
+    // float ramp = 0.1f;  // TODO
+    // float half_time = ramp * 0.5f;
 
-    float step_new = rate_limit_v04(st->interpolated, target, st->step_size, ramp);
-    smooth_value(&st->step_smooth, step_new, half_time, cfg->hertz);
-    st->interpolated += st->step_smooth;
+    float speed = tilt_speed(st->interpolated, target, cfg->turntilt_speed, cfg->noseangling_speed);
+
+    float interpolated_new = st->interpolated + speed / cfg->hertz;
+    smooth_value(&st->interpolated, interpolated_new, cfg->tiltback_filter, cfg->hertz);
+
+    // float step_new = rate_limit_v04(st->interpolated, target, st->step_size, ramp);
+    // smooth_value(&st->step_smooth, step_new, half_time, cfg->hertz);
+    // st->interpolated += st->step_smooth;
 }
 
 void speed_tilt_winddown(SpeedTilt *st) {
-    st->interpolated *= 0.995;
+    st->interpolated *= 0.998;
 }

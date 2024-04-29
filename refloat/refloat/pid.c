@@ -42,7 +42,7 @@ void pid_configure(PID *pid, const RefloatConfig *cfg) {
 
 void pid_update(PID *pid, const IMUData *imu, const MotorData *mot, const RefloatConfig *cfg, float setpoint) {
     // Prepare Brake Scaling (ramp scale values as needed for smooth transitions)
-    if (mot->abs_erpm < 500) {
+    if (mot->erpm_abs < 500) {
         // All scaling should roll back to 1.0x when near a stop for a smooth stand-still
         // and back-forth transition
         pid->kp_brake_scale = 0.01f + 0.99f * pid->kp_brake_scale;

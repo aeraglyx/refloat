@@ -56,9 +56,10 @@ void motor_data_configure(MotorData *m, RefloatConfig *cfg) {
 void motor_data_update(MotorData *m) {
     m->erpm = VESC_IF->mc_get_rpm();
     m->erpm_filtered = m->erpm_filtered * 0.9f + m->erpm * 0.1f;
-    m->abs_erpm = fabsf(m->erpm_filtered);
+    m->erpm_abs = fabsf(m->erpm_filtered);
     m->erpm_sign = sign(m->erpm_filtered);
     m->erpm_smooth = m->erpm_smooth * 0.996f + m->erpm * 0.004f;
+    m->erpm_abs_10k = fabsf(m->erpm_smooth) * 0.0001f;
 
     float current_acceleration = m->erpm - m->last_erpm;
     float current_accel_clamped = clampf(current_acceleration, -5.0f, 5.0f);
@@ -78,7 +79,7 @@ void motor_data_update(MotorData *m) {
         m->atr_filtered_current = m->current;
     }
 
-    m->braking = m->abs_erpm > 250 && sign(m->current) != m->erpm_sign;
+    m->braking = m->erpm_abs > 250 && sign(m->current) != m->erpm_sign;
     // m->gas_factor = sigmoid_norm(m->current * sigmoid(m->erpm_filtered, 500), 5.0f);
     // m->braking_factor = sigmoid(m->current * m->erpm_sign, 5.0f);
 

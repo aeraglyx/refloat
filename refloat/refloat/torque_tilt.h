@@ -23,9 +23,9 @@
 
 typedef struct {
     float step_size_on;
-    float step_size_off;
+    // float step_size_off;
     float interpolated;
-    float step_smooth;
+    // float speed_smooth;
 } TorqueTilt;
 
 void torque_tilt_reset(TorqueTilt *tt);

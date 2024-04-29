@@ -443,9 +443,9 @@ Item {
                     pitch.setpointValue = dv.getFloat32(ind); ind += 4;
 
                     debugAtrSetpoint.rValue = dv.getFloat32(ind); ind += 4;
-                    debugBrakeTiltSetpoint.rValue = dv.getFloat32(ind); ind += 4;
                     debugTorqueTiltSetpoint.rValue = dv.getFloat32(ind); ind += 4;
                     debugTurnTiltSetpoint.rValue = dv.getFloat32(ind); ind += 4;
+                    debugSpeedTiltSetpoint.rValue = dv.getFloat32(ind); ind += 4;
                     debugRemoteTiltSetpoint.rValue = dv.getFloat32(ind); ind += 4;
 
                     debugRequestedCurrent.rValue = dv.getFloat32(ind); ind += 4;
@@ -3367,11 +3367,17 @@ Item {
                             spacing: 5
                             clip: true
 
-                            RealValue {id: debugAtrSetpoint; label: "ATR setpoint"; unit: "°";}
-                            RealValue {id: debugBrakeTiltSetpoint; label: "Brake Tilt setpoint"; unit: "°";}
-                            RealValue {id: debugTorqueTiltSetpoint; label: "Torque Tilt setpoint"; unit: "°";}
-                            RealValue {id: debugTurnTiltSetpoint; label: "Turn Tilt setpoint"; unit: "°";}
-                            RealValue {id: debugRemoteTiltSetpoint; label: "Remote Tilt setpoint"; unit: "°";}
+                            // LText {
+                            //     widht: parent.width
+                            //     text: "Setpoints"
+                            //     font.bold = true
+                            // }
+
+                            RealValue {id: debugAtrSetpoint; label: "Interpolated"; unit: "°";}
+                            RealValue {id: debugTorqueTiltSetpoint; label: "Speed"; unit: "°";}
+                            RealValue {id: debugTurnTiltSetpoint; label: "Target"; unit: "°";}
+                            RealValue {id: debugSpeedTiltSetpoint; label: "ERPM abs 10k"; unit: "°";}
+                            RealValue {id: debugRemoteTiltSetpoint; label: "Smoothing x1000"; unit: "°";}
                         }
                     }
 

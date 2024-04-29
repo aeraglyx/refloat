@@ -24,7 +24,7 @@
 typedef struct {
     float step_size;
     float interpolated;
-    float step_smooth;
+    // float step_smooth;
     float tiltback_variable;
     float tiltback_variable_max_erpm;
 } SpeedTilt;
