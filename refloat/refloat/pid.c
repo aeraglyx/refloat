@@ -37,6 +37,7 @@ void pid_reset(PID *pid) {
 }
 
 void pid_configure(PID *pid, const RefloatConfig *cfg) {
+    pid->ki = cfg->ki / cfg->hertz;
     pid->softstart_ramp_step_size = 200.0f / cfg->hertz;
 }
 
@@ -76,7 +77,7 @@ void pid_update(PID *pid, const IMUData *imu, const MotorData *mot, const Refloa
     pid->proportional = pitch_offset * kp_scale;
 
     // INTEGRAL
-    pid->integral += pitch_offset * cfg->ki;
+    pid->integral += pitch_offset * pid->ki;
     if (cfg->ki_limit > 0.0f && fabsf(pid->integral) > cfg->ki_limit) {
         pid->integral = cfg->ki_limit * sign(pid->integral);
     }

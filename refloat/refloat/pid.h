@@ -34,6 +34,8 @@ typedef struct {
     float kp_accel_scale;
     float kp2_accel_scale;
 
+    float ki;
+
     float softstart_ramp_step_size;
     float softstart_pid_limit;
 } PID;

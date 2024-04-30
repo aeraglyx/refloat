@@ -145,12 +145,15 @@ typedef struct {
     float version;
     bool disabled;
     float kp;
-    float ki;
     float kp2;
+    float ki;
+    float ki_limit;
+
     float mahony_kp;
     float mahony_kp_roll;
     float mahony_kp_yaw;
     float bf_accel_confidence_decay;
+
     float kp_brake;
     float kp2_brake;
     uint16_t kp_brake_erpm;
@@ -167,6 +170,7 @@ typedef struct {
     bool fault_is_dual_switch;
     bool fault_moving_fault_disabled;
     bool fault_reversestop_enabled;
+
     float tiltback_duty_angle;
     float tiltback_duty_speed;
     float tiltback_duty;
@@ -177,28 +181,30 @@ typedef struct {
     float tiltback_lv_speed;
     float tiltback_lv;
     float tiltback_return_speed;
-    // float tiltback_constant;
-    // uint16_t tiltback_constant_erpm;
-    float tiltback_variable;
-    float tiltback_variable_max;
-    uint16_t tiltback_variable_erpm;
+
+    float speedtilt_constant;
+    float speedtilt_variable;
+    float speedtilt_variable_max;
+    float speedtilt_speed;
+    float speedtilt_speed_max;
+    
     FLOAT_INPUTTILT_REMOTE_TYPE inputtilt_remote_type;
-    float inputtilt_speed;
+    float inputtilt_speed_max;
     float inputtilt_angle_limit;
     uint16_t inputtilt_smoothing_factor;
     bool inputtilt_invert_throttle;
     float inputtilt_deadband;
     float remote_throttle_current_max;
     float remote_throttle_grace_period;
-    float noseangling_speed;
+
     float startup_pitch_tolerance;
     float startup_roll_tolerance;
     float startup_speed;
     bool startup_simplestart_enabled;
     bool startup_pushstart_enabled;
     bool startup_dirtylandings_enabled;
+
     float brake_current;
-    float ki_limit;
     float torquetilt_strength;
     float torquetilt_strength_regen;
     float torquetilt_start_current;
@@ -207,6 +213,7 @@ typedef struct {
     float torquetilt_speed_max_on;
     // float torquetilt_speed_max_off;
     float torquetilt_method;
+
     float atr_strength_up;
     float atr_strength_down;
     float atr_threshold_up;
@@ -222,8 +229,7 @@ typedef struct {
     float tiltback_filter;
     float atr_amps_accel_ratio;
     float atr_amp_offset_per_erpm;
-    // float braketilt_strength;
-    // float braketilt_lingering;
+
     float turntilt_strength;
     float turntilt_angle_limit;
     float turntilt_start_angle;
@@ -231,6 +237,7 @@ typedef struct {
     float turntilt_speed;
     float turntilt_speed_max;
     float turntilt_erpm_boost;
+
     bool is_beeper_enabled;
     bool is_dutybeep_enabled;
     bool is_footbeep_enabled;

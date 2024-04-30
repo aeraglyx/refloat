@@ -95,6 +95,31 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Values: 0.005 - 0.08 (Caution with higher values!!)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
             <cDefine>CFG_DFLT_KI</cDefine>
+            <editorDecimalsDouble>1</editorDecimalsDouble>
+            <editorScale>1</editorScale>
+            <editAsPercentage>0</editAsPercentage>
+            <maxDouble>40</maxDouble>
+            <minDouble>0</minDouble>
+            <showDisplay>0</showDisplay>
+            <stepDouble>1.0</stepDouble>
+            <valDouble>5.0</valDouble>
+            <vTxDoubleScale>10</vTxDoubleScale>
+            <suffix></suffix>
+            <vTx>7</vTx>
+        </ki>
+        <!-- <ki>
+            <longName>Angle I</longName>
+            <type>1</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Angle I (Integral) value&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;As time passes with the board angle away from setpoint (considered &amp;quot;error&amp;quot;), Angle I will strengthen the board response based on cumulative error over time. Can be a subtle effect, and has most noticeable effect at the start of uphills/downhills, as well as tricks involving motor freespin.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Values: 0.005 - 0.08 (Caution with higher values!!)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_KI</cDefine>
             <editorDecimalsDouble>3</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -106,7 +131,7 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100000</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
-        </ki>
+        </ki> -->
         <mahony_kp>
             <longName>Pitch KP</longName>
             <type>1</type>
@@ -863,7 +888,7 @@ p, li { white-space: pre-wrap; }
             <suffix> °/s</suffix>
             <vTx>7</vTx>
         </tiltback_return_speed>
-        <tiltback_constant>
+        <speedtilt_constant>
             <longName>Constant Tiltback</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -874,7 +899,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Tiltback that will be applied above a configurable minimum ERPM. AKA Nose Angle adjustment, can be downwards (negative) too.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*Note: Should not be used to accomodate tilted rail angle! Instead, the IMU calibration should be adjusted accordingly, either manually or using the IMU Wizard. Otherwise, you will experience the opposite of the desired effect while riding backwards.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TILTBACK_CONSTANT</cDefine>
+            <cDefine>CFG_DFLT_SPEEDTILT_CONSTANT</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -886,8 +911,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix> °</suffix>
             <vTx>7</vTx>
-        </tiltback_constant>
-        <tiltback_constant_erpm>
+        </speedtilt_constant>
+        <speedtilt_constant_erpm>
             <longName>Constant Tiltback ERPM</longName>
             <type>2</type>
             <transmittable>1</transmittable>
@@ -896,7 +921,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;ERPM (absolute value) above which Constant Tiltback will be applied.&lt;br /&gt;&lt;br /&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*Note: ERPM = RPM * (Motor Poles / 2)&lt;br /&gt;For an 11&amp;quot; Tire on a Hypercore Motor (30 Poles):&lt;br /&gt;1000 ERPM ≈ 2.2 mph ≈ 3.5 km/h&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TILTBACK_CONSTANT_ERPM</cDefine>
+            <cDefine>CFG_DFLT_SPEEDTILT_CONSTANT_ERPM</cDefine>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
             <maxInt>100000</maxInt>
@@ -906,8 +931,8 @@ p, li { white-space: pre-wrap; }
             <valInt>500</valInt>
             <suffix> ERPM</suffix>
             <vTx>3</vTx>
-        </tiltback_constant_erpm>
-        <tiltback_variable>
+        </speedtilt_constant_erpm>
+        <speedtilt_variable>
             <longName>Variable Tiltback Rate</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -916,7 +941,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Nose Angle adjustment that will be applied depending on speed, specified in degrees per 1000 ERPM, applied linearly as the rate at which you approach Variable Tiltback Maximum. Applies in addition to Constant Tiltback.&lt;br /&gt;&lt;br /&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*Note: ERPM = RPM * (Motor Poles / 2)&lt;br /&gt;For an 11&amp;quot; Tire on a Hypercore Motor (30 Poles):&lt;br /&gt;1000 ERPM ≈ 2.2 mph ≈ 3.5 km/h&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TILTBACK_VARIABLE</cDefine>
+            <cDefine>CFG_DFLT_SPEEDTILT_VARIABLE</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -928,8 +953,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix> °/1000 ERPM</suffix>
             <vTx>7</vTx>
-        </tiltback_variable>
-        <tiltback_variable_max>
+        </speedtilt_variable>
+        <speedtilt_variable_max>
             <longName>Variable Tiltback Maximum</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -938,7 +963,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Target Angle that Variable Tiltback approaches at the specified rate (Variable Tiltback Rate). Can be negative (nose down) as well. Added in addition to Constant Tiltback and does not affect or prevent alert pushbacks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TILTBACK_VARIABLE_MAX</cDefine>
+            <cDefine>CFG_DFLT_SPEEDTILT_VARIABLE_MAX</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -950,28 +975,30 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °</suffix>
             <vTx>7</vTx>
-        </tiltback_variable_max>
-        <tiltback_variable_erpm>
-            <longName>Variable Tiltback Start ERPM</longName>
-            <type>2</type>
+        </speedtilt_variable_max>
+        <speedtilt_speed>
+            <longName>Speed</longName>
+            <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;ERPM (absolute value) above which Variable Tiltback will begin to be applied.&lt;br /&gt;&lt;br /&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*Note: ERPM = RPM * (Motor Poles / 2)&lt;br /&gt;For an 11&amp;quot; Tire on a Hypercore Motor (30 Poles):&lt;br /&gt;1000 ERPM ≈ 2.2 mph ≈ 3.5 km/h&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TILTBACK_VARIABLE_ERPM</cDefine>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Speed proportional to distance from target. The resulting speed is then limited by Max Tiltback Speed. Lower values will respond slowly, higher values more aggressively.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_SPEEDTILT_SPEED</cDefine>
+            <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxInt>100000</maxInt>
-            <minInt>0</minInt>
+            <maxDouble>100</maxDouble>
+            <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepInt>50</stepInt>
-            <valInt>0</valInt>
-            <suffix> ERPM</suffix>
-            <vTx>3</vTx>
-        </tiltback_variable_erpm>
-        <noseangling_speed>
+            <stepDouble>5</stepDouble>
+            <valDouble>30</valDouble>
+            <vTxDoubleScale>10</vTxDoubleScale>
+            <suffix> Hz</suffix>
+            <vTx>7</vTx>
+        </speedtilt_speed>
+        <speedtilt_speed_max>
             <longName>Nose Angling Speed</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -980,7 +1007,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Maximum Rate at which nose will tilt to the desired angle during Constant and/or Variable Tiltback.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_NOSEANGLING_SPEED</cDefine>
+            <cDefine>CFG_DFLT_SPEEDTILT_SPEED_MAX</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -992,7 +1019,7 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °/s</suffix>
             <vTx>7</vTx>
-        </noseangling_speed>
+        </speedtilt_speed_max>
         <inputtilt_remote_type>
             <longName>Remote Type</longName>
             <type>4</type>
@@ -1038,7 +1065,7 @@ p, li { white-space: pre-wrap; }
             <suffix> °</suffix>
             <vTx>7</vTx>
         </inputtilt_angle_limit>
-        <inputtilt_speed>
+        <inputtilt_speed_max>
             <longName>Tiltback Speed</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1047,7 +1074,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rate at which Remote Tiltback will tilt to the desired angle.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_INPUTTILT_SPEED</cDefine>
+            <cDefine>CFG_DFLT_INPUTTILT_SPEED_MAX</cDefine>
             <editorDecimalsDouble>0</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1059,7 +1086,7 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °/s</suffix>
             <vTx>7</vTx>
-        </inputtilt_speed>
+        </inputtilt_speed_max>
         <inputtilt_smoothing_factor>
             <longName>Tiltback Smoothing Factor</longName>
             <type>2</type>
@@ -1725,28 +1752,6 @@ p, li { white-space: pre-wrap; }
             <suffix> °/s</suffix>
             <vTx>7</vTx>
         </atr_speed_max_off> -->
-        <!-- <atr_ramp>
-            <longName>Speed Ramping</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ramps down speed when close to target. If the offset exceeds this number, Max Tiltback Speed is used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_RAMP</cDefine>
-            <editorDecimalsDouble>2</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>1</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>0.05</stepDouble>
-            <valDouble>0.25</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> °</suffix>
-            <vTx>7</vTx>
-        </atr_ramp> -->
         <atr_speed>
             <longName>Speed</longName>
             <type>1</type>
@@ -3372,15 +3377,15 @@ p, li { white-space: pre-wrap; }
         <ser>tiltback_lv_speed</ser>
         <ser>tiltback_lv</ser>
         <ser>tiltback_return_speed</ser>
-        <!-- <ser>tiltback_constant</ser>
-        <ser>tiltback_constant_erpm</ser> -->
-        <ser>tiltback_variable</ser>
-        <ser>tiltback_variable_max</ser>
-        <ser>tiltback_variable_erpm</ser>
-        <ser>noseangling_speed</ser>
+        <ser>speedtilt_constant</ser>
+        <!-- <ser>speedtilt_constant_erpm</ser> -->
+        <ser>speedtilt_variable</ser>
+        <ser>speedtilt_variable_max</ser>
+        <ser>speedtilt_speed</ser>
+        <ser>speedtilt_speed_max</ser>
         <ser>inputtilt_remote_type</ser>
         <ser>inputtilt_angle_limit</ser>
-        <ser>inputtilt_speed</ser>
+        <ser>inputtilt_speed_max</ser>
         <ser>inputtilt_smoothing_factor</ser>
         <ser>inputtilt_invert_throttle</ser>
         <ser>inputtilt_deadband</ser>
@@ -3423,8 +3428,6 @@ p, li { white-space: pre-wrap; }
         <ser>tiltback_filter</ser>
         <ser>atr_amps_accel_ratio</ser>
         <ser>atr_amp_offset_per_erpm</ser>
-        <!-- <ser>braketilt_strength</ser>
-        <ser>braketilt_lingering</ser> -->
         <ser>leds.on</ser>
         <ser>leds.headlights_on</ser>
         <ser>leds.headlights_transition</ser>
@@ -3498,12 +3501,12 @@ p, li { white-space: pre-wrap; }
                 <subgroupName>Tune Modifiers</subgroupName>
                 <subgroupParams>
                     <param>::sep::Nose Angling</param>
-                    <!-- <param>tiltback_constant</param>
-                    <param>tiltback_constant_erpm</param> -->
-                    <param>tiltback_variable</param>
-                    <param>tiltback_variable_max</param>
-                    <param>tiltback_variable_erpm</param>
-                    <param>noseangling_speed</param>
+                    <param>speedtilt_constant</param>
+                    <!-- <param>speedtilt_constant_erpm</param> -->
+                    <param>speedtilt_variable</param>
+                    <param>speedtilt_variable_max</param>
+                    <param>speedtilt_speed</param>
+                    <param>speedtilt_speed_max</param>
                     <param>::sep::Torque Tiltback</param>
                     <param>torquetilt_strength</param>
                     <param>torquetilt_strength_regen</param>
@@ -3543,9 +3546,6 @@ p, li { white-space: pre-wrap; }
                     <param>atr_amp_offset_per_erpm</param>
                     <param>atr_filter</param>
                     <param>tiltback_filter</param>
-                    <!-- <param>::sep:: Brake Tiltback</param>
-                    <param>braketilt_strength</param>
-                    <param>braketilt_lingering</param> -->
                 </subgroupParams>
             </subgroup>
             <subgroup>
@@ -3610,7 +3610,7 @@ p, li { white-space: pre-wrap; }
                     <param>::sep::Remote Tiltback</param>
                     <param>inputtilt_remote_type</param>
                     <param>inputtilt_angle_limit</param>
-                    <param>inputtilt_speed</param>
+                    <param>inputtilt_speed_max</param>
                     <param>inputtilt_smoothing_factor</param>
                     <param>inputtilt_invert_throttle</param>
                     <param>inputtilt_deadband</param>

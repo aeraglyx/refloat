@@ -27,47 +27,20 @@ void speed_tilt_reset(SpeedTilt *st) {
 }
 
 void speed_tilt_configure(SpeedTilt *st, const RefloatConfig *cfg) {
-    st->step_size = cfg->noseangling_speed / cfg->hertz;
-
-    // Variable nose angle adjustment / tiltback (setting is per 1000erpm, convert to per erpm)
-    st->tiltback_variable = cfg->tiltback_variable / 1000;
-    if (st->tiltback_variable > 0) {
-        st->tiltback_variable_max_erpm =
-            fabsf(cfg->tiltback_variable_max / st->tiltback_variable);
-    } else {
-        st->tiltback_variable_max_erpm = 100000;
-    }
+    // st->step_size = cfg->speedtilt_speed_max / cfg->hertz;
+    st->linear_converted = cfg->speedtilt_variable / 1000;
 }
 
 void speed_tilt_update(SpeedTilt *st, const MotorData *mot, const RefloatConfig *cfg) {
-    // Variable Tiltback looks at ERPM from the reference point of the set minimum ERPM
-    // float variable_erpm = fmaxf(0, d->motor.erpm_abs - d->float_conf.tiltback_variable_erpm);
-    float target = mot->erpm_smooth * st->tiltback_variable;
-    angle_limitf(&target, cfg->tiltback_variable_max);
+    float linear = mot->erpm_smooth * st->linear_converted;
+    angle_limitf(&linear, cfg->speedtilt_variable_max);
+    float constant = clampf(mot->erpm_smooth / 500, -1.0f, 1.0f) * cfg->speedtilt_constant;
+    float target = linear + constant;
 
-    // if (variable_erpm > d->tiltback_variable_max_erpm) {
-    //     target = d->float_conf.tiltback_variable_max * d->motor.erpm_sign;
-    // } else {
-    //     target = d->tiltback_variable * variable_erpm * d->motor.erpm_sign *
-    //         sign(d->float_conf.tiltback_variable_max);
-    // }
-
-    // TODO constant
-    // if (d->motor.erpm_abs > d->float_conf.tiltback_constant_erpm) {
-    //     target += d->float_conf.tiltback_constant * d->motor.erpm_sign;
-    // }
-
-    // float ramp = 0.1f;  // TODO
-    // float half_time = ramp * 0.5f;
-
-    float speed = tilt_speed(st->interpolated, target, cfg->turntilt_speed, cfg->noseangling_speed);
+    float speed = tilt_speed(st->interpolated, target, cfg->speedtilt_speed, cfg->speedtilt_speed_max);
 
     float interpolated_new = st->interpolated + speed / cfg->hertz;
     smooth_value(&st->interpolated, interpolated_new, cfg->tiltback_filter, cfg->hertz);
-
-    // float step_new = rate_limit_v04(st->interpolated, target, st->step_size, ramp);
-    // smooth_value(&st->step_smooth, step_new, half_time, cfg->hertz);
-    // st->interpolated += st->step_smooth;
 }
 
 void speed_tilt_winddown(SpeedTilt *st) {

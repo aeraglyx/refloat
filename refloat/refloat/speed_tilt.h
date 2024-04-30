@@ -22,11 +22,10 @@
 #include "motor_data.h"
 
 typedef struct {
-    float step_size;
+    // float step_size;
     float interpolated;
+    float linear_converted;
     // float step_smooth;
-    float tiltback_variable;
-    float tiltback_variable_max_erpm;
 } SpeedTilt;
 
 void speed_tilt_reset(SpeedTilt *tt);
