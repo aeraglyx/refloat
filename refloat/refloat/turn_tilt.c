@@ -24,11 +24,10 @@
 void turn_tilt_reset(TurnTilt *tt) {
     tt->target = 0.0f;
     tt->interpolated = 0.0f;
-    // tt->step_smooth = 0.0f;
 }
 
 void turn_tilt_configure(TurnTilt *tt, const RefloatConfig *cfg) {
-    tt->step_size = cfg->turntilt_speed_max / cfg->hertz;
+    // tt->step_size = cfg->turntilt_speed_max / cfg->hertz;
 }
 
 void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, const ATR *atr, const RefloatConfig *cfg) {
@@ -39,7 +38,7 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
     tt->target = fabsf(imu->yaw_diff) * cfg->turntilt_strength;
     // TODO try using filtered gyro instead?
 
-    float speed_boost = powf(cfg->turntilt_erpm_boost, mot->erpm_abs_10k);
+    float speed_boost = powf(cfg->turntilt_strength_boost, mot->erpm_abs_10k);
     tt->target *= speed_boost;
 
     // Disable below erpm threshold otherwise add directionality
@@ -65,21 +64,16 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
     //     tt->target = 0;
     // }
 
-    angle_limitf(&tt->target, cfg->turntilt_angle_limit);
-    // TODO turntilt_start_angle
+    // dead_zonef(&tt->target, cfg->turntilt_start_angle);
+    clamp_sym(&tt->target, cfg->turntilt_angle_limit);
 
-    // float ramp = cfg->turntilt_ramp;
-    // float half_time = ramp * 0.5f;
+    const float offset = tt->target - tt->interpolated;
+    float speed = offset * cfg->turntilt_speed;
+    clamp_sym(&speed, cfg->turntilt_speed_max);
 
-    float speed = tilt_speed(tt->interpolated, tt->target, cfg->turntilt_speed, cfg->turntilt_speed_max);
-    // float step_new = rate_limit_v04(tt->interpolated, tt->target, tt->step_size, ramp);
-    // smooth_value(&tt->step_smooth, step_new, half_time, cfg->hertz);
-    // tt->interpolated += tt->step_smooth;
-    float interpolated_new = tt->interpolated + speed / cfg->hertz;
-    smooth_value(&tt->interpolated, interpolated_new, cfg->tiltback_filter, cfg->hertz);
+    tt->interpolated += speed / cfg->hertz;
 }
 
-// TODO
 void turn_tilt_winddown(TurnTilt *tt) {
     tt->interpolated *= 0.998;
 }

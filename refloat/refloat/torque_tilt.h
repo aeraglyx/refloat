@@ -22,10 +22,10 @@
 #include "motor_data.h"
 
 typedef struct {
-    float step_size_on;
-    // float step_size_off;
     float interpolated;
-    // float speed_smooth;
+    float debug;
+    // float step_size_on;
+    // float step_size_off;
 } TorqueTilt;
 
 void torque_tilt_reset(TorqueTilt *tt);

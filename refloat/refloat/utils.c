@@ -25,9 +25,17 @@ uint32_t rnd(uint32_t seed) {
 }
 
 
-float clampf(float value, float min, float max) {
+float clamp(float value, float min, float max) {
     const float m = value < min ? min : value;
     return m > max ? max : m;
+}
+
+void clamp_sym(float *angle_in, float angle_limit) {
+    *angle_in = clamp(*angle_in, -angle_limit, angle_limit);
+}
+
+void dead_zonef(float *value, float threshold) {
+    *value = fmaxf(fabsf(*value) - threshold, 0.0f) * sign(*value);
 }
 
 void rate_limitf(float *value, float target, float step) {
@@ -42,23 +50,13 @@ void rate_limitf(float *value, float target, float step) {
 
 // float rate_limit_v04(float interpolated, float target, float step, float ramp) {
 //     float offset = target - interpolated;
-//     float step_multiplier = clampf(offset / fmaxf(ramp, 0.01f), -1.0f, 1.0f);
+//     float step_multiplier = clamp(offset / fmaxf(ramp, 0.01f), -1.0f, 1.0f);
 //     return step * step_multiplier;
 // }
 
 float tilt_speed(float interpolated, float target, float speed, float speed_max) {
     float offset = target - interpolated;
-    // float offset = interpolated - target;
-    return clampf(offset * speed, -speed_max, speed_max);
-}
-
-float set_step(float interpolated, float target, float step_on, float step_off) {
-    float offset = fabsf(target) - fabsf(interpolated);
-    return (offset < 0.0f) ? step_off : step_on;
-}
-
-void angle_limitf(float *angle_in, float angle_limit) {
-    *angle_in = clampf(*angle_in, -angle_limit, angle_limit);
+    return clamp(offset * speed, -speed_max, speed_max);
 }
 
 // void dead_zonef(float *value, float thr_pos, float thr_neg) {
@@ -70,10 +68,6 @@ void angle_limitf(float *angle_in, float angle_limit) {
 //         *value = 0.0f;
 //     }
 // }
-
-void dead_zonef(float *value, float threshold) {
-    *value = fmaxf(fabsf(*value) - threshold, 0.0f) * sign(*value);
-}
 
 void smooth_value(float *value_smooth, float value_current, float half_time_sec, uint16_t hertz) {
     if (half_time_sec < 0.001f) {

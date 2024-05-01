@@ -955,7 +955,7 @@ p, li { white-space: pre-wrap; }
             <vTx>7</vTx>
         </speedtilt_variable>
         <speedtilt_variable_max>
-            <longName>Variable Tiltback Maximum</longName>
+            <longName>Variable Tiltback Limit</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -968,7 +968,7 @@ p, li { white-space: pre-wrap; }
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
             <maxDouble>20</maxDouble>
-            <minDouble>-20</minDouble>
+            <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>0.1</stepDouble>
             <valDouble>1.0</valDouble>
@@ -999,7 +999,7 @@ p, li { white-space: pre-wrap; }
             <vTx>7</vTx>
         </speedtilt_speed>
         <speedtilt_speed_max>
-            <longName>Nose Angling Speed</longName>
+            <longName>Max Speed</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -1015,7 +1015,7 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>0.5</stepDouble>
-            <valDouble>5</valDouble>
+            <valDouble>10</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °/s</suffix>
             <vTx>7</vTx>
@@ -1358,7 +1358,7 @@ p, li { white-space: pre-wrap; }
             <vTx>7</vTx>
         </ki_limit>
         <torquetilt_strength>
-            <longName>Strength</longName>
+            <longName>Strength Accel</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -1382,7 +1382,7 @@ p, li { white-space: pre-wrap; }
             <vTx>7</vTx>
         </torquetilt_strength>
         <torquetilt_strength_regen>
-            <longName>Strength (Regen)</longName>
+            <longName>Strength Decel</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -1405,28 +1405,6 @@ p, li { white-space: pre-wrap; }
             <suffix> °/A</suffix>
             <vTx>7</vTx>
         </torquetilt_strength_regen>
-        <torquetilt_method>
-            <longName>Method (Classic / Accel.)</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;EXPERIMENTAL: 0.0 is the classic Amp based Torque Tilt, 1.0 uses measured ERPM acceleration instead. That way it doesn't interfere with setpoint when simply maintaining speed, but it could have some negative side effects (e.g. when wheel locks). Please be mindful when using 0.3 and higher.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TORQUETILT_METHOD</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>1</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>0.05</stepDouble>
-            <valDouble>0</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix></suffix>
-            <vTx>7</vTx>
-        </torquetilt_method>
         <torquetilt_start_current>
             <longName>Start Current Threshold</longName>
             <type>1</type>
@@ -1471,8 +1449,30 @@ p, li { white-space: pre-wrap; }
             <suffix> °</suffix>
             <vTx>7</vTx>
         </torquetilt_angle_limit>
+        <torquetilt_speed>
+            <longName>Speed</longName>
+            <type>1</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Speed proportional to distance from target. The resulting speed is then limited by Max Tiltback Speed. Lower values will respond slowly, higher values more aggressively.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_TORQUETILT_SPEED</cDefine>
+            <editorDecimalsDouble>2</editorDecimalsDouble>
+            <editorScale>1</editorScale>
+            <editAsPercentage>0</editAsPercentage>
+            <maxDouble>100</maxDouble>
+            <minDouble>0</minDouble>
+            <showDisplay>0</showDisplay>
+            <stepDouble>5</stepDouble>
+            <valDouble>40</valDouble>
+            <vTxDoubleScale>10</vTxDoubleScale>
+            <suffix> Hz</suffix>
+            <vTx>7</vTx>
+        </torquetilt_speed>
         <torquetilt_speed_max_on>
-            <longName>Max Tiltback Speed</longName>
+            <longName>Max Speed</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -1488,7 +1488,7 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>0.5</stepDouble>
-            <valDouble>5</valDouble>
+            <valDouble>10</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °/s</suffix>
             <vTx>7</vTx>
@@ -1537,30 +1537,30 @@ p, li { white-space: pre-wrap; }
             <suffix> °</suffix>
             <vTx>7</vTx>
         </torquetilt_ramp> -->
-        <torquetilt_speed>
-            <longName>Speed</longName>
+        <torquetilt_method>
+            <longName>Method (Classic / Accel.)</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Speed proportional to distance from target. The resulting speed is then limited by Max Tiltback Speed. Lower values will respond slowly, higher values more aggressively.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TORQUETILT_SPEED</cDefine>
-            <editorDecimalsDouble>2</editorDecimalsDouble>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;EXPERIMENTAL: 0.0 is the classic Amp based Torque Tilt, 1.0 uses measured ERPM acceleration instead. That way it doesn't interfere with setpoint when simply maintaining speed, but it could have some negative side effects (e.g. when wheel locks). Please be mindful when using 0.3 and higher.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_TORQUETILT_METHOD</cDefine>
+            <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxDouble>100</maxDouble>
+            <maxDouble>1</maxDouble>
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>5</stepDouble>
-            <valDouble>30</valDouble>
-            <vTxDoubleScale>10</vTxDoubleScale>
-            <suffix> Hz</suffix>
+            <stepDouble>0.05</stepDouble>
+            <valDouble>0</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
+            <suffix></suffix>
             <vTx>7</vTx>
-        </torquetilt_speed>
+        </torquetilt_method>
         <atr_strength_up>
-            <longName>ATR Uphill Strength</longName>
+            <longName>Strength Uphill</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -1586,7 +1586,7 @@ p, li { white-space: pre-wrap; }
             <vTx>7</vTx>
         </atr_strength_up>
         <atr_strength_down>
-            <longName>ATR Downhill Strength</longName>
+            <longName>Strength Downhill</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -1612,8 +1612,30 @@ p, li { white-space: pre-wrap; }
             <suffix></suffix>
             <vTx>7</vTx>
         </atr_strength_down>
-        <atr_threshold_up>
-            <longName>Threshold Angle Up</longName>
+        <atr_strength_boost>
+            <longName>Strength at Speed</longName>
+            <type>1</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Defines how ATR response changes at higher speeds. Set to negative numbers to lower the response as speed increases.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_ATR_STRENGTH_BOOST</cDefine>
+            <editorDecimalsDouble>1</editorDecimalsDouble>
+            <editorScale>1</editorScale>
+            <editAsPercentage>0</editAsPercentage>
+            <maxDouble>4.0</maxDouble>
+            <minDouble>0.1</minDouble>
+            <showDisplay>0</showDisplay>
+            <stepDouble>0.1</stepDouble>
+            <valDouble>1</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
+            <suffix>x</suffix>
+            <vTx>7</vTx>
+        </atr_strength_boost>
+        <atr_threshold>
+            <longName>Threshold Angle</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -1625,7 +1647,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Once the ATR target angle exceeds the threshold, setpoint changes will be produced. &lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Example: If the threshold is 2 and the computed ATR angle is 3 then a 1 degree setpoint adjustment will be performed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_THRESHOLD_UP</cDefine>
+            <cDefine>CFG_DFLT_ATR_THRESHOLD</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1637,8 +1659,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °</suffix>
             <vTx>7</vTx>
-        </atr_threshold_up>
-        <atr_threshold_down>
+        </atr_threshold>
+        <!-- <atr_threshold_down>
             <longName>Threshold Angle Down</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1663,29 +1685,7 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °</suffix>
             <vTx>7</vTx>
-        </atr_threshold_down>
-        <atr_speed_boost>
-            <longName>Strength at Speed</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Defines how ATR response changes at higher speeds. Set to negative numbers to lower the response as speed increases.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_SPEED_BOOST</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>4.0</maxDouble>
-            <minDouble>0.1</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>0.1</stepDouble>
-            <valDouble>1</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix>x</suffix>
-            <vTx>7</vTx>
-        </atr_speed_boost>
+        </atr_threshold_down> -->
         <atr_angle_limit>
             <longName>Tilitback Angle Limit</longName>
             <type>1</type>
@@ -1708,8 +1708,30 @@ p, li { white-space: pre-wrap; }
             <suffix> °</suffix>
             <vTx>7</vTx>
         </atr_angle_limit>
+        <atr_speed>
+            <longName>Speed</longName>
+            <type>1</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Speed proportional to distance from target. The resulting speed is then limited by Max Tiltback Speed. Lower values will respond slowly, higher values more aggressively.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_ATR_SPEED</cDefine>
+            <editorDecimalsDouble>2</editorDecimalsDouble>
+            <editorScale>1</editorScale>
+            <editAsPercentage>0</editAsPercentage>
+            <maxDouble>100</maxDouble>
+            <minDouble>0</minDouble>
+            <showDisplay>0</showDisplay>
+            <stepDouble>5</stepDouble>
+            <valDouble>30</valDouble>
+            <vTxDoubleScale>10</vTxDoubleScale>
+            <suffix> Hz</suffix>
+            <vTx>7</vTx>
+        </atr_speed>
         <atr_speed_max_on>
-            <longName>Max Tiltback Speed</longName>
+            <longName>Max Speed</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -1725,7 +1747,7 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>0.5</stepDouble>
-            <valDouble>4</valDouble>
+            <valDouble>10</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °/s</suffix>
             <vTx>7</vTx>
@@ -1752,30 +1774,8 @@ p, li { white-space: pre-wrap; }
             <suffix> °/s</suffix>
             <vTx>7</vTx>
         </atr_speed_max_off> -->
-        <atr_speed>
-            <longName>Speed</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Speed proportional to distance from target. The resulting speed is then limited by Max Tiltback Speed. Lower values will respond slowly, higher values more aggressively.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_SPEED</cDefine>
-            <editorDecimalsDouble>2</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>100</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>5</stepDouble>
-            <valDouble>30</valDouble>
-            <vTxDoubleScale>10</vTxDoubleScale>
-            <suffix> Hz</suffix>
-            <vTx>7</vTx>
-        </atr_speed>
-        <atr_response_boost>
-            <longName>Tiltback Response Boost</longName>
+        <atr_speed_boost>
+            <longName>Response at Speed</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -1783,7 +1783,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;ATR Tiltback Speed at 10000 ERPM.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_RESPONSE_BOOST</cDefine>
+            <cDefine>CFG_DFLT_ATR_SPEED_BOOST</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1795,7 +1795,7 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix>x</suffix>
             <vTx>7</vTx>
-        </atr_response_boost>
+        </atr_speed_boost>
         <atr_filter>
             <longName>Current Filter</longName>
             <type>1</type>
@@ -2049,13 +2049,13 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>5</stepDouble>
-            <valDouble>30</valDouble>
+            <valDouble>35</valDouble>
             <vTxDoubleScale>10</vTxDoubleScale>
             <suffix> Hz</suffix>
             <vTx>7</vTx>
         </turntilt_speed>
         <turntilt_speed_max>
-            <longName>Max Tiltback Speed</longName>
+            <longName>Max Speed</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -2071,7 +2071,7 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>0.5</stepDouble>
-            <valDouble>5</valDouble>
+            <valDouble>10</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °/s</suffix>
             <vTx>7</vTx>
@@ -2098,7 +2098,7 @@ p, li { white-space: pre-wrap; }
             <suffix> °</suffix>
             <vTx>7</vTx>
         </turntilt_ramp> -->
-        <turntilt_erpm_boost>
+        <turntilt_strength_boost>
             <longName>Strength at Speed</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -2107,7 +2107,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Turn Tilt Strength at 10000 ERPM.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TURNTILT_ERPM_BOOST</cDefine>
+            <cDefine>CFG_DFLT_TURNTILT_STRENGTH_BOOST</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -2119,7 +2119,7 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix>x</suffix>
             <vTx>7</vTx>
-        </turntilt_erpm_boost>
+        </turntilt_strength_boost>
         <leds.on>
             <longName>LEDs On</longName>
             <type>5</type>
@@ -3413,17 +3413,17 @@ p, li { white-space: pre-wrap; }
         <ser>turntilt_start_erpm</ser>
         <ser>turntilt_speed</ser>
         <ser>turntilt_speed_max</ser>
-        <ser>turntilt_erpm_boost</ser>
+        <ser>turntilt_strength_boost</ser>
         <ser>atr_strength_up</ser>
         <ser>atr_strength_down</ser>
-        <ser>atr_threshold_up</ser>
-        <ser>atr_threshold_down</ser>
-        <ser>atr_speed_boost</ser>
+        <ser>atr_strength_boost</ser>
+        <ser>atr_threshold</ser>
+        <!-- <ser>atr_threshold_down</ser> -->
         <ser>atr_angle_limit</ser>
         <ser>atr_speed</ser>
         <ser>atr_speed_max_on</ser>
         <!-- <ser>atr_speed_max_off</ser> -->
-        <ser>atr_response_boost</ser>
+        <ser>atr_speed_boost</ser>
         <ser>atr_filter</ser>
         <ser>tiltback_filter</ser>
         <ser>atr_amps_accel_ratio</ser>
@@ -3522,7 +3522,7 @@ p, li { white-space: pre-wrap; }
                     <param>turntilt_start_erpm</param>
                     <param>turntilt_speed</param>
                     <param>turntilt_speed_max</param>
-                    <param>turntilt_erpm_boost</param>
+                    <param>turntilt_strength_boost</param>
                     <param>turntilt_start_angle</param>
                 </subgroupParams>
             </subgroup>
@@ -3532,15 +3532,15 @@ p, li { white-space: pre-wrap; }
                     <param>::sep::Adaptive Torque Response</param>
                     <param>atr_strength_up</param>
                     <param>atr_strength_down</param>
-                    <param>atr_threshold_up</param>
-                    <param>atr_threshold_down</param>
-                    <param>atr_speed_boost</param>
+                    <param>atr_strength_boost</param>
+                    <param>atr_threshold</param>
+                    <!-- <param>atr_threshold_down</param> -->
                     <param>::sep::Nose Angling</param>
                     <param>atr_angle_limit</param>
                     <param>atr_speed</param>
                     <param>atr_speed_max_on</param>
                     <!-- <param>atr_speed_max_off</param> -->
-                    <param>atr_response_boost</param>
+                    <param>atr_speed_boost</param>
                     <param>::sep::Advanced</param>
                     <param>atr_amps_accel_ratio</param>
                     <param>atr_amp_offset_per_erpm</param>

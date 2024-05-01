@@ -24,10 +24,8 @@
 #include "atr.h"
 
 typedef struct {
-    float step_size;
     float target;
     float interpolated;
-    // float step_smooth;
 } TurnTilt;
 
 void turn_tilt_reset(TurnTilt *tt);

@@ -55,7 +55,7 @@ void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter) {
         }
     }
 
-    float yaw_diff_clamped = clampf(imu->yaw_diff_clean, -0.1f, 0.1f);
+    float yaw_diff_clamped = clamp(imu->yaw_diff_clean, -0.1f, 0.1f);
     imu->yaw_diff = imu->yaw_diff * 0.9f + yaw_diff_clamped * 0.1f;
     imu->yaw_last = imu->yaw;
 

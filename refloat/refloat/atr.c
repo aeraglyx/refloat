@@ -22,17 +22,49 @@
 #include <math.h>
 
 void atr_reset(ATR *atr) {
-    atr->accel_diff = 0.0f;
     atr->target = 0.0f;
-    atr->interpolated = 0.0f;
     atr->speed = 0.0f;
+    atr->interpolated = 0.0f;
+
+    atr->accel_diff = 0.0f;
     atr->debug = 0.0f;
-    // atr->speed_smooth = 0.0f;
 }
 
 void atr_configure(ATR *atr, const RefloatConfig *cfg) {
-    atr->step_size_on = cfg->atr_speed_max_on / cfg->hertz;
-    // atr->step_size_off = cfg->atr_speed_max_off / cfg->hertz;
+    // atr->speed_scaled = cfg->atr_speed / cfg->hertz;
+    // atr->speed_max_scaled = cfg->atr_speed_max_on / cfg->hertz;
+}
+
+void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
+    const float amp_offset = cfg->atr_amp_offset_per_erpm * mot->erpm_smooth;
+    const float accel_expected = (mot->current_filtered - amp_offset) / cfg->atr_amps_accel_ratio;
+
+    const float accel_diff_raw = accel_expected - mot->accel_clamped;
+    const float accel_diff_half_time = 0.15f * exp2f(-0.003f * mot->erpm_smooth);
+    smooth_value(&atr->accel_diff, accel_diff_raw, accel_diff_half_time, cfg->hertz);
+
+    const bool uphill = sign(atr->accel_diff) == sign(mot->erpm_smooth);
+    float strength = uphill ? cfg->atr_strength_up : cfg->atr_strength_down;
+    const float speed_boost = powf(cfg->atr_strength_boost, mot->erpm_abs_10k);
+    strength *= speed_boost;
+
+    atr->target = atr->accel_diff * strength;
+    dead_zonef(&atr->target, cfg->atr_threshold);
+    clamp_sym(&atr->target, cfg->atr_angle_limit);
+    atr->target = clamp(atr->target, -cfg->atr_angle_limit, cfg->atr_angle_limit);
+    
+    const float response_boost = powf(cfg->atr_speed_boost, mot->erpm_abs_10k);
+    const float speed_k = cfg->atr_speed * response_boost;
+    const float offset = atr->target - atr->interpolated;
+    atr->speed = offset * speed_k;
+    clamp_sym(&atr->speed, cfg->atr_speed_max_on);
+
+    atr->interpolated *= atr->speed / cfg->hertz;
+}
+
+void atr_winddown(ATR *atr) {
+    atr->interpolated *= 0.995f;
+    atr->target *= 0.99f;
 }
 
 // static void get_wheelslip_probability(MotorData *mot, const RefloatConfig *cfg) {
@@ -43,61 +75,12 @@ void atr_configure(ATR *atr, const RefloatConfig *cfg) {
 //     const float wheelslip_start = 4.0f;
 //     const float wheelslip_end = 8.0f;
 //     float is_wheelslip = (fabs(accel_diff) - wheelslip_start) / (wheelslip_end - wheelslip_start);
-// 	is_wheelslip = clampf(is_wheelslip, 0.0f, 1.0f);
+//  is_wheelslip = clamp(is_wheelslip, 0.0f, 1.0f);
 
 //     const float freespin_start = 16000.0f;
 //     const float freespin_end = 20000.0f;
 //     float is_freespin = (mot->erpm_abs - freespin_start) / (freespin_end - freespin_start);
-// 	is_freespin = clampf(is_freespin, 0.0f, 1.0f);
+//  is_freespin = clamp(is_freespin, 0.0f, 1.0f);
 
 //     mot->wheelslip_prob = fmaxf(is_wheelslip, is_freespin);
 // }
-
-void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
-    float amp_offset = cfg->atr_amp_offset_per_erpm * mot->erpm_smooth;
-    float accel_expected = (mot->current_filtered - amp_offset) / cfg->atr_amps_accel_ratio;
-
-    float accel_diff_raw = accel_expected - mot->accel_clamped;
-    float accel_diff_half_time = 0.15f * exp2f(-0.003f * mot->erpm_smooth);
-    smooth_value(&atr->accel_diff, accel_diff_raw, accel_diff_half_time, cfg->hertz);
-
-    bool uphill = sign(atr->accel_diff) == sign(mot->erpm_smooth);
-    float strength = uphill ? cfg->atr_strength_up : cfg->atr_strength_down;
-    float speed_boost = powf(cfg->atr_speed_boost, mot->erpm_abs_10k);
-    strength *= speed_boost;
-    // atr->target = atr->accel_diff * strength * speed_boost;
-    atr->target = atr->accel_diff * strength;
-
-    // float threshold = mot->braking ? cfg->atr_threshold_down : cfg->atr_threshold_up;
-    // dead_zonef(&atr->target, threshold);
-    // angle_limitf(&atr->target, cfg->atr_angle_limit);
-    atr->target = clampf(atr->target, -cfg->atr_angle_limit, cfg->atr_angle_limit);
-    // atr->target = target_new;
-    
-    // float offset = fabsf(atr->target) - fabsf(atr->interpolated);
-    // float step = (offset < 0.0f) ? atr->step_size_off : atr->step_size_on;
-
-    // step *= response_boost;
-
-    // float ramp = cfg->atr_ramp;
-    // float speed = cfg->atr_speed;
-    // float half_time = ramp * 0.5f;
-
-    // float step_new = rate_limit_v04(atr->interpolated, atr->target, step, ramp);
-    atr->speed = tilt_speed(atr->interpolated, atr->target, cfg->atr_speed, cfg->atr_speed_max_on);
-    // float response_boost = powf(cfg->atr_response_boost, mot->erpm_abs_10k);
-
-    // smooth_value(&atr->speed_smooth, speed * response_boost, 0.1f, cfg->hertz);
-    // atr->interpolated += atr->speed_smooth / cfg->hertz;
-
-    float interpolated_new = atr->interpolated + atr->speed / cfg->hertz;
-    // smooth_value(&atr->interpolated, interpolated_new, 0.1f, cfg->hertz);
-    smooth_value(&atr->interpolated, interpolated_new, cfg->tiltback_filter, cfg->hertz);
-    
-    // atr->debug = (1.0f - powf(0.5f, 1.0f / (cfg->tiltback_filter * cfg->hertz))) * 1000.0f;
-}
-
-void atr_winddown(ATR *atr) {
-    atr->interpolated *= 0.995f;
-    atr->target *= 0.99f;
-}

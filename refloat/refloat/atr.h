@@ -23,14 +23,11 @@
 #include "motor_data.h"
 
 typedef struct {
-    float step_size_on;
-    // float step_size_off;
-    // float speed_smooth;
+    float target;
+    float speed;
+    float interpolated;
 
     float accel_diff;
-    float target;
-    float interpolated;
-    float speed;
     float debug;
 } ATR;
 

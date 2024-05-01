@@ -62,7 +62,7 @@ void motor_data_update(MotorData *m) {
     m->erpm_abs_10k = fabsf(m->erpm_smooth) * 0.0001f;
 
     float current_acceleration = m->erpm - m->last_erpm;
-    float current_accel_clamped = clampf(current_acceleration, -5.0f, 5.0f);
+    float current_accel_clamped = clamp(current_acceleration, -5.0f, 5.0f);
 
     smooth_value(&m->acceleration, current_acceleration, m->filter_half_time, 800);
     smooth_value(&m->accel_clamped, current_accel_clamped, m->filter_half_time, 800);

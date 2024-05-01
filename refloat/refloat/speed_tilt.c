@@ -23,7 +23,6 @@
 
 void speed_tilt_reset(SpeedTilt *st) {
     st->interpolated = 0.0f;
-    // st->step_smooth = 0.0f;
 }
 
 void speed_tilt_configure(SpeedTilt *st, const RefloatConfig *cfg) {
@@ -33,14 +32,15 @@ void speed_tilt_configure(SpeedTilt *st, const RefloatConfig *cfg) {
 
 void speed_tilt_update(SpeedTilt *st, const MotorData *mot, const RefloatConfig *cfg) {
     float linear = mot->erpm_smooth * st->linear_converted;
-    angle_limitf(&linear, cfg->speedtilt_variable_max);
-    float constant = clampf(mot->erpm_smooth / 500, -1.0f, 1.0f) * cfg->speedtilt_constant;
+    clamp_sym(&linear, cfg->speedtilt_variable_max);
+    float constant = clamp(mot->erpm_smooth / 250, -1.0f, 1.0f) * cfg->speedtilt_constant;
     float target = linear + constant;
 
-    float speed = tilt_speed(st->interpolated, target, cfg->speedtilt_speed, cfg->speedtilt_speed_max);
+    const float offset = target - st->interpolated;
+    float speed = offset * cfg->speedtilt_speed;
+    clamp_sym(&speed, cfg->speedtilt_speed_max);
 
-    float interpolated_new = st->interpolated + speed / cfg->hertz;
-    smooth_value(&st->interpolated, interpolated_new, cfg->tiltback_filter, cfg->hertz);
+    st->interpolated += speed / cfg->hertz;
 }
 
 void speed_tilt_winddown(SpeedTilt *st) {

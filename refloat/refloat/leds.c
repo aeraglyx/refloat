@@ -218,8 +218,8 @@ static void anim_pulse(
     for (uint8_t i = 0; i < strip->length; ++i) {
         float dist1 = i - offset + 1.0f;
         float dist2 = strip->length - offset - i;
-        float k1 = clampf(dist1 / feather, 0.0f, 1.0f);
-        float k2 = clampf(dist2 / feather, 0.0f, 1.0f);
+        float k1 = clamp(dist1 / feather, 0.0f, 1.0f);
+        float k2 = clamp(dist2 / feather, 0.0f, 1.0f);
 
         uint32_t color =
             color_blend(colors[bar->color2], colors[bar->color1], fminf(k1, k2) * fade);
@@ -864,7 +864,7 @@ void leds_update(Leds *leds, const State *state, FootpadSensorState fs_state) {
         if (headlights_should == leds->headlights_on) {
             time_diff = -time_diff;
         }
-        hl_split = leds->headlights_trans.split = clampf(hl_split + time_diff, -1.0f, 1.0f);
+        hl_split = leds->headlights_trans.split = clamp(hl_split + time_diff, -1.0f, 1.0f);
         leds->headlights_time = current_time;
     }
 
@@ -873,7 +873,7 @@ void leds_update(Leds *leds, const State *state, FootpadSensorState fs_state) {
     if (leds->state.state == STATE_RUNNING && leds->headlights_time <= 0.0f) {
         float distance = VESC_IF->mc_get_distance();
         float distance_diff = distance - leds->split_distance;
-        split = clampf(split + distance_diff * 2, -1.0f, 1.0f);
+        split = clamp(split + distance_diff * 2, -1.0f, 1.0f);
         leds->split_distance = distance;
         leds->dir_trans.split = split;
     }
