@@ -189,6 +189,7 @@ typedef struct {
     float speedtilt_speed_max;
     
     FLOAT_INPUTTILT_REMOTE_TYPE inputtilt_remote_type;
+    float inputtilt_speed;
     float inputtilt_speed_max;
     float inputtilt_angle_limit;
     uint16_t inputtilt_smoothing_factor;
@@ -218,7 +219,6 @@ typedef struct {
     float atr_strength_down;
     float atr_strength_boost;
     float atr_threshold;
-    // float atr_threshold_down;
     float atr_angle_limit;
     float atr_speed;
     float atr_speed_max_on;
@@ -228,7 +228,8 @@ typedef struct {
     float atr_filter;
     float tiltback_filter;
     float atr_amps_accel_ratio;
-    float atr_amp_offset_per_erpm;
+    float atr_amp_offset_constant;
+    float atr_amp_offset_variable;
 
     float turntilt_strength;
     float turntilt_angle_limit;

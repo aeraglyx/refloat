@@ -37,16 +37,14 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
 
     tt->target = fabsf(imu->yaw_diff) * cfg->turntilt_strength;
     // TODO try using filtered gyro instead?
+    // tt->target = fabsf(imu->gyro[2]) * cfg->turntilt_strength;
 
     float speed_boost = powf(cfg->turntilt_strength_boost, mot->erpm_abs_10k);
     tt->target *= speed_boost;
 
-    // Disable below erpm threshold otherwise add directionality
-    if (mot->erpm_abs < cfg->turntilt_start_erpm) {
-        tt->target = 0.0f;
-    } else {
-        tt->target *= mot->erpm_sign;
-    }
+    float start_erpm = max(cfg->turntilt_start_erpm, 10);
+    float direction = clamp_sym(mot->erpm_smooth / start_erpm, 1.0f);
+    tt->target *= direction;
 
     // ATR interference: Reduce target during moments of high torque response
     float atr_min = 2;
@@ -65,11 +63,13 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
     // }
 
     // dead_zonef(&tt->target, cfg->turntilt_start_angle);
-    clamp_sym(&tt->target, cfg->turntilt_angle_limit);
+    // clamp_sym(&tt->target, cfg->turntilt_angle_limit);
+    tt->target = clamp_sym(tt->target, cfg->turntilt_angle_limit);
 
     const float offset = tt->target - tt->interpolated;
     float speed = offset * cfg->turntilt_speed;
-    clamp_sym(&speed, cfg->turntilt_speed_max);
+    // clamp_sym(&speed, cfg->turntilt_speed_max);
+    speed = clamp_sym(speed, cfg->turntilt_speed_max);
 
     tt->interpolated += speed / cfg->hertz;
 }

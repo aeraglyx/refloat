@@ -36,9 +36,12 @@ void atr_configure(ATR *atr, const RefloatConfig *cfg) {
 }
 
 void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
-    const float amp_offset = cfg->atr_amp_offset_per_erpm * mot->erpm_smooth;
-    const float accel_expected = (mot->current_filtered - amp_offset) / cfg->atr_amps_accel_ratio;
+    float amp_offset_lerp = clamp_sym(mot->erpm_smooth / 500, 1.0f);
+    float amp_offset_constant = cfg->atr_amp_offset_constant * amp_offset_lerp;
+    float amp_offset_variable = cfg->atr_amp_offset_variable * mot->erpm_smooth;
+    float amp_offset = amp_offset_constant + amp_offset_variable;
 
+    float accel_expected = (mot->current_filtered - amp_offset) / cfg->atr_amps_accel_ratio;
     const float accel_diff_raw = accel_expected - mot->accel_clamped;
     const float accel_diff_half_time = 0.15f * exp2f(-0.003f * mot->erpm_smooth);
     smooth_value(&atr->accel_diff, accel_diff_raw, accel_diff_half_time, cfg->hertz);
@@ -50,14 +53,13 @@ void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
 
     atr->target = atr->accel_diff * strength;
     dead_zonef(&atr->target, cfg->atr_threshold);
-    clamp_sym(&atr->target, cfg->atr_angle_limit);
-    atr->target = clamp(atr->target, -cfg->atr_angle_limit, cfg->atr_angle_limit);
+    atr->target = clamp_sym(atr->target, cfg->atr_angle_limit);
     
     const float response_boost = powf(cfg->atr_speed_boost, mot->erpm_abs_10k);
     const float speed_k = cfg->atr_speed * response_boost;
     const float offset = atr->target - atr->interpolated;
     atr->speed = offset * speed_k;
-    clamp_sym(&atr->speed, cfg->atr_speed_max_on);
+    atr->speed = clamp_sym(atr->speed, cfg->atr_speed_max_on);
 
     atr->interpolated *= atr->speed / cfg->hertz;
 }

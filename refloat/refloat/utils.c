@@ -30,8 +30,12 @@ float clamp(float value, float min, float max) {
     return m > max ? max : m;
 }
 
-void clamp_sym(float *angle_in, float angle_limit) {
-    *angle_in = clamp(*angle_in, -angle_limit, angle_limit);
+// void clamp_sym(float *angle_in, float angle_limit) {
+//     *angle_in = clamp(*angle_in, -angle_limit, angle_limit);
+// }
+
+float clamp_sym(float angle_in, float angle_limit) {
+    return clamp(angle_in, -angle_limit, angle_limit);
 }
 
 void dead_zonef(float *value, float threshold) {

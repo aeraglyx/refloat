@@ -43,11 +43,13 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfi
     float strength =
         mot->braking ? cfg->torquetilt_strength_regen : cfg->torquetilt_strength;
     target *= strength;
-    clamp_sym(&target, cfg->torquetilt_angle_limit);
+    // clamp_sym(&target, cfg->torquetilt_angle_limit);
+    target = clamp_sym(target, cfg->torquetilt_angle_limit);
 
     const float offset = target - tt->interpolated;
     float speed = offset * cfg->torquetilt_speed;
-    clamp_sym(&speed, cfg->torquetilt_speed_max_on);
+    // clamp_sym(&speed, cfg->torquetilt_speed_max_on);
+    speed = clamp_sym(speed, cfg->torquetilt_speed_max_on);
 
     tt->interpolated += speed / cfg->hertz;
 

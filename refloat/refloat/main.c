@@ -23,6 +23,7 @@
 #include "torque_tilt.h"
 #include "turn_tilt.h"
 #include "speed_tilt.h"
+#include "input_tilt.h"
 
 #include "pid.h"
 #include "balance_filter.h"
@@ -81,6 +82,9 @@ typedef struct {
     IMUData imu;
     MotorData motor;
 
+    float mc_max_temp_fet, mc_max_temp_mot;
+    float mc_current_max, mc_current_min;
+
     // IMU data for the balancing filter
     BalanceFilterData balance_filter;
 
@@ -89,6 +93,9 @@ typedef struct {
     TorqueTilt torque_tilt;
     TurnTilt turn_tilt;
     SpeedTilt speed_tilt;
+    InputTilt input_tilt;
+
+    float throttle_val;
 
     // Beeper
     int beep_num_left;
@@ -110,14 +117,10 @@ typedef struct {
     float startup_step_size;
     float tiltback_duty_step_size, tiltback_hv_step_size, tiltback_lv_step_size,
         tiltback_return_step_size;
-    float inputtilt_ramped_step_size, inputtilt_step_size;
-    float mc_max_temp_fet, mc_max_temp_mot;
-    float mc_current_max, mc_current_min;
     float surge_angle, surge_angle2, surge_angle3, surge_adder;
     bool surge_enable;
     bool duty_beeping;
 
-    float throttle_val;
     float max_duty_with_margin;
 
     FootpadSensor footpad_sensor;
@@ -125,7 +128,6 @@ typedef struct {
     PID pid;
 
     float setpoint, setpoint_target, setpoint_target_interpolated;
-    float inputtilt_interpolated;
     float current_time;
     float disengage_timer, nag_timer;
     float idle_voltage;
@@ -215,22 +217,21 @@ void beep_on(data *d, bool force) {
     }
 }
 
-static void reconfigure(data *d) {
-    motor_data_configure(&d->motor, &d->float_conf);
-    balance_filter_configure(&d->balance_filter, &d->float_conf);
-
-    atr_configure(&d->atr, &d->float_conf);
-    torque_tilt_configure(&d->torque_tilt, &d->float_conf);
-    turn_tilt_configure(&d->turn_tilt, &d->float_conf);
-    speed_tilt_configure(&d->speed_tilt, &d->float_conf);
-
-    pid_configure(&d->pid, &d->float_conf);
-}
-
 static void configure(data *d) {
     state_init(&d->state, d->float_conf.disabled);
 
     lcm_configure(&d->lcm, &d->float_conf.leds);
+
+    motor_data_configure(&d->motor, &d->float_conf);
+    balance_filter_configure(&d->balance_filter, &d->float_conf);
+
+    // atr_configure(&d->atr, &d->float_conf);
+    // torque_tilt_configure(&d->torque_tilt, &d->float_conf);
+    // turn_tilt_configure(&d->turn_tilt, &d->float_conf);
+    speed_tilt_configure(&d->speed_tilt, &d->float_conf);
+    // input_tilt_configure(&d->input_tilt, &d->float_conf);
+
+    pid_configure(&d->pid, &d->float_conf);
 
     // This timer is used to determine how long the board has been disengaged / idle
     d->disengage_timer = d->current_time;
@@ -243,7 +244,6 @@ static void configure(data *d) {
     d->motor_timeout_s = 20.0f / d->float_conf.hertz;
 
     d->startup_step_size = d->float_conf.startup_speed / d->float_conf.hertz;
-    d->inputtilt_step_size = d->float_conf.inputtilt_speed_max / d->float_conf.hertz;
 
     d->tiltback_duty_step_size = d->float_conf.tiltback_duty_speed / d->float_conf.hertz;
     d->tiltback_hv_step_size = d->float_conf.tiltback_hv_speed / d->float_conf.hertz;
@@ -283,15 +283,10 @@ static void configure(data *d) {
     d->reverse_tolerance = 50000;
     d->reverse_stop_step_size = 100.0 / d->float_conf.hertz;
 
-    // Allows smoothing of Remote Tilt
-    d->inputtilt_ramped_step_size = 0;
-
     // Speed above which to warn users about an impending full switch fault
     d->switch_warn_beep_erpm = d->float_conf.is_footbeep_enabled ? 2000 : 100000;
 
     d->beeper_enabled = d->float_conf.is_beeper_enabled;
-
-    reconfigure(d);
 
     if (d->state.state == STATE_DISABLED) {
         beep_alert(d, 3, false);
@@ -308,22 +303,22 @@ static void reset_vars(data *d) {
     torque_tilt_reset(&d->torque_tilt);
     turn_tilt_reset(&d->turn_tilt);
     speed_tilt_reset(&d->speed_tilt);
+    input_tilt_reset(&d->input_tilt);
 
     pid_reset(&d->pid);
 
     // Set values for startup
     d->setpoint = d->imu.pitch_balance;
     d->setpoint_target_interpolated = d->imu.pitch_balance;
-    d->setpoint_target = 0;
-    d->inputtilt_interpolated = 0;
-    d->brake_timeout = 0;
+    d->setpoint_target = 0.0f;
+    d->brake_timeout = 0.0f;
 
     d->startup_pitch_tolerance = d->float_conf.startup_pitch_tolerance;
-    d->surge_adder = 0;
+    d->surge_adder = 0.0f;
 
     // RC Move:
-    d->rc_steps = 0;
-    d->rc_current = 0;
+    d->rc_steps = 0.0f;
+    d->rc_current = 0.0f;
 
     state_engage(&d->state);
 }
@@ -451,7 +446,7 @@ static bool check_faults(data *d) {
         }
 
         if (d->motor.erpm_abs < 200 && fabsf(d->imu.pitch) > 14 &&
-            fabsf(d->inputtilt_interpolated) < 30 && sign(d->imu.pitch) == d->motor.erpm_sign) {
+            fabsf(d->input_tilt.interpolated) < 30 && sign(d->imu.pitch) == d->motor.erpm_sign) {
             state_stop(&d->state, STOP_QUICKSTOP);
             return true;
         }
@@ -514,7 +509,7 @@ static bool check_faults(data *d) {
     }
 
     // Check pitch angle
-    if (fabsf(d->imu.pitch) > d->float_conf.fault_pitch && fabsf(d->inputtilt_interpolated) < 30) {
+    if (fabsf(d->imu.pitch) > d->float_conf.fault_pitch && fabsf(d->input_tilt.interpolated) < 30) {
         if ((1000.0 * (d->current_time - d->fault_angle_pitch_timer)) >
             d->float_conf.fault_delay_pitch) {
             state_stop(&d->state, STOP_PITCH);
@@ -691,16 +686,15 @@ static void calculate_setpoint_interpolated(data *d) {
 
 void aggregate_tiltbacks(data *d){
     d->setpoint += d->atr.interpolated;
-    // d->setpoint += d->atr.braketilt_interpolated;
     d->setpoint += d->torque_tilt.interpolated;
     d->setpoint += d->turn_tilt.interpolated;
     d->setpoint += d->speed_tilt.interpolated;
-    // float ab_offset = d->atr.offset + d->atr.braketilt_offset;
-    // if (sign(ab_offset) == sign(d->torque_tilt.offset)) {
+    d->setpoint += d->input_tilt.interpolated;
+    // if (sign(d->atr.interpolated) == sign(d->torque_tilt.interpolated)) {
     //     d->setpoint +=
-    //         sign(ab_offset) * fmaxf(fabsf(ab_offset), fabsf(d->torque_tilt.offset));
+    //         sign(d->atr.interpolated) * fmaxf(fabsf(d->atr.interpolated), fabsf(d->torque_tilt.interpolated));
     // } else {
-    //     d->setpoint += ab_offset + d->torque_tilt.offset;
+    //     d->setpoint += d->atr.interpolated + d->torque_tilt.interpolated;
     // }
 }
 
@@ -735,62 +729,6 @@ static void add_surge(data *d) {
     }
 }
 
-static void apply_inputtilt(data *d) {
-    float input_tiltback_target;
-
-    // Scale by Max Angle
-    input_tiltback_target = d->throttle_val * d->float_conf.inputtilt_angle_limit;
-
-    float input_tiltback_target_diff = input_tiltback_target - d->inputtilt_interpolated;
-
-    // Smoothen changes in tilt angle by ramping the step size
-    if (d->float_conf.inputtilt_smoothing_factor > 0) {
-        float smoothing_factor = 0.02;
-        for (int i = 1; i < d->float_conf.inputtilt_smoothing_factor; i++) {
-            smoothing_factor /= 2;
-        }
-
-        // Sets the angle away from Target that step size begins ramping down
-        float smooth_center_window = 1.5 + (0.5 * d->float_conf.inputtilt_smoothing_factor);
-
-        // Within X degrees of Target Angle, start ramping down step size
-        if (fabsf(input_tiltback_target_diff) < smooth_center_window) {
-            // Target step size is reduced the closer to center you are (needed for smoothly
-            // transitioning away from center)
-            d->inputtilt_ramped_step_size =
-                (smoothing_factor * d->inputtilt_step_size * (input_tiltback_target_diff / 2)) +
-                ((1 - smoothing_factor) * d->inputtilt_ramped_step_size);
-            // Linearly ramped down step size is provided as minimum to prevent overshoot
-            float centering_step_size =
-                fminf(
-                    fabsf(d->inputtilt_ramped_step_size),
-                    fabsf(input_tiltback_target_diff / 2) * d->inputtilt_step_size
-                ) *
-                sign(input_tiltback_target_diff);
-            if (fabsf(input_tiltback_target_diff) < fabsf(centering_step_size)) {
-                d->inputtilt_interpolated = input_tiltback_target;
-            } else {
-                d->inputtilt_interpolated += centering_step_size;
-            }
-        } else {
-            // Ramp up step size until the configured tilt speed is reached
-            d->inputtilt_ramped_step_size =
-                (smoothing_factor * d->inputtilt_step_size * sign(input_tiltback_target_diff)) +
-                ((1 - smoothing_factor) * d->inputtilt_ramped_step_size);
-            d->inputtilt_interpolated += d->inputtilt_ramped_step_size;
-        }
-    } else {
-        // Constant step size; no smoothing
-        if (fabsf(input_tiltback_target_diff) < d->inputtilt_step_size) {
-            d->inputtilt_interpolated = input_tiltback_target;
-        } else {
-            d->inputtilt_interpolated += d->inputtilt_step_size * sign(input_tiltback_target_diff);
-        }
-    }
-
-    d->setpoint += d->inputtilt_interpolated;
-}
-
 static void brake(data *d) {
     // Brake timeout logic
     float brake_timeout_length = 1;  // Brake Timeout hard-coded to 1s
@@ -816,6 +754,44 @@ static void imu_ref_callback(float *acc, float *gyro, [[maybe_unused]] float *ma
     data *d = (data *) ARG;
     balance_filter_update(&d->balance_filter, gyro, acc, dt);
 }
+static void get_throttle_value(data *d) {
+    bool remote_connected = false;
+    float servo_val = 0.0f;
+
+    switch (d->float_conf.inputtilt_remote_type) {
+    case (INPUTTILT_PPM):
+        servo_val = VESC_IF->get_ppm();
+        remote_connected = VESC_IF->get_ppm_age() < 1;
+        break;
+    case (INPUTTILT_UART): {
+        remote_state remote = VESC_IF->get_remote_state();
+        servo_val = remote.js_y;
+        remote_connected = remote.age_s < 1;
+        break;
+    }
+    case (INPUTTILT_NONE):
+        break;
+    }
+
+    // TODO check not needed?
+    if (!remote_connected) {
+        servo_val = 0.0f;
+    } else {
+        // Apply Deadband
+        float deadband = d->float_conf.inputtilt_deadband;
+        if (fabsf(servo_val) < deadband) {
+            servo_val = 0.0f;
+        } else {
+            servo_val = sign(servo_val) * (fabsf(servo_val) - deadband) / (1 - deadband);
+        }
+
+        if (d->float_conf.inputtilt_invert_throttle) {
+            servo_val *= -1.0f;
+        }
+    }
+
+    d->throttle_val = servo_val;
+}
 
 static void refloat_thd(void *arg) {
     data *d = (data *) arg;
@@ -831,41 +807,7 @@ static void refloat_thd(void *arg) {
         
         imu_data_update(&d->imu, &d->balance_filter);
         motor_data_update(&d->motor);
-
-        bool remote_connected = false;
-        float servo_val = 0;
-
-        switch (d->float_conf.inputtilt_remote_type) {
-        case (INPUTTILT_PPM):
-            servo_val = VESC_IF->get_ppm();
-            remote_connected = VESC_IF->get_ppm_age() < 1;
-            break;
-        case (INPUTTILT_UART): {
-            remote_state remote = VESC_IF->get_remote_state();
-            servo_val = remote.js_y;
-            remote_connected = remote.age_s < 1;
-            break;
-        }
-        case (INPUTTILT_NONE):
-            break;
-        }
-
-        if (!remote_connected) {
-            servo_val = 0;
-        } else {
-            // Apply Deadband
-            float deadband = d->float_conf.inputtilt_deadband;
-            if (fabsf(servo_val) < deadband) {
-                servo_val = 0.0;
-            } else {
-                servo_val = sign(servo_val) * (fabsf(servo_val) - deadband) / (1 - deadband);
-            }
-
-            // Invert Throttle
-            servo_val *= (d->float_conf.inputtilt_invert_throttle ? -1.0 : 1.0);
-        }
-
-        d->throttle_val = servo_val;
+        get_throttle_value(d);
 
         footpad_sensor_update(&d->footpad_sensor, &d->float_conf);
 
@@ -925,7 +867,7 @@ static void refloat_thd(void *arg) {
             d->setpoint = d->setpoint_target_interpolated;
 
             add_surge(d);
-            apply_inputtilt(d);
+            input_tilt_update(&d->input_tilt, &d->float_conf, d->throttle_val);
             if (d->state.wheelslip) {
                 atr_winddown(&d->atr);
                 torque_tilt_winddown(&d->torque_tilt);
@@ -1259,7 +1201,7 @@ static void send_realtime_data(data *d) {
         // buffer_append_float32_auto(buffer, d->torque_tilt.interpolated, &ind);
         // buffer_append_float32_auto(buffer, d->turn_tilt.interpolated, &ind);
         // buffer_append_float32_auto(buffer, d->speed_tilt.interpolated, &ind);
-        // buffer_append_float32_auto(buffer, d->inputtilt_interpolated, &ind);
+        // buffer_append_float32_auto(buffer, d->input_tilt.interpolated, &ind);
 
         // DEBUG
         buffer_append_float32_auto(buffer, d->pid.pid_value, &ind);

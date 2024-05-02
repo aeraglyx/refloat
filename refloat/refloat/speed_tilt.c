@@ -32,13 +32,16 @@ void speed_tilt_configure(SpeedTilt *st, const RefloatConfig *cfg) {
 
 void speed_tilt_update(SpeedTilt *st, const MotorData *mot, const RefloatConfig *cfg) {
     float linear = mot->erpm_smooth * st->linear_converted;
-    clamp_sym(&linear, cfg->speedtilt_variable_max);
-    float constant = clamp(mot->erpm_smooth / 250, -1.0f, 1.0f) * cfg->speedtilt_constant;
+    // clamp_sym(&linear, cfg->speedtilt_variable_max);
+    linear = clamp_sym(linear, cfg->speedtilt_variable_max);
+    // float constant = clamp(mot->erpm_smooth / 250, -1.0f, 1.0f) * cfg->speedtilt_constant;
+    float constant = clamp_sym(mot->erpm_smooth / 250, 1.0f) * cfg->speedtilt_constant;
     float target = linear + constant;
 
     const float offset = target - st->interpolated;
     float speed = offset * cfg->speedtilt_speed;
-    clamp_sym(&speed, cfg->speedtilt_speed_max);
+    // clamp_sym(&speed, cfg->speedtilt_speed_max);
+    speed = clamp_sym(speed, cfg->speedtilt_speed_max);
 
     st->interpolated += speed / cfg->hertz;
 }
