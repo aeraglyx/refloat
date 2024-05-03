@@ -805,7 +805,7 @@ static void refloat_thd(void *arg) {
 
         d->current_time = VESC_IF->system_time();
         
-        imu_data_update(&d->imu, &d->balance_filter);
+        imu_data_update(&d->imu, &d->balance_filter, &d->float_conf);
         motor_data_update(&d->motor);
         get_throttle_value(d);
 
@@ -875,7 +875,7 @@ static void refloat_thd(void *arg) {
                 speed_tilt_winddown(&d->speed_tilt);
             } else {
                 atr_update(&d->atr, &d->motor, &d->float_conf);
-                torque_tilt_update(&d->torque_tilt, &d->motor, &d->float_conf);
+                torque_tilt_update(&d->torque_tilt, &d->motor, &d->float_conf, &d->imu);
                 turn_tilt_update(&d->turn_tilt, &d->motor, &d->imu, &d->atr, &d->float_conf);
                 speed_tilt_update(&d->speed_tilt, &d->motor, &d->float_conf);
             }

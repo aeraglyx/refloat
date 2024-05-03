@@ -31,7 +31,7 @@ void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *cfg) {
     // tt->step_size_off = cfg->torquetilt_speed_max_off / cfg->hertz;
 }
 
-void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfig *cfg) {
+void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfig *cfg, const IMUData *imu) {
     float current = mot->current_filtered;
     float accel_factor = cfg->atr_amps_accel_ratio;
     float current_based_on_accel = mot->accel_clamped * accel_factor;
@@ -42,8 +42,11 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfi
     dead_zonef(&target, cfg->torquetilt_start_current);
     float strength =
         mot->braking ? cfg->torquetilt_strength_regen : cfg->torquetilt_strength;
+
+    float turn_boost = 1.0f + fabsf(imu->yaw_rate) * cfg->torquetilt_turn_boost * 0.00125f;
+    strength *= turn_boost;
+
     target *= strength;
-    // clamp_sym(&target, cfg->torquetilt_angle_limit);
     target = clamp_sym(target, cfg->torquetilt_angle_limit);
 
     const float offset = target - tt->interpolated;
@@ -53,7 +56,7 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfi
 
     tt->interpolated += speed / cfg->hertz;
 
-    tt->debug = method;
+    tt->debug = imu->yaw_rate;
 }
 
 void torque_tilt_winddown(TorqueTilt *tt) {

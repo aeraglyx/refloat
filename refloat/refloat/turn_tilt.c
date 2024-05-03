@@ -35,9 +35,9 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
         return;
     }
 
-    tt->target = fabsf(imu->yaw_diff) * cfg->turntilt_strength;
+    // tt->target = fabsf(imu->yaw_diff) * cfg->turntilt_strength;
     // TODO try using filtered gyro instead?
-    // tt->target = fabsf(imu->gyro[2]) * cfg->turntilt_strength;
+    tt->target = fabsf(imu->yaw_rate) * cfg->turntilt_strength * 0.00125;
 
     float speed_boost = powf(cfg->turntilt_strength_boost, mot->erpm_abs_10k);
     tt->target *= speed_boost;

@@ -20,6 +20,7 @@
 
 #include "conf/datatypes.h"
 #include "motor_data.h"
+#include "imu_data.h"
 
 typedef struct {
     float interpolated;
@@ -32,6 +33,6 @@ void torque_tilt_reset(TorqueTilt *tt);
 
 void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *config);
 
-void torque_tilt_update(TorqueTilt *tt, const MotorData *motor, const RefloatConfig *config);
+void torque_tilt_update(TorqueTilt *tt, const MotorData *motor, const RefloatConfig *config, const IMUData *imu);
 
 void torque_tilt_winddown(TorqueTilt *tt);

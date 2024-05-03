@@ -35,10 +35,11 @@ typedef struct {
     float pitch_balance;
 
     float gyro[3];
+    float yaw_rate;
 } IMUData;
 
 void imu_data_reset(IMUData *imu);
 
 // void motor_data_configure(MotorData *m, float frequency);
 
-void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter);
+void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter, const RefloatConfig *cfg);
