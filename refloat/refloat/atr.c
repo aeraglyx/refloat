@@ -61,7 +61,7 @@ void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
     atr->speed = offset * speed_k;
     atr->speed = clamp_sym(atr->speed, cfg->atr_speed_max_on);
 
-    atr->interpolated *= atr->speed / cfg->hertz;
+    atr->interpolated += atr->speed / cfg->hertz;
 }
 
 void atr_winddown(ATR *atr) {
