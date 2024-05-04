@@ -226,7 +226,7 @@ static void configure(data *d) {
     imu_data_configure(&d->imu, &d->float_conf);
     balance_filter_configure(&d->balance_filter, &d->float_conf);
 
-    // atr_configure(&d->atr, &d->float_conf);
+    atr_configure(&d->atr, &d->float_conf);
     // torque_tilt_configure(&d->torque_tilt, &d->float_conf);
     // turn_tilt_configure(&d->turn_tilt, &d->float_conf);
     speed_tilt_configure(&d->speed_tilt, &d->float_conf);
