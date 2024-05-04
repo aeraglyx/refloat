@@ -28,18 +28,16 @@ typedef struct {
     float roll;
     float yaw;
 
-    float yaw_diff;
-    float yaw_diff_clean;
-    float yaw_last;
-
     float pitch_balance;
 
     float gyro[3];
+
     float yaw_rate;
+    float yaw_rate_alpha;
 } IMUData;
 
 void imu_data_reset(IMUData *imu);
 
-// void motor_data_configure(MotorData *m, float frequency);
+void imu_data_configure(IMUData *imu, const RefloatConfig *cfg);
 
-void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter, const RefloatConfig *cfg);
+void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter);

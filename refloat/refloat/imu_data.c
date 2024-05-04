@@ -23,50 +23,26 @@
 #include <math.h>
 
 void imu_data_reset(IMUData *imu) {
-    imu->yaw_last = rad2deg(VESC_IF->imu_get_yaw());
-    imu->yaw_diff = 0.0f;
-    imu->yaw_diff_clean = 0.0f;
     imu->yaw_rate = 0.0f;
 }
 
-// void imu_data_configure(IMUData *imu, float frequency) {
-//     if (frequency > 0) {
-//         biquad_configure(&imu->atr_current_biquad, BQ_LOWPASS, frequency);
-//         imu->atr_filter_enabled = true;
-//     } else {
-//         imu->atr_filter_enabled = false;
-//     }
-// }
+void imu_data_configure(IMUData *imu, const RefloatConfig *cfg) {
+    imu->yaw_rate_alpha = half_time_to_alpha(cfg->turntilt_filter, cfg->hertz);
+}
 
-void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter, const RefloatConfig *cfg) {
+void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter) {
     // TODO rad2deg(VESC_IF->ahrs_get_pitch(&d->m_att_ref))
+
     imu->pitch = rad2deg(VESC_IF->imu_get_pitch());
     imu->roll = rad2deg(VESC_IF->imu_get_roll());
     imu->yaw = rad2deg(VESC_IF->imu_get_yaw());
-
-    float yaw_diff_raw = imu->yaw - imu->yaw_last;
-    if (yaw_diff_raw != 0.0f) {
-        imu->yaw_diff_clean = yaw_diff_raw;
-        if (fabsf(yaw_diff_raw) > 180.0f) {
-            if (yaw_diff_raw < 0.0f) {
-                imu->yaw_diff_clean += 360.0f;
-            } else {
-                imu->yaw_diff_clean -= 360.0f;
-            }
-        }
-    }
-
-    float yaw_diff_clamped = clamp_sym(imu->yaw_diff_clean, 0.1f);
-    imu->yaw_diff = imu->yaw_diff * 0.9f + yaw_diff_clamped * 0.1f;
-    imu->yaw_last = imu->yaw;
 
     imu->pitch_balance = rad2deg(balance_filter_get_pitch(balance_filter));
     
     VESC_IF->imu_get_gyro(imu->gyro);
 
-    // imu->yaw_rate = imu->yaw_rate * 0.95f + clamp_sym(imu->gyro[2], 200.0f) * 0.05f;
     const float yaw_rate_new = clamp_sym(imu->gyro[2], 200.0f);
-    smooth_value(&imu->yaw_rate, yaw_rate_new, cfg->tiltback_filter, cfg->hertz);
+    filter_ema(&imu->yaw_rate, yaw_rate_new, imu->yaw_rate_alpha);
 
     // TODO accel?
 }

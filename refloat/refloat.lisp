@@ -22,6 +22,6 @@
             (define atr_offset (ext-dbg 6))
             (define erpm (ext-dbg 7))
             (define current (ext-dbg 8))
-            (define atr_filtered_current (ext-dbg 9))
+            (define current_filtered (ext-dbg 9))
             (sleep 0.1)
 )))

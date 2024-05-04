@@ -226,19 +226,19 @@ typedef struct {
     // float atr_speed_max_off;
     float atr_speed_boost;
     float atr_transition_boost;
-    float atr_filter;
-    float tiltback_filter;
     float atr_amps_accel_ratio;
     float atr_amp_offset_constant;
     float atr_amp_offset_variable;
+    float atr_filter;
 
     float turntilt_strength;
+    float turntilt_strength_boost;
     float turntilt_angle_limit;
-    float turntilt_start_angle;
-    uint16_t turntilt_start_erpm;
     float turntilt_speed;
     float turntilt_speed_max;
-    float turntilt_strength_boost;
+    float turntilt_start_angle;
+    uint16_t turntilt_start_erpm;
+    float turntilt_filter;
 
     bool is_beeper_enabled;
     bool is_dutybeep_enabled;

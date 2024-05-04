@@ -31,20 +31,24 @@ void atr_reset(ATR *atr) {
 }
 
 void atr_configure(ATR *atr, const RefloatConfig *cfg) {
+    atr->accel_amps_ratio = 1.0f / cfg->atr_amps_accel_ratio;
     // atr->speed_scaled = cfg->atr_speed / cfg->hertz;
     // atr->speed_max_scaled = cfg->atr_speed_max_on / cfg->hertz;
 }
 
 void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
-    float amp_offset_lerp = clamp_sym(mot->erpm_smooth / 500, 1.0f);
-    float amp_offset_constant = cfg->atr_amp_offset_constant * amp_offset_lerp;
-    float amp_offset_variable = cfg->atr_amp_offset_variable * mot->erpm_smooth;
-    float amp_offset = amp_offset_constant + amp_offset_variable;
+    const float amp_offset_lerp = clamp_sym(mot->erpm_smooth / 500, 1.0f);
+    const float amp_offset_constant = cfg->atr_amp_offset_constant * amp_offset_lerp;
+    const float amp_offset_variable = cfg->atr_amp_offset_variable * mot->erpm_smooth;
+    const float amp_offset = amp_offset_constant + amp_offset_variable;
 
-    float accel_expected = (mot->current_filtered - amp_offset) / cfg->atr_amps_accel_ratio;
+    const float accel_amps_ratio = atr->accel_amps_ratio * powf(0.5f, mot->erpm_abs_10k);
+    const float accel_expected = (mot->current_filtered - amp_offset) * accel_amps_ratio;
     const float accel_diff_raw = accel_expected - mot->accel_clamped;
-    const float accel_diff_half_time = 0.15f * exp2f(-0.003f * mot->erpm_smooth);
-    smooth_value(&atr->accel_diff, accel_diff_raw, accel_diff_half_time, cfg->hertz);
+
+    const float half_time = 0.15f * exp2f(-0.003f * mot->erpm_smooth);
+    const float alpha = half_time_to_alpha(half_time, cfg->hertz);
+    filter_ema(&atr->accel_diff, accel_diff_raw, alpha);
 
     const bool uphill = sign(atr->accel_diff) == sign(mot->erpm_smooth);
     float strength = uphill ? cfg->atr_strength_up : cfg->atr_strength_down;
@@ -71,7 +75,7 @@ void atr_winddown(ATR *atr) {
 
 // static void get_wheelslip_probability(MotorData *mot, const RefloatConfig *cfg) {
 // 	float accel_factor = cfg->atr_amps_accel_ratio;
-// 	float accel_expected = mot->atr_filtered_current / accel_factor;
+// 	float accel_expected = mot->current_filtered / accel_factor;
 // 	float accel_diff = mot->acceleration - accel_expected;
     
 //     const float wheelslip_start = 4.0f;

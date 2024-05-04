@@ -30,10 +30,6 @@ float clamp(float value, float min, float max) {
     return m > max ? max : m;
 }
 
-// void clamp_sym(float *angle_in, float angle_limit) {
-//     *angle_in = clamp(*angle_in, -angle_limit, angle_limit);
-// }
-
 float clamp_sym(float angle_in, float angle_limit) {
     return clamp(angle_in, -angle_limit, angle_limit);
 }
@@ -52,17 +48,6 @@ void rate_limitf(float *value, float target, float step) {
     }
 }
 
-// float rate_limit_v04(float interpolated, float target, float step, float ramp) {
-//     float offset = target - interpolated;
-//     float step_multiplier = clamp(offset / fmaxf(ramp, 0.01f), -1.0f, 1.0f);
-//     return step * step_multiplier;
-// }
-
-float tilt_speed(float interpolated, float target, float speed, float speed_max) {
-    float offset = target - interpolated;
-    return clamp(offset * speed, -speed_max, speed_max);
-}
-
 // void dead_zonef(float *value, float thr_pos, float thr_neg) {
 //     if (*value > thr_pos) {
 //         *value = *value - thr_pos;
@@ -73,20 +58,13 @@ float tilt_speed(float interpolated, float target, float speed, float speed_max)
 //     }
 // }
 
-void smooth_value(float *value_smooth, float value_current, float half_time_sec, uint16_t hertz) {
-    if (half_time_sec < 0.001f) {
-        *value_smooth = value_current;
-    } else {
-        float mult = powf(0.5f, 1.0f / (half_time_sec * (float)hertz));
-        *value_smooth = mult * (*value_smooth) + (1.0f - mult) * value_current;
-    }
+float half_time_to_alpha(float half_time_sec, uint16_t hertz) {
+    if (half_time_sec < 0.001f) { return 1.0f; }
+    return 1.0f - powf(0.5f, 1.0f / (half_time_sec * (float)hertz));
 }
 
-float smoothing_factor(float half_time_sec, uint16_t hertz) {
-    if (half_time_sec < 0.001f) {
-        return 1.0f;
-    }
-    return powf(0.5f, 1.0f / (half_time_sec * (float)hertz));
+void filter_ema(float *value_smooth, float value_new, float alpha) {
+    *value_smooth = *value_smooth * (1.0f - alpha) + value_new * alpha;
 }
 
 // float smoothstep(float x) {

@@ -98,16 +98,12 @@ uint32_t rnd(uint32_t seed);
 void rate_limitf(float *value, float target, float step);
 // float get_step(float offset, float step_max, float ramp);
 float clamp(float value, float min, float max);
-// void clamp_sym(float *angle_in, float angle_limit);
 float clamp_sym(float angle_in, float angle_limit);
 
 void dead_zonef(float *value, float threshold);
 
-void smooth_value(float *value_smooth, float value_current, float half_time_sec, uint16_t hertz);
-// float rate_limit_v04(float interpolated, float target, float max_step, float ramp);
-float tilt_speed(float interpolated, float target, float speed, float speed_max);
-// void rate_limit_smooth(float *value, float target, float max_step, float ramp);
-// void limit_speed(float *value, float target, float speed, float max_speed, uint16_t freq);
+float half_time_to_alpha(float half_time_sec, uint16_t hertz);
+void filter_ema(float *value_smooth, float value_current, float alpha);
 
 // float sigmoid(float x, float radius);
 // float sigmoid_norm(float x, float radius);

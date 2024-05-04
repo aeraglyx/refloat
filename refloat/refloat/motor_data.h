@@ -30,30 +30,27 @@ typedef struct {
     float erpm;
     float erpm_filtered;
     float erpm_abs;
-    float last_erpm;
+    float erpm_last;
     int8_t erpm_sign;
-    // float erpm_last;
     float erpm_smooth;
     float erpm_abs_10k;
 
     float current;
+    float current_filtered;
     bool braking;
-    // float gas_factor;
 
     float duty_cycle;
     float duty_smooth;
 
     float acceleration;
     float accel_clamped;
-    // float accel_history[ACCEL_ARRAY_SIZE];
-    // uint8_t accel_idx;
 
-    bool atr_filter_enabled;
-    Biquad atr_current_biquad;
-    float atr_filtered_current;
-    float current_filtered;
-    // float atr_smoothing;
+    // bool atr_filter_enabled;
+    // Biquad atr_current_biquad;
+
     float filter_half_time;
+    float erpm_filter_alpha;
+    float atr_filter_alpha;
 
     float current_min;
     float current_max;

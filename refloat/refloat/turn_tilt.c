@@ -35,8 +35,6 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
         return;
     }
 
-    // tt->target = fabsf(imu->yaw_diff) * cfg->turntilt_strength;
-    // TODO try using filtered gyro instead?
     tt->target = fabsf(imu->yaw_rate) * cfg->turntilt_strength * 0.00125;
 
     float speed_boost = powf(cfg->turntilt_strength_boost, mot->erpm_abs_10k);
@@ -62,8 +60,6 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
     //     tt->target = 0;
     // }
 
-    // dead_zonef(&tt->target, cfg->turntilt_start_angle);
-    // clamp_sym(&tt->target, cfg->turntilt_angle_limit);
     tt->target = clamp_sym(tt->target, cfg->turntilt_angle_limit);
 
     const float offset = tt->target - tt->interpolated;

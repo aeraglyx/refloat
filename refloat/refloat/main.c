@@ -223,6 +223,7 @@ static void configure(data *d) {
     lcm_configure(&d->lcm, &d->float_conf.leds);
 
     motor_data_configure(&d->motor, &d->float_conf);
+    imu_data_configure(&d->imu, &d->float_conf);
     balance_filter_configure(&d->balance_filter, &d->float_conf);
 
     // atr_configure(&d->atr, &d->float_conf);
@@ -805,7 +806,7 @@ static void refloat_thd(void *arg) {
 
         d->current_time = VESC_IF->system_time();
         
-        imu_data_update(&d->imu, &d->balance_filter, &d->float_conf);
+        imu_data_update(&d->imu, &d->balance_filter);
         motor_data_update(&d->motor);
         get_throttle_value(d);
 
@@ -1049,7 +1050,7 @@ static float app_get_debug(int index) {
     case (8):
         return d->motor.current;
     case (9):
-        return d->motor.atr_filtered_current;
+        return d->motor.current_filtered;
     default:
         return 0;
     }
@@ -1197,7 +1198,7 @@ static void send_realtime_data(data *d) {
         buffer_append_float32_auto(buffer, d->atr.speed, &ind);
         buffer_append_float32_auto(buffer, d->atr.target, &ind);
         buffer_append_float32_auto(buffer, d->motor.erpm_abs_10k, &ind);
-        buffer_append_float32_auto(buffer, d->torque_tilt.debug, &ind);
+        buffer_append_float32_auto(buffer, d->float_conf.turntilt_filter, &ind);
         // buffer_append_float32_auto(buffer, d->torque_tilt.interpolated, &ind);
         // buffer_append_float32_auto(buffer, d->turn_tilt.interpolated, &ind);
         // buffer_append_float32_auto(buffer, d->speed_tilt.interpolated, &ind);
@@ -1205,7 +1206,7 @@ static void send_realtime_data(data *d) {
 
         // DEBUG
         buffer_append_float32_auto(buffer, d->pid.pid_value, &ind);
-        buffer_append_float32_auto(buffer, d->motor.atr_filtered_current, &ind);
+        buffer_append_float32_auto(buffer, d->motor.current_filtered, &ind);
         buffer_append_float32_auto(buffer, d->atr.accel_diff, &ind);
     }
 
