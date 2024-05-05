@@ -1198,7 +1198,7 @@ static void send_realtime_data(data *d) {
         buffer_append_float32_auto(buffer, d->atr.speed, &ind);
         buffer_append_float32_auto(buffer, d->atr.target, &ind);
         buffer_append_float32_auto(buffer, d->motor.erpm_abs_10k, &ind);
-        buffer_append_float32_auto(buffer, d->float_conf.turntilt_filter, &ind);
+        buffer_append_float32_auto(buffer, d->atr.debug, &ind);
         // buffer_append_float32_auto(buffer, d->torque_tilt.interpolated, &ind);
         // buffer_append_float32_auto(buffer, d->turn_tilt.interpolated, &ind);
         // buffer_append_float32_auto(buffer, d->speed_tilt.interpolated, &ind);

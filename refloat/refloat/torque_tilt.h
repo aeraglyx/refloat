@@ -24,6 +24,7 @@
 
 typedef struct {
     float interpolated;
+    float accel_minus_amps_smooth;
     float debug;
     // float step_size_on;
     // float step_size_off;

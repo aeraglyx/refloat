@@ -24,6 +24,7 @@
 void torque_tilt_reset(TorqueTilt *tt) {
     tt->interpolated = 0.0f;
     tt->debug = 0.0f;
+    tt->accel_minus_amps_smooth = 0.0f;
 }
 
 void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *cfg) {
@@ -36,8 +37,13 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfi
     float accel_factor = cfg->atr_amps_accel_ratio;
     float current_based_on_accel = mot->accel_clamped * accel_factor;
 
+    float alpha = half_time_to_alpha(cfg->torquetilt_filter, cfg->hertz);
+    float accel_minus_amps = current_based_on_accel - current;
+    filter_ema(&tt->accel_minus_amps_smooth, accel_minus_amps, alpha);
+    float current_with_offset = current + tt->accel_minus_amps_smooth;
+
     float method = cfg->torquetilt_method;
-    float target = (1.0f - method) * current + method * current_based_on_accel;
+    float target = (1.0f - method) * current + method * current_with_offset;
 
     dead_zonef(&target, cfg->torquetilt_start_current);
     float strength =
@@ -51,7 +57,6 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfi
 
     const float offset = target - tt->interpolated;
     float speed = offset * cfg->torquetilt_speed;
-    // clamp_sym(&speed, cfg->torquetilt_speed_max_on);
     speed = clamp_sym(speed, cfg->torquetilt_speed_max_on);
 
     tt->interpolated += speed / cfg->hertz;

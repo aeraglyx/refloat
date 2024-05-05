@@ -58,9 +58,15 @@ void rate_limitf(float *value, float target, float step) {
 //     }
 // }
 
-float half_time_to_alpha(float half_time_sec, uint16_t hertz) {
-    if (half_time_sec < 0.001f) { return 1.0f; }
-    return 1.0f - powf(0.5f, 1.0f / (half_time_sec * (float)hertz));
+float half_time_to_alpha(float half_time_sec, uint16_t loop_freq) {
+    if (half_time_sec < 0.005f) {
+        return 1.0f;
+    }
+    // Approximation of 1.0f - exp2f(-1.0f / (half_time * freq))
+    // I couldn't make this up, ln(2) ≈ 0.69 :)
+    return 0.69f / (half_time_sec * loop_freq);
+
+    // return 1.0f - exp2f(-1.0f / (half_time_sec * loop_freq));
 }
 
 void filter_ema(float *value_smooth, float value_new, float alpha) {

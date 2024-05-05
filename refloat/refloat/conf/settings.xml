@@ -1545,20 +1545,42 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;EXPERIMENTAL: 0.0 is the classic Amp based Torque Tilt, 1.0 uses measured ERPM acceleration instead. That way it doesn't interfere with setpoint when simply maintaining speed, but it could have some negative side effects (e.g. when wheel locks). Please be mindful when using 0.3 and higher.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;EXPERIMENTAL: 0.0 is the classic Amp based Torque Tilt, 1.0 incorporates measured ERPM acceleration as well. That way it doesn't interfere with setpoint when simply maintaining speed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
             <cDefine>CFG_DFLT_TORQUETILT_METHOD</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
+            <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
             <maxDouble>1</maxDouble>
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>0.05</stepDouble>
+            <stepDouble>0.1</stepDouble>
             <valDouble>0</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
         </torquetilt_method>
+        <torquetilt_filter>
+            <longName>Current Complimentary Filter</longName>
+            <type>1</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Half time of current/accel complimentary filtering. Lower values will use more acceleration.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_TORQUETILT_FILTER</cDefine>
+            <editorDecimalsDouble>2</editorDecimalsDouble>
+            <editorScale>1</editorScale>
+            <editAsPercentage>0</editAsPercentage>
+            <maxDouble>3</maxDouble>
+            <minDouble>0.0</minDouble>
+            <showDisplay>0</showDisplay>
+            <stepDouble>0.05</stepDouble>
+            <valDouble>0.5</valDouble>
+            <vTxDoubleScale>10000</vTxDoubleScale>
+            <suffix> s</suffix>
+            <vTx>7</vTx>
+        </torquetilt_filter>
         <torquetilt_turn_boost>
             <longName>Turn Boost</longName>
             <type>1</type>
@@ -1872,18 +1894,18 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Biquad Low-pass Filter on the current used for calculating ATR. Setting a lower value here helps smooth out spikes in the current, and prevents ATR from being twitchy. Setting a high value here improves responsiveness, but can lead to overreacting ATR during normal acceleration.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Half time of current filtering. Used for ATR and Torque Tilt.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
             <cDefine>CFG_DFLT_ATR_FILTER</cDefine>
-            <editorDecimalsDouble>0</editorDecimalsDouble>
+            <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxDouble>20</maxDouble>
-            <minDouble>0</minDouble>
+            <maxDouble>0.5</maxDouble>
+            <minDouble>0.0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>1</stepDouble>
-            <valDouble>5</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> Hz</suffix>
+            <stepDouble>0.01</stepDouble>
+            <valDouble>0.1</valDouble>
+            <vTxDoubleScale>1000</vTxDoubleScale>
+            <suffix> s</suffix>
             <vTx>7</vTx>
         </atr_filter>
         <turntilt_strength>
@@ -3351,6 +3373,7 @@ p, li { white-space: pre-wrap; }
         <!-- <ser>torquetilt_speed_max_off</ser> -->
         <ser>torquetilt_method</ser>
         <ser>torquetilt_turn_boost</ser>
+        <ser>torquetilt_filter</ser>
         <ser>turntilt_strength</ser>
         <ser>turntilt_strength_boost</ser>
         <ser>turntilt_angle_limit</ser>
@@ -3462,6 +3485,7 @@ p, li { white-space: pre-wrap; }
                     <!-- <param>torquetilt_speed_max_off</param> -->
                     <param>torquetilt_method</param>
                     <param>torquetilt_turn_boost</param>
+                    <param>torquetilt_filter</param>
                     <param>::sep::Turn Tiltback</param>
                     <param>turntilt_strength</param>
                     <param>turntilt_strength_boost</param>

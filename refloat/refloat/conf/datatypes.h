@@ -215,6 +215,7 @@ typedef struct {
     // float torquetilt_speed_max_off;
     float torquetilt_method;
     float torquetilt_turn_boost;
+    float torquetilt_filter;
 
     float atr_strength_up;
     float atr_strength_down;

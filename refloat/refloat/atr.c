@@ -37,12 +37,12 @@ void atr_configure(ATR *atr, const RefloatConfig *cfg) {
 }
 
 void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
-    const float amp_offset_lerp = clamp_sym(mot->erpm_smooth / 500, 1.0f);
+    const float amp_offset_lerp = clamp_sym(mot->erpm_smooth / 1000, 1.0f);
     const float amp_offset_constant = cfg->atr_amp_offset_constant * amp_offset_lerp;
     const float amp_offset_variable = cfg->atr_amp_offset_variable * mot->erpm_smooth;
     const float amp_offset = amp_offset_constant + amp_offset_variable;
 
-    const float accel_amps_ratio = atr->accel_amps_ratio * powf(0.5f, mot->erpm_abs_10k);
+    const float accel_amps_ratio = atr->accel_amps_ratio * powf(0.6f, mot->erpm_abs_10k);
     const float accel_expected = (mot->current_filtered - amp_offset) * accel_amps_ratio;
     const float accel_diff_raw = accel_expected - mot->accel_clamped;
 
@@ -66,6 +66,8 @@ void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
     atr->speed = clamp_sym(atr->speed, cfg->atr_speed_max_on);
 
     atr->interpolated += atr->speed / cfg->hertz;
+
+    atr->debug = accel_expected;
 }
 
 void atr_winddown(ATR *atr) {

@@ -38,8 +38,7 @@ void motor_data_reset(MotorData *m) {
 }
 
 void motor_data_configure(MotorData *m, RefloatConfig *cfg) {
-    m->filter_half_time = 1.0f / cfg->atr_filter;
-    m->atr_filter_alpha = half_time_to_alpha(m->filter_half_time, cfg->hertz);
+    m->atr_filter_alpha = half_time_to_alpha(cfg->atr_filter, cfg->hertz);
     m->erpm_filter_alpha = half_time_to_alpha(0.2f, cfg->hertz);
 
     // float frequency = cfg->atr_filter / cfg->hertz;
