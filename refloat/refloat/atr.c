@@ -55,8 +55,9 @@ void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
     const float speed_boost = powf(cfg->atr_strength_boost, mot->erpm_abs_10k);
     strength *= speed_boost;
 
-    atr->target = atr->accel_diff * strength;
-    dead_zonef(&atr->target, cfg->atr_threshold);
+    atr->target = atr->accel_diff;
+    dead_zonef(&atr->target, cfg->atr_threshold * accel_amps_ratio);
+    atr->target *= strength;
     atr->target = clamp_sym(atr->target, cfg->atr_angle_limit);
     
     const float response_boost = powf(cfg->atr_speed_boost, mot->erpm_abs_10k);
