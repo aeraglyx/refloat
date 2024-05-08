@@ -52,8 +52,8 @@ void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
 
     const bool uphill = sign(atr->accel_diff) == sign(mot->erpm_smooth);
     float strength = uphill ? cfg->atr_strength_up : cfg->atr_strength_down;
-    const float speed_boost = powf(cfg->atr_strength_boost, mot->erpm_abs_10k);
-    strength *= speed_boost;
+    const float strength_boost = powf(cfg->atr_strength_boost, mot->erpm_abs_10k);
+    strength *= strength_boost;
 
     atr->target = atr->accel_diff;
     dead_zonef(&atr->target, cfg->atr_threshold * accel_amps_ratio);
