@@ -28,6 +28,8 @@ void pid_reset(PID *pid) {
     pid->integral = 0.0f;
     pid->rate_p = 0.0f;
 
+    pid->pitch_rate_filtered = 0.0f;
+
     pid->kp_brake_scale = 1.0f;
     pid->kp2_brake_scale = 1.0f;
     pid->kp_accel_scale = 1.0f;
@@ -37,6 +39,7 @@ void pid_reset(PID *pid) {
 }
 
 void pid_configure(PID *pid, const RefloatConfig *cfg) {
+    pid->pitch_rate_alpha = half_time_to_alpha(cfg->kp2_filter, cfg->hertz);
     pid->ki = cfg->ki / cfg->hertz;
     pid->softstart_ramp_step_size = 200.0f / cfg->hertz;
 }
@@ -87,7 +90,9 @@ void pid_update(PID *pid, const IMUData *imu, const MotorData *mot, const Refloa
     // }
 
     // RATE P
-    const float rate_prop = -imu->gyro[1];  // TODO filter gyro?
+    filter_ema(&pid->pitch_rate_filtered, -imu->gyro[1], pid->pitch_rate_alpha); 
+    // const float rate_prop = -imu->gyro[1];
+    const float rate_prop = pid->pitch_rate_filtered;
     float rate_p_scale;
     if (rate_prop < 0.0f) {
         rate_p_scale = cfg->kp2 * pid->kp2_brake_scale;

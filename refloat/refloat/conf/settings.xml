@@ -82,6 +82,28 @@ p, li { white-space: pre-wrap; }
             <suffix></suffix>
             <vTx>7</vTx>
         </kp2>
+        <kp2_filter>
+            <longName>Rate P Filter</longName>
+            <type>1</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Half time of Rate P filtering. Could help with vibrations at higher Rate P.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_KP2_FILTER</cDefine>
+            <editorDecimalsDouble>2</editorDecimalsDouble>
+            <editorScale>1</editorScale>
+            <editAsPercentage>0</editAsPercentage>
+            <maxDouble>2</maxDouble>
+            <minDouble>0.0</minDouble>
+            <showDisplay>0</showDisplay>
+            <stepDouble>0.05</stepDouble>
+            <valDouble>0.0</valDouble>
+            <vTxDoubleScale>10000</vTxDoubleScale>
+            <suffix> s</suffix>
+            <vTx>7</vTx>
+        </kp2_filter>
         <ki>
             <longName>Angle I</longName>
             <type>1</type>
@@ -3319,6 +3341,7 @@ p, li { white-space: pre-wrap; }
     <SerOrder>
         <ser>kp</ser>
         <ser>kp2</ser>
+        <ser>kp2_filter</ser>
         <ser>ki</ser>
         <ser>mahony_kp</ser>
         <ser>mahony_kp_roll</ser>
@@ -3466,6 +3489,7 @@ p, li { white-space: pre-wrap; }
                     <param>::sep::PID</param>
                     <param>kp</param>
                     <param>kp2</param>
+                    <param>kp2_filter</param>
                     <param>ki</param>
                     <param>ki_limit</param>
                     <param>::sep::Balance Filter</param>

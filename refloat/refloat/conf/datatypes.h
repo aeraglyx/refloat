@@ -146,6 +146,7 @@ typedef struct {
     bool disabled;
     float kp;
     float kp2;
+    float kp2_filter;
     float ki;
     float ki_limit;
 

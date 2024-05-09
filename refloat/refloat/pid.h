@@ -29,6 +29,9 @@ typedef struct {
     float integral;
     float rate_p;
 
+    float pitch_rate_alpha;
+    float pitch_rate_filtered;
+
     float kp_brake_scale;
     float kp2_brake_scale;
     float kp_accel_scale;
