@@ -3377,7 +3377,7 @@ Item {
                             RealValue {id: debugTorqueTiltSetpoint; label: "Speed"; unit: "°";}
                             RealValue {id: debugTurnTiltSetpoint; label: "Target"; unit: "°";}
                             RealValue {id: debugSpeedTiltSetpoint; label: "ERPM abs 10k"; unit: "°";}
-                            RealValue {id: debugRemoteTiltSetpoint; label: "Accel Expected"; unit: "s";}
+                            RealValue {id: debugRemoteTiltSetpoint; label: "Debug"; unit: "";}
                         }
                     }
 

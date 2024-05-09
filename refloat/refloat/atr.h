@@ -28,7 +28,7 @@ typedef struct {
     float interpolated;
 
     float accel_amps_ratio;
-    float accel_diff;
+    float amp_diff;
     float debug;
 } ATR;
 

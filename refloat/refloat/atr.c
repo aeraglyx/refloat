@@ -26,7 +26,7 @@ void atr_reset(ATR *atr) {
     atr->speed = 0.0f;
     atr->interpolated = 0.0f;
 
-    atr->accel_diff = 0.0f;
+    atr->amp_diff = 0.0f;
     atr->debug = 0.0f;
 }
 
@@ -42,21 +42,21 @@ void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
     const float amp_offset_variable = cfg->atr_amp_offset_variable * mot->erpm_smooth;
     const float amp_offset = amp_offset_constant + amp_offset_variable;
 
-    const float accel_amps_ratio = atr->accel_amps_ratio * powf(0.6f, mot->erpm_abs_10k);
-    const float accel_expected = (mot->current_filtered - amp_offset) * accel_amps_ratio;
-    const float accel_diff_raw = accel_expected - mot->accel_clamped;
+    const float amps = mot->current_filtered - amp_offset;
+    const float amps_expected = mot->accel_clamped * cfg->atr_amps_accel_ratio;
+    const float amp_diff_raw = amps - amps_expected;
 
     const float half_time = 0.15f * exp2f(-0.003f * fabsf(mot->erpm_smooth));
     const float alpha = half_time_to_alpha(half_time, cfg->hertz);
-    filter_ema(&atr->accel_diff, accel_diff_raw, alpha);
+    filter_ema(&atr->amp_diff, amp_diff_raw, alpha);
 
-    const bool uphill = sign(atr->accel_diff) == sign(mot->erpm_smooth);
+    const bool uphill = sign(atr->amp_diff) == sign(mot->erpm_smooth);
     float strength = uphill ? cfg->atr_strength_up : cfg->atr_strength_down;
     const float strength_boost = powf(cfg->atr_strength_boost, mot->erpm_abs_10k);
     strength *= strength_boost;
 
-    atr->target = atr->accel_diff;
-    dead_zonef(&atr->target, cfg->atr_threshold * accel_amps_ratio);
+    atr->target = atr->amp_diff;
+    dead_zonef(&atr->target, cfg->atr_threshold);
     atr->target *= strength;
     atr->target = clamp_sym(atr->target, cfg->atr_angle_limit);
     
@@ -67,8 +67,7 @@ void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
     atr->speed = clamp_sym(atr->speed, cfg->atr_speed_max_on);
 
     atr->interpolated += atr->speed / cfg->hertz;
-
-    atr->debug = accel_expected;
+    atr->debug = amps;
 }
 
 void atr_winddown(ATR *atr) {
