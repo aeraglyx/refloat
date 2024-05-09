@@ -1397,7 +1397,7 @@ p, li { white-space: pre-wrap; }
             <maxDouble>1</maxDouble>
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>0.02</stepDouble>
+            <stepDouble>0.01</stepDouble>
             <valDouble>0.1</valDouble>
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix> °/A</suffix>
@@ -1421,12 +1421,34 @@ p, li { white-space: pre-wrap; }
             <maxDouble>1</maxDouble>
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>0.02</stepDouble>
+            <stepDouble>0.01</stepDouble>
             <valDouble>0.1</valDouble>
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix> °/A</suffix>
             <vTx>7</vTx>
         </torquetilt_strength_regen>
+        <torquetilt_strength_boost>
+            <longName>Strength at Speed</longName>
+            <type>1</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Torque Tilt strength multiplier at 10K ERPM. Applied exponentially.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_TORQUETILT_STRENGTH_BOOST</cDefine>
+            <editorDecimalsDouble>1</editorDecimalsDouble>
+            <editorScale>1</editorScale>
+            <editAsPercentage>0</editAsPercentage>
+            <maxDouble>4.0</maxDouble>
+            <minDouble>0.1</minDouble>
+            <showDisplay>0</showDisplay>
+            <stepDouble>0.1</stepDouble>
+            <valDouble>1</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
+            <suffix>x</suffix>
+            <vTx>7</vTx>
+        </torquetilt_strength_boost>
         <torquetilt_start_current>
             <longName>Start Current Threshold</longName>
             <type>1</type>
@@ -1841,7 +1863,7 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Current needed for riding at very low speed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Current needed for riding at very low speed. To tune, ride at constant speed of 500-1000 ERPM on flat ground and take note of Motor Current.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
             <cDefine>CFG_DFLT_ATR_AMP_OFFSET_CONSTANT</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
@@ -3357,32 +3379,32 @@ p, li { white-space: pre-wrap; }
         <ser>ki_limit</ser>
         <ser>torquetilt_strength</ser>
         <ser>torquetilt_strength_regen</ser>
-        <ser>torquetilt_start_current</ser>
-        <ser>torquetilt_angle_limit</ser>
+        <ser>torquetilt_strength_boost</ser>
         <ser>torquetilt_speed</ser>
         <ser>torquetilt_speed_max_on</ser>
         <!-- <ser>torquetilt_speed_max_off</ser> -->
-        <ser>torquetilt_method</ser>
+        <ser>torquetilt_start_current</ser>
+        <ser>torquetilt_angle_limit</ser>
         <ser>torquetilt_turn_boost</ser>
+        <ser>torquetilt_method</ser>
         <ser>torquetilt_filter</ser>
         <ser>turntilt_strength</ser>
         <ser>turntilt_strength_boost</ser>
-        <ser>turntilt_angle_limit</ser>
         <ser>turntilt_speed</ser>
         <ser>turntilt_speed_max</ser>
+        <ser>turntilt_angle_limit</ser>
         <ser>turntilt_start_angle</ser>
         <ser>turntilt_start_erpm</ser>
         <ser>turntilt_filter</ser>
         <ser>atr_strength_up</ser>
         <ser>atr_strength_down</ser>
         <ser>atr_strength_boost</ser>
-        <ser>atr_threshold</ser>
-        <!-- <ser>atr_threshold_down</ser> -->
-        <ser>atr_angle_limit</ser>
         <ser>atr_speed</ser>
         <ser>atr_speed_max_on</ser>
         <!-- <ser>atr_speed_max_off</ser> -->
         <ser>atr_speed_boost</ser>
+        <ser>atr_threshold</ser>
+        <ser>atr_angle_limit</ser>
         <ser>atr_amps_accel_ratio</ser>
         <ser>atr_amp_offset_constant</ser>
         <ser>atr_amp_offset_variable</ser>
@@ -3457,8 +3479,50 @@ p, li { white-space: pre-wrap; }
                 </subgroupParams>
             </subgroup>
             <subgroup>
+                <subgroupName>ATR</subgroupName>
+                <subgroupParams>
+                    <param>::sep::Adaptive Torque Response</param>
+                    <param>atr_strength_up</param>
+                    <param>atr_strength_down</param>
+                    <param>atr_strength_boost</param>
+                    <param>::sep::Nose Angling</param>
+                    <param>atr_speed</param>
+                    <param>atr_speed_max_on</param>
+                    <!-- <param>atr_speed_max_off</param> -->
+                    <param>atr_speed_boost</param>
+                    <param>atr_threshold</param>
+                    <param>atr_angle_limit</param>
+                    <param>::sep::Advanced</param>
+                    <param>atr_amps_accel_ratio</param>
+                    <param>atr_amp_offset_constant</param>
+                    <param>atr_amp_offset_variable</param>
+                    <param>atr_filter</param>
+                </subgroupParams>
+            </subgroup>
+            <subgroup>
                 <subgroupName>Tune Modifiers</subgroupName>
                 <subgroupParams>
+                    <param>::sep::Torque Tiltback</param>
+                    <param>torquetilt_strength</param>
+                    <param>torquetilt_strength_regen</param>
+                    <param>torquetilt_strength_boost</param>
+                    <param>torquetilt_speed</param>
+                    <param>torquetilt_speed_max_on</param>
+                    <!-- <param>torquetilt_speed_max_off</param> -->
+                    <param>torquetilt_start_current</param>
+                    <param>torquetilt_angle_limit</param>
+                    <param>torquetilt_turn_boost</param>
+                    <param>torquetilt_method</param>
+                    <param>torquetilt_filter</param>
+                    <param>::sep::Turn Tiltback</param>
+                    <param>turntilt_strength</param>
+                    <param>turntilt_strength_boost</param>
+                    <param>turntilt_speed</param>
+                    <param>turntilt_speed_max</param>
+                    <param>turntilt_angle_limit</param>
+                    <param>turntilt_start_angle</param>
+                    <param>turntilt_start_erpm</param>
+                    <param>turntilt_filter</param>
                     <param>::sep::Nose Angling</param>
                     <param>speedtilt_constant</param>
                     <!-- <param>speedtilt_constant_erpm</param> -->
@@ -3466,47 +3530,6 @@ p, li { white-space: pre-wrap; }
                     <param>speedtilt_variable_max</param>
                     <param>speedtilt_speed</param>
                     <param>speedtilt_speed_max</param>
-                    <param>::sep::Torque Tiltback</param>
-                    <param>torquetilt_strength</param>
-                    <param>torquetilt_strength_regen</param>
-                    <param>torquetilt_start_current</param>
-                    <param>torquetilt_angle_limit</param>
-                    <param>torquetilt_speed</param>
-                    <param>torquetilt_speed_max_on</param>
-                    <!-- <param>torquetilt_speed_max_off</param> -->
-                    <param>torquetilt_method</param>
-                    <param>torquetilt_turn_boost</param>
-                    <param>torquetilt_filter</param>
-                    <param>::sep::Turn Tiltback</param>
-                    <param>turntilt_strength</param>
-                    <param>turntilt_strength_boost</param>
-                    <param>turntilt_angle_limit</param>
-                    <param>turntilt_speed</param>
-                    <param>turntilt_speed_max</param>
-                    <param>turntilt_start_angle</param>
-                    <param>turntilt_start_erpm</param>
-                    <param>turntilt_filter</param>
-                </subgroupParams>
-            </subgroup>
-            <subgroup>
-                <subgroupName>ATR</subgroupName>
-                <subgroupParams>
-                    <param>::sep::Adaptive Torque Response</param>
-                    <param>atr_strength_up</param>
-                    <param>atr_strength_down</param>
-                    <param>atr_strength_boost</param>
-                    <param>atr_threshold</param>
-                    <param>::sep::Nose Angling</param>
-                    <param>atr_angle_limit</param>
-                    <param>atr_speed</param>
-                    <param>atr_speed_max_on</param>
-                    <!-- <param>atr_speed_max_off</param> -->
-                    <param>atr_speed_boost</param>
-                    <param>::sep::Advanced</param>
-                    <param>atr_amps_accel_ratio</param>
-                    <param>atr_amp_offset_constant</param>
-                    <param>atr_amp_offset_variable</param>
-                    <param>atr_filter</param>
                 </subgroupParams>
             </subgroup>
             <subgroup>

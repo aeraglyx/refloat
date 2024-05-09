@@ -45,6 +45,9 @@ void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfi
     dead_zonef(&target, cfg->torquetilt_start_current);
     float strength =
         mot->braking ? cfg->torquetilt_strength_regen : cfg->torquetilt_strength;
+    
+    const float strength_boost = powf(cfg->torquetilt_strength_boost, mot->erpm_abs_10k);
+    strength *= strength_boost;
 
     float turn_boost = 1.0f + fabsf(imu->yaw_rate) * cfg->torquetilt_turn_boost * 0.00125f;
     strength *= turn_boost;

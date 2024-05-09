@@ -208,13 +208,14 @@ typedef struct {
     float brake_current;
     float torquetilt_strength;
     float torquetilt_strength_regen;
+    float torquetilt_strength_boost;
     float torquetilt_start_current;
     float torquetilt_angle_limit;
     float torquetilt_speed;
     float torquetilt_speed_max_on;
     // float torquetilt_speed_max_off;
-    float torquetilt_method;
     float torquetilt_turn_boost;
+    float torquetilt_method;
     float torquetilt_filter;
 
     float atr_strength_up;
