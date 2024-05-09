@@ -46,7 +46,7 @@ void atr_update(ATR *atr, const MotorData *mot, const RefloatConfig *cfg) {
     const float accel_expected = (mot->current_filtered - amp_offset) * accel_amps_ratio;
     const float accel_diff_raw = accel_expected - mot->accel_clamped;
 
-    const float half_time = 0.15f * exp2f(-0.003f * mot->erpm_smooth);
+    const float half_time = 0.15f * exp2f(-0.003f * fabsf(mot->erpm_smooth));
     const float alpha = half_time_to_alpha(half_time, cfg->hertz);
     filter_ema(&atr->accel_diff, accel_diff_raw, alpha);
 
