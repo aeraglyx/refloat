@@ -20,14 +20,14 @@
 
 #include "conf/datatypes.h"
 #include "motor_data.h"
+#include "remote_data.h"
 
 typedef struct {
     float interpolated;
-    // float throttle_val;
 } InputTilt;
 
 void input_tilt_reset(InputTilt *tt);
 
 void input_tilt_configure(InputTilt *tt, const RefloatConfig *config);
 
-void input_tilt_update(InputTilt *tt, const RefloatConfig *config, float throttle);
+void input_tilt_update(InputTilt *tt, const RemoteData *remote, const RefloatConfig *config);

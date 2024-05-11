@@ -1,4 +1,4 @@
-// Copyright 2022 Dado Mista
+
 // Copyright 2024 Lukas Hrazky
 //
 // This file is part of the Refloat VESC package.
@@ -16,25 +16,20 @@
 // You should have received a copy of the GNU General Public License along with
 // this program. If not, see <http://www.gnu.org/licenses/>.
 
-#include "input_tilt.h"
-#include "utils.h"
+#pragma once
 
-#include <math.h>
+#include "conf/datatypes.h"
 
-void input_tilt_reset(InputTilt *it) {
-    it->interpolated = 0.0f;
-}
+#include <stdbool.h>
+#include <stdint.h>
 
-void input_tilt_configure(InputTilt *it, const RefloatConfig *cfg) {
-    // it->inputtilt_step_size = cfg->inputtilt_speed_max / cfg->hertz;
-}
+typedef struct {
+    float throttle;
+    float throttle_filtered;
+} RemoteData;
 
-void input_tilt_update(InputTilt *it, const RemoteData *remote, const RefloatConfig *cfg) {
-    float target = remote->throttle_filtered * cfg->inputtilt_angle_limit;
+void remote_data_reset(RemoteData *remote);
 
-    const float offset = target - it->interpolated;
-    float speed = offset * cfg->inputtilt_speed;
-    speed = clamp_sym(speed, cfg->inputtilt_speed_max);
+void remote_data_configure(RemoteData *remote, const RefloatConfig *cfg);
 
-    it->interpolated += speed / cfg->hertz;
-}
+void remote_data_update(RemoteData *remote, const RefloatConfig *cfg);

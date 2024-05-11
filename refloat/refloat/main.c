@@ -19,6 +19,11 @@
 
 #include "vesc_c_if.h"
 
+#include "balance_filter.h"
+#include "imu_data.h"
+#include "motor_data.h"
+#include "remote_data.h"
+
 #include "atr.h"
 #include "torque_tilt.h"
 #include "turn_tilt.h"
@@ -26,13 +31,10 @@
 #include "input_tilt.h"
 
 #include "pid.h"
-#include "balance_filter.h"
 #include "charging.h"
 #include "footpad_sensor.h"
 #include "lcm.h"
 #include "leds.h"
-#include "motor_data.h"
-#include "imu_data.h"
 #include "state.h"
 #include "utils.h"
 
@@ -81,6 +83,7 @@ typedef struct {
     // Board data
     IMUData imu;
     MotorData motor;
+    RemoteData remote;
 
     float mc_max_temp_fet, mc_max_temp_mot;
     float mc_current_max, mc_current_min;
@@ -95,7 +98,7 @@ typedef struct {
     SpeedTilt speed_tilt;
     InputTilt input_tilt;
 
-    float throttle_val;
+    // float throttle_val;
 
     // Beeper
     int beep_num_left;
@@ -366,11 +369,11 @@ static void do_rc_move(data *d) {
         // Throttle must be greater than 2% (Help mitigate lingering throttle)
         if ((d->float_conf.remote_throttle_current_max > 0) &&
             (d->current_time - d->disengage_timer > d->float_conf.remote_throttle_grace_period) &&
-            (fabsf(d->throttle_val) > 0.02)) {
-            float servo_val = d->throttle_val;
-            servo_val *= (d->float_conf.inputtilt_invert_throttle ? -1.0 : 1.0);
+            (fabsf(d->remote.throttle_filtered) > 0.02)) {
+            // float servo_val = d->throttle_val;
+            // servo_val *= (d->float_conf.inputtilt_invert_throttle ? -1.0 : 1.0);
             d->rc_current = d->rc_current * 0.95 +
-                (d->float_conf.remote_throttle_current_max * servo_val) * 0.05;
+                (d->float_conf.remote_throttle_current_max * d->remote.throttle_filtered) * 0.05;
             set_current(d, d->rc_current);
         } else {
             d->rc_current = 0;
@@ -755,44 +758,6 @@ static void imu_ref_callback(float *acc, float *gyro, [[maybe_unused]] float *ma
     data *d = (data *) ARG;
     balance_filter_update(&d->balance_filter, gyro, acc, dt);
 }
-static void get_throttle_value(data *d) {
-    bool remote_connected = false;
-    float servo_val = 0.0f;
-
-    switch (d->float_conf.inputtilt_remote_type) {
-    case (INPUTTILT_PPM):
-        servo_val = VESC_IF->get_ppm();
-        remote_connected = VESC_IF->get_ppm_age() < 1;
-        break;
-    case (INPUTTILT_UART): {
-        remote_state remote = VESC_IF->get_remote_state();
-        servo_val = remote.js_y;
-        remote_connected = remote.age_s < 1;
-        break;
-    }
-    case (INPUTTILT_NONE):
-        break;
-    }
-
-    // TODO check not needed?
-    if (!remote_connected) {
-        servo_val = 0.0f;
-    } else {
-        // Apply Deadband
-        float deadband = d->float_conf.inputtilt_deadband;
-        if (fabsf(servo_val) < deadband) {
-            servo_val = 0.0f;
-        } else {
-            servo_val = sign(servo_val) * (fabsf(servo_val) - deadband) / (1 - deadband);
-        }
-
-        if (d->float_conf.inputtilt_invert_throttle) {
-            servo_val *= -1.0f;
-        }
-    }
-
-    d->throttle_val = servo_val;
-}
 
 static void refloat_thd(void *arg) {
     data *d = (data *) arg;
@@ -808,7 +773,7 @@ static void refloat_thd(void *arg) {
         
         imu_data_update(&d->imu, &d->balance_filter);
         motor_data_update(&d->motor);
-        get_throttle_value(d);
+        remote_data_update(&d->remote, &d->float_conf);
 
         footpad_sensor_update(&d->footpad_sensor, &d->float_conf);
 

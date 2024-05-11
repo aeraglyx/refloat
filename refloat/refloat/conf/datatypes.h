@@ -196,6 +196,7 @@ typedef struct {
     uint16_t inputtilt_smoothing_factor;
     bool inputtilt_invert_throttle;
     float inputtilt_deadband;
+    float inputtilt_filter;
     float remote_throttle_current_max;
     float remote_throttle_grace_period;
 
