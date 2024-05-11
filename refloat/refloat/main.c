@@ -86,7 +86,7 @@ typedef struct {
     RemoteData remote;
 
     float mc_max_temp_fet, mc_max_temp_mot;
-    float mc_current_max, mc_current_min;
+    // float mc_current_max, mc_current_min;
 
     // IMU data for the balancing filter
     BalanceFilterData balance_filter;
@@ -277,9 +277,9 @@ static void configure(data *d) {
     d->mc_max_temp_fet = VESC_IF->get_cfg_float(CFG_PARAM_l_temp_fet_start) - 3;
     d->mc_max_temp_mot = VESC_IF->get_cfg_float(CFG_PARAM_l_temp_motor_start) - 3;
 
-    d->mc_current_max = VESC_IF->get_cfg_float(CFG_PARAM_l_current_max);
+    // d->mc_current_max = VESC_IF->get_cfg_float(CFG_PARAM_l_current_max);
     // min current is a positive value here!
-    d->mc_current_min = fabsf(VESC_IF->get_cfg_float(CFG_PARAM_l_current_min));
+    // d->mc_current_min = fabsf(VESC_IF->get_cfg_float(CFG_PARAM_l_current_min));
 
     d->max_duty_with_margin = VESC_IF->get_cfg_float(CFG_PARAM_l_max_duty) - 0.1;
 
@@ -1069,7 +1069,7 @@ static void cmd_handtest(data *d, unsigned char *cfg) {
     d->state.mode = cfg[0] ? MODE_HANDTEST : MODE_NORMAL;
     if (d->state.mode == MODE_HANDTEST) {
         // temporarily reduce max currents to make hand test safer / gentler
-        d->mc_current_max = d->mc_current_min = 7;
+        d->motor.current_max = d->motor.current_min = 7;
         // Disable I-term and all tune modifiers and tilts
         d->float_conf.ki = 0;
         d->float_conf.kp_brake = 1;
