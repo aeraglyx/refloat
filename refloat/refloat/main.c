@@ -435,7 +435,7 @@ bool is_engaged(const data *d) {
 // Fault checking order does not really matter. From a UX perspective, switch should be before
 // angle.
 static bool check_faults(data *d) {
-    bool disable_switch_faults = d->config.faults.fault_moving_fault_disabled &&
+    bool disable_switch_faults = d->config.faults.moving_fault_disabled &&
         // Rolling forward (not backwards!)
         d->motor.erpm > (d->config.faults.switch_half_erpm * 2) &&
         // Not tipped over

@@ -169,6 +169,7 @@ typedef struct {
 
 typedef struct {
     Warning duty;
+    // TODO Warning speed;
     Warning lv;
     Warning hv;
     float tiltback_return_speed;
@@ -189,8 +190,8 @@ typedef struct {
     uint16_t switch_full_delay;
     uint16_t switch_half_erpm;
     bool is_posi_enabled;
-    bool fault_moving_fault_disabled;
-    bool fault_reversestop_enabled;
+    bool moving_fault_disabled;
+    bool is_reversestop_enabled;
 } CfgFaults;
 
 typedef struct {
@@ -219,7 +220,6 @@ typedef struct {
     float speed;
     float speed_max;
     float speed_boost;
-    float transition_boost;
     float amps_accel_ratio;
     float amp_offset_constant;
     float amp_offset_variable;
