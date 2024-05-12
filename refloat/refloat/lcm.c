@@ -212,9 +212,9 @@ void lcm_light_ctrl_request(LcmData *lcm, unsigned char *cfg, int len) {
             }
         } else {
             if (len > 5) {
-                // d->float_conf.led_mode = cfg[idx++];
-                // d->float_conf.led_mode_idle = cfg[idx++];
-                // d->float_conf.led_status_mode = cfg[idx++];
+                // d->config.led_mode = cfg[idx++];
+                // d->config.led_mode_idle = cfg[idx++];
+                // d->config.led_status_mode = cfg[idx++];
             }
         }
     }

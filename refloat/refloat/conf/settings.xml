@@ -25,7 +25,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This is the VESC Logging and Communication Module.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
             <cDefine></cDefine>
         </hw_name>
-        <kp>
+        <tune.pid.kp>
             <longName>Angle P</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -39,7 +39,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Values: 10 - 35 (Take caution closer to 35!)&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*Note: Angle P and Rate P work together to shape a large part of the ride feel. If trying to soften the effects of both and you would like to maintain the ride feel, these values should be adjusted together by the same proportion (i.e. If reducing Angle P by half, such as from 20 -&amp;gt; 10, Rate P should be reduced by half as well, such as from 0.6 -&amp;gt; 0.3).&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_KP</cDefine>
+            <cDefine>CFG_DFLT_TUNE_PID_KP</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -51,8 +51,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>10</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
-        </kp>
-        <kp2>
+        </tune.pid.kp>
+        <tune.pid.kd>
             <longName>Rate P</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -69,7 +69,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;(0.7 - 1.2+ is possible, may experience negative side effects)&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*Note: Angle P and Rate P work together to shape a large part of the ride feel. If trying to soften the effects of both and you would like to maintain the ride feel, these values should be adjusted together by the same proportion (i.e. If reducing Angle P by half, such as from 20 -&amp;gt; 10, Rate P should be reduced by half as well, such as from 0.6 -&amp;gt; 0.3).&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_KP2</cDefine>
+            <cDefine>CFG_DFLT_TUNE_PID_KD</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -81,8 +81,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
-        </kp2>
-        <kp2_filter>
+        </tune.pid.kd>
+        <tune.pid.kd_filter>
             <longName>Rate P Filter</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -91,7 +91,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Half time of Rate P filtering. Could help with vibrations at higher Rate P.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_KP2_FILTER</cDefine>
+            <cDefine>CFG_DFLT_TUNE_PID_KD_FILTER</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -103,8 +103,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>10000</vTxDoubleScale>
             <suffix> s</suffix>
             <vTx>7</vTx>
-        </kp2_filter>
-        <ki>
+        </tune.pid.kd_filter>
+        <tune.pid.ki>
             <longName>Angle I</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -116,7 +116,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;As time passes with the board angle away from setpoint (considered &amp;quot;error&amp;quot;), Angle I will strengthen the board response based on cumulative error over time. Can be a subtle effect, and has most noticeable effect at the start of uphills/downhills, as well as tricks involving motor freespin.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Values: 0 - 20 (Caution with higher values!)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_KI</cDefine>
+            <cDefine>CFG_DFLT_TUNE_PID_KI</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -128,33 +128,58 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>10</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
-        </ki>
-        <!-- <ki>
-            <longName>Angle I</longName>
+        </tune.pid.ki>
+        <tune.pid.kp_brake>
+            <longName>Angle P (Braking)</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Angle I (Integral) value&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;As time passes with the board angle away from setpoint (considered &amp;quot;error&amp;quot;), Angle I will strengthen the board response based on cumulative error over time. Can be a subtle effect, and has most noticeable effect at the start of uphills/downhills, as well as tricks involving motor freespin.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Values: 0.005 - 0.08 (Caution with higher values!!)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_KI</cDefine>
-            <editorDecimalsDouble>3</editorDecimalsDouble>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Scales your Angle P value for braking. For example, if:&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Angle P = 20,&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Angle P (Braking) = 0.5x,&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;then your brakes will use an Angle P of 10, half the strength of your acceleration Angle P.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_TUNE_PID_KP_BRAKE</cDefine>
+            <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxDouble>0.5</maxDouble>
+            <maxDouble>2</maxDouble>
+            <minDouble>0.2</minDouble>
+            <showDisplay>0</showDisplay>
+            <stepDouble>0.1</stepDouble>
+            <valDouble>1</valDouble>
+            <vTxDoubleScale>10</vTxDoubleScale>
+            <suffix>x</suffix>
+            <vTx>7</vTx>
+        </tune.pid.kp_brake>
+        <tune.pid.kd_brake>
+            <longName>Rate P (Braking)</longName>
+            <type>1</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Scales your Rate P value for braking. For example, if:&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rate P = 0.6,&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rate P (Braking) = 0.5x,&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;then your brakes will use a Rate P of 0.3, half the strength of your acceleration Rate P.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_TUNE_PID_KD_BRAKE</cDefine>
+            <editorDecimalsDouble>1</editorDecimalsDouble>
+            <editorScale>1</editorScale>
+            <editAsPercentage>0</editAsPercentage>
+            <maxDouble>2</maxDouble>
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>0.005</stepDouble>
-            <valDouble>0.005</valDouble>
-            <vTxDoubleScale>100000</vTxDoubleScale>
-            <suffix></suffix>
+            <stepDouble>0.1</stepDouble>
+            <valDouble>1</valDouble>
+            <vTxDoubleScale>10</vTxDoubleScale>
+            <suffix>x</suffix>
             <vTx>7</vTx>
-        </ki> -->
-        <mahony_kp>
+        </tune.pid.kd_brake>
+        <tune.balance_filter.mahony_kp>
             <longName>Pitch KP</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -170,7 +195,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This parameter is amongst those that have the most impact on the feel of the ride and how the board behaves in ondulated terrain.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Values: 1.5 - 2.5 (Caution with higher values!)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_MAHONY_KP</cDefine>
+            <cDefine>CFG_DFLT_TUNE_BF_MAHONY_KP</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -182,8 +207,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>10000</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
-        </mahony_kp>
-        <mahony_kp_roll>
+        </tune.balance_filter.mahony_kp>
+        <tune.balance_filter.mahony_kp_roll>
             <longName>Roll KP</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -201,7 +226,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;However, unequal axes KPs skew the Mahony's mathematical model and setting Roll KP too low brings unwanted side-effects, like the board being twitchy and the nose lifting too much during sudden rotations.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Values: 0.8 - 1.8&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_MAHONY_KP_ROLL</cDefine>
+            <cDefine>CFG_DFLT_TUNE_BF_MAHONY_KP_ROLL</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -213,8 +238,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>10000</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
-        </mahony_kp_roll>
-        <mahony_kp_yaw>
+        </tune.balance_filter.mahony_kp_roll>
+        <tune.balance_filter.mahony_kp_yaw>
             <longName>Yaw KP</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -230,7 +255,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Practical impact of Yaw KP seems to be minimal, but it is kept as a parameter for now for completeness and experimentation.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Due to the above and out of ignorance of the mathematics behind the Mahony filter, the recommended value is right inbetween your Pitch KP and Roll KP.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_MAHONY_KP_YAW</cDefine>
+            <cDefine>CFG_DFLT_TUNE_BF_MAHONY_KP_YAW</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -242,8 +267,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>10000</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
-        </mahony_kp_yaw>
-        <bf_accel_confidence_decay>
+        </tune.balance_filter.mahony_kp_yaw>
+        <tune.balance_filter.accel_confidence_decay>
             <longName>Accelerometer Confidence Decay</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -252,7 +277,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Sets how fast the accelerometer confidence will be decreased if the acceleration vector differs from 1.0.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_BF_ACCEL_CONFIDENCE_DECAY</cDefine>
+            <cDefine>CFG_DFLT_TUNE_BF_ACCEL_CONFIDENCE_DECAY</cDefine>
             <editorDecimalsDouble>3</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -264,59 +289,9 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
-        </bf_accel_confidence_decay>
-        <kp_brake>
-            <longName>Angle P (Braking)</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Scales your Angle P value for braking. For example, if:&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Angle P = 20,&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Angle P (Braking) = 0.5x,&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;then your brakes will use an Angle P of 10, half the strength of your acceleration Angle P.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_KP_BRAKE</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>2</maxDouble>
-            <minDouble>0.2</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>0.1</stepDouble>
-            <valDouble>1</valDouble>
-            <vTxDoubleScale>10</vTxDoubleScale>
-            <suffix>x</suffix>
-            <vTx>7</vTx>
-        </kp_brake>
-        <kp2_brake>
-            <longName>Rate P (Braking)</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Scales your Rate P value for braking. For example, if:&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rate P = 0.6,&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rate P (Braking) = 0.5x,&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;then your brakes will use a Rate P of 0.3, half the strength of your acceleration Rate P.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_KP2_BRAKE</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>2</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>0.1</stepDouble>
-            <valDouble>1</valDouble>
-            <vTxDoubleScale>10</vTxDoubleScale>
-            <suffix>x</suffix>
-            <vTx>7</vTx>
-        </kp2_brake>
-        <hertz>
-            <longName>Loop Hertz</longName>
+        </tune.balance_filter.accel_confidence_decay>
+        <hardware.esc.hertz>
+            <longName>Loop Frequency</longName>
             <type>2</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -328,18 +303,18 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Value: Same or multiple of IMU Sample Rate&lt;/span&gt;&lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-style:italic;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Little FOCer v3.1 (LSM6DS3): 832Hz&lt;/li&gt;
 &lt;li style=&quot; font-style:italic;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Little FOCer v3 (BMI160): 800Hz&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_HERTZ</cDefine>
+            <cDefine>CFG_DFLT_HW_ESC_HERTZ</cDefine>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
             <maxInt>4000</maxInt>
             <minInt>50</minInt>
             <showDisplay>0</showDisplay>
             <stepInt>16</stepInt>
-            <valInt>832</valInt>
+            <valInt>800</valInt>
             <suffix> Hz</suffix>
             <vTx>3</vTx>
-        </hertz>
-        <fault_pitch>
+        </hardware.esc.hertz>
+        <faults.pitch_threshold>
             <longName>Pitch Axis Fault Cutoff</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -348,7 +323,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Pitch Angle at which a fault is triggered and the board is disengaged. Can help potentially cut-off a runaway board with a stuck sensor (a.k.a &amp;quot;Ghosting&amp;quot;).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_FAULT_PITCH</cDefine>
+            <cDefine>CFG_DFLT_FAULT_PITCH_THRESHOLD</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -360,8 +335,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>10</vTxDoubleScale>
             <suffix> °</suffix>
             <vTx>7</vTx>
-        </fault_pitch>
-        <fault_roll>
+        </faults.pitch_threshold>
+        <faults.roll_threshold>
             <longName>Roll Axis Fault Cutoff</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -370,7 +345,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Roll Angle at which a fault is triggered and the board is disengaged. Can help potentially cut-off a runaway board with a stuck sensor (a.k.a &amp;quot;Ghosting&amp;quot;).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_FAULT_ROLL</cDefine>
+            <cDefine>CFG_DFLT_FAULT_ROLL_THRESHOLD</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -382,8 +357,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>10</vTxDoubleScale>
             <suffix> °</suffix>
             <vTx>7</vTx>
-        </fault_roll>
-        <fault_adc1>
+        </faults.roll_threshold>
+        <faults.adc1_threshold>
             <longName>ADC1 Switch Voltage</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -394,7 +369,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Voltage below this value will trigger a fault for the corresponding sensor zone. To disable this switch, set this value to 0.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic; text-decoration: underline;&quot;&gt;Hint:&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt; If voltage with no input does not settle near 0, consider a pulldown resisitor!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_FAULT_ADC1</cDefine>
+            <cDefine>CFG_DFLT_FAULT_ADC1_THRESHOLD</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -406,8 +381,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix> V</suffix>
             <vTx>7</vTx>
-        </fault_adc1>
-        <fault_adc2>
+        </faults.adc1_threshold>
+        <faults.adc2_threshold>
             <longName>ADC2 Switch Voltage</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -418,7 +393,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Voltage below this value will trigger a fault for the corresponding sensor zone. To disable this switch, set this value to 0.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic; text-decoration: underline;&quot;&gt;Hint:&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt; If voltage with no input does not settle near 0, consider a pulldown resisitor!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_FAULT_ADC2</cDefine>
+            <cDefine>CFG_DFLT_FAULT_ADC2_THRESHOLD</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -430,7 +405,7 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix> V</suffix>
             <vTx>7</vTx>
-        </fault_adc2>
+        </faults.adc2_threshold>
         <is_footbeep_enabled>
             <longName>Beep on Sensor Fault</longName>
             <type>5</type>
@@ -443,7 +418,7 @@ p, li { white-space: pre-wrap; }
             <cDefine>CFG_DFLT_IS_FOOTBEEP_ENABLED</cDefine>
             <valInt>1</valInt>
         </is_footbeep_enabled>
-        <fault_delay_pitch>
+        <faults.pitch_delay>
             <longName>Pitch Fault Delay</longName>
             <type>2</type>
             <transmittable>1</transmittable>
@@ -452,7 +427,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Delay before cutoff, in milliseconds, once a Pitch Axis Fault is detected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_FAULT_DELAY_PITCH</cDefine>
+            <cDefine>CFG_DFLT_FAULT_PITCH_DELAY</cDefine>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
             <maxInt>10000</maxInt>
@@ -462,8 +437,8 @@ p, li { white-space: pre-wrap; }
             <valInt>250</valInt>
             <suffix> ms</suffix>
             <vTx>3</vTx>
-        </fault_delay_pitch>
-        <fault_delay_roll>
+        </faults.pitch_delay>
+        <faults.roll_delay>
             <longName>Roll Fault Delay</longName>
             <type>2</type>
             <transmittable>1</transmittable>
@@ -472,7 +447,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Delay before cutoff, in milliseconds, once a Roll Axis Fault is detected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_FAULT_DELAY_ROLL</cDefine>
+            <cDefine>CFG_DFLT_FAULT_ROLL_DELAY</cDefine>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
             <maxInt>10000</maxInt>
@@ -482,8 +457,8 @@ p, li { white-space: pre-wrap; }
             <valInt>250</valInt>
             <suffix> ms</suffix>
             <vTx>3</vTx>
-        </fault_delay_roll>
-        <fault_delay_switch_half>
+        </faults.roll_delay>
+        <faults.switch_half_delay>
             <longName>Half Switch Fault Delay</longName>
             <type>2</type>
             <transmittable>1</transmittable>
@@ -492,7 +467,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Delay before cutoff, in milliseconds, once a Half Switch Fault is detected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_FAULT_DELAY_SWITCH_HALF</cDefine>
+            <cDefine>CFG_DFLT_FAULT_SWITCH_HALF_DELAY</cDefine>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
             <maxInt>10000</maxInt>
@@ -502,8 +477,8 @@ p, li { white-space: pre-wrap; }
             <valInt>250</valInt>
             <suffix> ms</suffix>
             <vTx>3</vTx>
-        </fault_delay_switch_half>
-        <fault_delay_switch_full>
+        </faults.switch_half_delay>
+        <faults.switch_full_delay>
             <longName>Full Switch Fault Delay</longName>
             <type>2</type>
             <transmittable>1</transmittable>
@@ -512,7 +487,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Delay before cutoff, in milliseconds, once a Full Switch Fault is detected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_FAULT_DELAY_SWITCH_FULL</cDefine>
+            <cDefine>CFG_DFLT_FAULT_SWITCH_FULL_DELAY</cDefine>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
             <maxInt>10000</maxInt>
@@ -522,8 +497,8 @@ p, li { white-space: pre-wrap; }
             <valInt>400</valInt>
             <suffix> ms</suffix>
             <vTx>3</vTx>
-        </fault_delay_switch_full>
-        <fault_adc_half_erpm>
+        </faults.switch_full_delay>
+        <faults.switch_half_erpm>
             <longName>ADC Half State Fault ERPM</longName>
             <type>2</type>
             <transmittable>1</transmittable>
@@ -534,7 +509,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;ERPM (absoulte value) below which a Half State on the ADC switches (sensor zones) will be considered a Fault.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*Note: ERPM = RPM * (Motor Poles / 2)&lt;br /&gt;For an 11&amp;quot; Tire on a Hypercore Motor (30 Poles):&lt;br /&gt;1000 ERPM ≈ 2.2 mph ≈ 3.5 km/h&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_FAULT_ADC_HALF_ERPM</cDefine>
+            <cDefine>CFG_DFLT_FAULT_SWITCH_HALF_ERPM</cDefine>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
             <maxInt>100000</maxInt>
@@ -544,8 +519,8 @@ p, li { white-space: pre-wrap; }
             <valInt>200</valInt>
             <suffix> ERPM</suffix>
             <vTx>3</vTx>
-        </fault_adc_half_erpm>
-        <fault_is_dual_switch>
+        </faults.switch_half_erpm>
+        <faults.is_posi_enabled>
             <longName>Treat Both Sensors as One (Posi)</longName>
             <type>5</type>
             <transmittable>1</transmittable>
@@ -556,10 +531,10 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Treats both sensors as one single-zone sensor (a.k.a. Posi Sensor). Can help guarantee continued sensor engagement, especially at low speed, but disables the Half Switch Fault (Heel Lift dismount) and can present extra ghosting risk if a sensor is stuck.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*Note: For Advanced Riders only!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_FAULT_IS_DUAL_SWITCH</cDefine>
+            <cDefine>CFG_DFLT_IS_POSI_ENABLED</cDefine>
             <valInt>0</valInt>
-        </fault_is_dual_switch>
-        <fault_moving_fault_disabled>
+        </faults.is_posi_enabled>
+        <faults.fault_moving_fault_disabled>
             <longName>Disable Moving Faults</longName>
             <type>5</type>
             <transmittable>1</transmittable>
@@ -572,8 +547,8 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;*DISCLAIMER: Requires correct speed calibration and Tail Heavy Board!! The board &lt;/span&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;WILL&lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; ghost for sure if your normal speeds read as negative or if your board is nose heavy!!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
             <cDefine>CFG_DFLT_FAULT_MOVING_FAULT_DISABLED</cDefine>
             <valInt>0</valInt>
-        </fault_moving_fault_disabled>
-        <fault_reversestop_enabled>
+        </faults.fault_moving_fault_disabled>
+        <faults.is_reversestop_enabled>
             <longName>Enable Reverse Stop</longName>
             <type>5</type>
             <transmittable>1</transmittable>
@@ -586,54 +561,10 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*Note: With Reverse Stop enabled, it's much harder if not impossible to balance standing still&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;*DISCLAIMER: Requires correct speed calibration!! You &lt;/span&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;WON'T&lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; be able to go forward if your normal speeds are negative!!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_FAULT_REVERSESTOP_ENABLED</cDefine>
+            <cDefine>CFG_DFLT_FAULTS_IS_REVERSESTOP_ENABLED</cDefine>
             <valInt>0</valInt>
-        </fault_reversestop_enabled>
-        <tiltback_duty_angle>
-            <longName>Angle</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Desired setpoint angle for Duty Cycle Pushback.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TILTBACK_DUTY_ANGLE</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>30</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>1</stepDouble>
-            <valDouble>5</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> °</suffix>
-            <vTx>7</vTx>
-        </tiltback_duty_angle>
-        <tiltback_duty_speed>
-            <longName>Speed</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rate at which nose is tilted back when exceeding Duty Cycle limit (fast pushback can be dangerous!).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TILTBACK_DUTY_SPEED</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>30</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>0.5</stepDouble>
-            <valDouble>3</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> °/s</suffix>
-            <vTx>7</vTx>
-        </tiltback_duty_speed>
-        <tiltback_duty>
+        </faults.is_reversestop_enabled>
+        <warnings.duty.threshold>
             <longName>Duty Cycle Threshold</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -646,7 +577,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*Note: Can be disabled by setting to 100%&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*&lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;DISCLAIMER&lt;/span&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;: Max Duty Cycle on a VESC is &lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;95%&lt;/span&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;NOT 100%! &lt;/span&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Reaching 95% Duty Cycle and pushing beyond &lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;WILL &lt;/span&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;result in a nosedive. Use this knowledge to leave yourself the headroom you desire.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TILTBACK_DUTY</cDefine>
+            <cDefine>CFG_DFLT_WARNING_DUTY_THRESHOLD</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>1</editAsPercentage>
@@ -658,8 +589,52 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
-        </tiltback_duty>
-        <is_dutybeep_enabled>
+        </warnings.duty.threshold>
+        <warnings.duty.tiltback_angle>
+            <longName>Angle</longName>
+            <type>1</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Desired setpoint angle for Duty Cycle Pushback.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_WARNING_DUTY_TILTBACK_ANGLE</cDefine>
+            <editorDecimalsDouble>1</editorDecimalsDouble>
+            <editorScale>1</editorScale>
+            <editAsPercentage>0</editAsPercentage>
+            <maxDouble>30</maxDouble>
+            <minDouble>0</minDouble>
+            <showDisplay>0</showDisplay>
+            <stepDouble>1</stepDouble>
+            <valDouble>5</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
+            <suffix> °</suffix>
+            <vTx>7</vTx>
+        </warnings.duty.tiltback_angle>
+        <warnings.duty.tiltback_speed>
+            <longName>Speed</longName>
+            <type>1</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rate at which nose is tilted back when exceeding Duty Cycle limit (fast pushback can be dangerous!).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_WARNING_DUTY_TILTBACK_SPEED</cDefine>
+            <editorDecimalsDouble>1</editorDecimalsDouble>
+            <editorScale>1</editorScale>
+            <editAsPercentage>0</editAsPercentage>
+            <maxDouble>30</maxDouble>
+            <minDouble>0</minDouble>
+            <showDisplay>0</showDisplay>
+            <stepDouble>0.5</stepDouble>
+            <valDouble>3</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
+            <suffix> °/s</suffix>
+            <vTx>7</vTx>
+        </warnings.duty.tiltback_speed>
+        <warnings.is_dutybeep_enabled>
             <longName>Beep on Duty Pushback</longName>
             <type>5</type>
             <transmittable>1</transmittable>
@@ -672,7 +647,7 @@ p, li { white-space: pre-wrap; }
 &lt;p align=&quot;justify&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Warning: beeper may not be easily audible at high speeds!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
             <cDefine>CFG_DFLT_IS_DUTYBEEP_ENABLED</cDefine>
             <valInt>0</valInt>
-        </is_dutybeep_enabled>
+        </warnings.is_dutybeep_enabled>
         <surge_angle>
             <longName>Surge Angle Increment</longName>
             <type>1</type>
@@ -748,51 +723,7 @@ p, li { white-space: pre-wrap; }
             <cDefine>CFG_DFLT_IS_SURGEBEEP_ENABLED</cDefine>
             <valInt>1</valInt>
         </is_surgebeep_enabled>
-        <tiltback_hv_angle>
-            <longName>Angle</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Desired setpoint angle for High Voltage Pushback.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TILTBACK_HV_ANGLE</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>30</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>1</stepDouble>
-            <valDouble>8</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> °</suffix>
-            <vTx>7</vTx>
-        </tiltback_hv_angle>
-        <tiltback_hv_speed>
-            <longName>Speed</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rate at which nose is tilted back when exceeding High Voltage limit (fast pushback can be dangerous!).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TILTBACK_HV_SPEED</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>30</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>0.5</stepDouble>
-            <valDouble>1</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> °/s</suffix>
-            <vTx>7</vTx>
-        </tiltback_hv_speed>
-        <tiltback_hv>
+        <warnings.hv.threshold>
             <longName>High Voltage Threshold</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -803,7 +734,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;High Voltage threshold to trigger a safety pushback (Pushback raises the nose of the vehicle to alert you). High voltage pushback is most likely to be triggered when braking or going downhill on a full battery, sometimes resulting in a tail drag (take caution!).&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Value: 4.3V * Cell Count (i.e. for a 15s battery, 4.3V * 15 = 64.5V)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TILTBACK_HV</cDefine>
+            <cDefine>CFG_DFLT_WARNING_HV_THRESHOLD</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -815,8 +746,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>10</vTxDoubleScale>
             <suffix> V</suffix>
             <vTx>7</vTx>
-        </tiltback_hv>
-        <tiltback_lv_angle>
+        </warnings.hv.threshold>
+        <warnings.hv.tiltback_angle>
             <longName>Angle</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -824,8 +755,8 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Desired setpoint angle for Low Voltage Pushback.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TILTBACK_LV_ANGLE</cDefine>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Desired setpoint angle for High Voltage Pushback.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_WARNING_HV_TILTBACK_ANGLE</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -833,12 +764,12 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>1</stepDouble>
-            <valDouble>10</valDouble>
+            <valDouble>8</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °</suffix>
             <vTx>7</vTx>
-        </tiltback_lv_angle>
-        <tiltback_lv_speed>
+        </warnings.hv.tiltback_angle>
+        <warnings.hv.tiltback_speed>
             <longName>Speed</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -846,8 +777,8 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rate at which nose is tilted back when exceeding Low Voltage threshold (fast pushback can be dangerous!).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TILTBACK_LV_SPEED</cDefine>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rate at which nose is tilted back when exceeding High Voltage limit (fast pushback can be dangerous!).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_WARNING_HV_TILTBACK_SPEED</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -859,8 +790,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °/s</suffix>
             <vTx>7</vTx>
-        </tiltback_lv_speed>
-        <tiltback_lv>
+        </warnings.hv.tiltback_speed>
+        <warnings.lv.threshold>
             <longName>Low Voltage Threshold</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -875,7 +806,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;*DISCLAIMER: Make sure your Voltage Cutoff Start and End (Motor CFG -&amp;gt; General -&amp;gt; Voltage) are below this threshold! LV Pushback should be used as a notice to stop riding immediately, while the Voltage Cutoffs should be used as a last resort measure to protect the battery.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;ALWAYS RESPECT LOW VOLTAGE PUSHBACK!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TILTBACK_LV</cDefine>
+            <cDefine>CFG_DFLT_WARNING_LV_THRESHOLD</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -887,8 +818,52 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>10</vTxDoubleScale>
             <suffix> V</suffix>
             <vTx>7</vTx>
-        </tiltback_lv>
-        <tiltback_return_speed>
+        </warnings.lv.threshold>
+        <warnings.lv.tiltback_angle>
+            <longName>Angle</longName>
+            <type>1</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Desired setpoint angle for Low Voltage Pushback.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_WARNING_LV_TILTBACK_ANGLE</cDefine>
+            <editorDecimalsDouble>1</editorDecimalsDouble>
+            <editorScale>1</editorScale>
+            <editAsPercentage>0</editAsPercentage>
+            <maxDouble>30</maxDouble>
+            <minDouble>0</minDouble>
+            <showDisplay>0</showDisplay>
+            <stepDouble>1</stepDouble>
+            <valDouble>10</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
+            <suffix> °</suffix>
+            <vTx>7</vTx>
+        </warnings.lv.tiltback_angle>
+        <warnings.lv.tiltback_speed>
+            <longName>Speed</longName>
+            <type>1</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rate at which nose is tilted back when exceeding Low Voltage threshold (fast pushback can be dangerous!).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_WARNING_LV_TILTBACK_SPEED</cDefine>
+            <editorDecimalsDouble>1</editorDecimalsDouble>
+            <editorScale>1</editorScale>
+            <editAsPercentage>0</editAsPercentage>
+            <maxDouble>30</maxDouble>
+            <minDouble>0</minDouble>
+            <showDisplay>0</showDisplay>
+            <stepDouble>0.5</stepDouble>
+            <valDouble>1</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
+            <suffix> °/s</suffix>
+            <vTx>7</vTx>
+        </warnings.lv.tiltback_speed>
+        <warnings.tiltback_return_speed>
             <longName>Return To Level Speed</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -897,7 +872,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Speed at which nose is returned back to normal after a pushback condition has been cleared.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TILTBACK_RETURN_SPEED</cDefine>
+            <cDefine>CFG_DFLT_WARNINGS_TILTBACK_RETURN_SPEED</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -909,8 +884,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °/s</suffix>
             <vTx>7</vTx>
-        </tiltback_return_speed>
-        <speedtilt_constant>
+        </warnings.tiltback_return_speed>
+        <tune.speed_tilt.constant>
             <longName>Constant Tiltback</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -921,7 +896,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Tiltback that will be applied above a configurable minimum ERPM. AKA Nose Angle adjustment, can be downwards (negative) too.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*Note: Should not be used to accomodate tilted rail angle! Instead, the IMU calibration should be adjusted accordingly, either manually or using the IMU Wizard. Otherwise, you will experience the opposite of the desired effect while riding backwards.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_SPEEDTILT_CONSTANT</cDefine>
+            <cDefine>CFG_DFLT_TUNE_SPEEDTILT_CONSTANT</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -933,8 +908,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix> °</suffix>
             <vTx>7</vTx>
-        </speedtilt_constant>
-        <speedtilt_constant_erpm>
+        </tune.speed_tilt.constant>
+        <tune.speed_tilt.constant_erpm>
             <longName>Constant Tiltback ERPM</longName>
             <type>2</type>
             <transmittable>1</transmittable>
@@ -943,7 +918,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;ERPM (absolute value) above which Constant Tiltback will be applied.&lt;br /&gt;&lt;br /&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*Note: ERPM = RPM * (Motor Poles / 2)&lt;br /&gt;For an 11&amp;quot; Tire on a Hypercore Motor (30 Poles):&lt;br /&gt;1000 ERPM ≈ 2.2 mph ≈ 3.5 km/h&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_SPEEDTILT_CONSTANT_ERPM</cDefine>
+            <cDefine>CFG_DFLT_TUNE_SPEEDTILT_CONSTANT_ERPM</cDefine>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
             <maxInt>100000</maxInt>
@@ -953,8 +928,8 @@ p, li { white-space: pre-wrap; }
             <valInt>500</valInt>
             <suffix> ERPM</suffix>
             <vTx>3</vTx>
-        </speedtilt_constant_erpm>
-        <speedtilt_variable>
+        </tune.speed_tilt.constant_erpm>
+        <tune.speed_tilt.variable>
             <longName>Variable Tiltback Rate</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -963,7 +938,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Nose Angle adjustment that will be applied depending on speed, specified in degrees per 1000 ERPM, applied linearly as the rate at which you approach Variable Tiltback Maximum. Applies in addition to Constant Tiltback.&lt;br /&gt;&lt;br /&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*Note: ERPM = RPM * (Motor Poles / 2)&lt;br /&gt;For an 11&amp;quot; Tire on a Hypercore Motor (30 Poles):&lt;br /&gt;1000 ERPM ≈ 2.2 mph ≈ 3.5 km/h&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_SPEEDTILT_VARIABLE</cDefine>
+            <cDefine>CFG_DFLT_TUNE_SPEEDTILT_VARIABLE</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -975,8 +950,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix> °/1000 ERPM</suffix>
             <vTx>7</vTx>
-        </speedtilt_variable>
-        <speedtilt_variable_max>
+        </tune.speed_tilt.variable>
+        <tune.speed_tilt.variable_max>
             <longName>Variable Tiltback Limit</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -985,7 +960,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Target Angle that Variable Tiltback approaches at the specified rate (Variable Tiltback Rate). Can be negative (nose down) as well. Added in addition to Constant Tiltback and does not affect or prevent alert pushbacks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_SPEEDTILT_VARIABLE_MAX</cDefine>
+            <cDefine>CFG_DFLT_TUNE_SPEEDTILT_VARIABLE_MAX</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -997,8 +972,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °</suffix>
             <vTx>7</vTx>
-        </speedtilt_variable_max>
-        <speedtilt_speed>
+        </tune.speed_tilt.variable_max>
+        <tune.speed_tilt.speed>
             <longName>Responsiveness</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1007,7 +982,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Speed proportional to distance from target. The resulting speed is then limited by Max Tiltback Speed. Lower values will respond slowly, higher values more aggressively.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_SPEEDTILT_SPEED</cDefine>
+            <cDefine>CFG_DFLT_TUNE_SPEEDTILT_SPEED</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1019,8 +994,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>10</vTxDoubleScale>
             <suffix> Hz</suffix>
             <vTx>7</vTx>
-        </speedtilt_speed>
-        <speedtilt_speed_max>
+        </tune.speed_tilt.speed>
+        <tune.speed_tilt.speed_max>
             <longName>Max Response</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1029,7 +1004,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Maximum Rate at which nose will tilt to the desired angle during Constant and/or Variable Tiltback.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_SPEEDTILT_SPEED_MAX</cDefine>
+            <cDefine>CFG_DFLT_TUNE_SPEEDTILT_SPEED_MAX</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1041,7 +1016,7 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °/s</suffix>
             <vTx>7</vTx>
-        </speedtilt_speed_max>
+        </tune.speed_tilt.speed_max>
         <inputtilt_remote_type>
             <longName>Remote Type</longName>
             <type>4</type>
@@ -1398,7 +1373,7 @@ p, li { white-space: pre-wrap; }
             <suffix> A</suffix>
             <vTx>7</vTx>
         </ki_limit>
-        <torquetilt_strength>
+        <tune.torque_tilt.strength>
             <longName>Strength Accel</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1409,7 +1384,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;How much &lt;span style=&quot; font-weight:600;&quot;&gt;Nose&lt;/span&gt; &lt;span style=&quot; font-weight:600;&quot;&gt;Lift&lt;/span&gt; should be applied based on output current &lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;(Postive / Acceleration Current Only!)&lt;/span&gt;. Can be used alongside ATR to increase aggressiveness on flat and uphill acceleration, or on its own to ensure some uphill tiltback is applied in the absence of ATR.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Values: 0 - 0.35&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TORQUETILT_STRENGTH</cDefine>
+            <cDefine>CFG_DFLT_TUNE_TORQUETILT_STRENGTH</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1421,8 +1396,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix> °/A</suffix>
             <vTx>7</vTx>
-        </torquetilt_strength>
-        <torquetilt_strength_regen>
+        </tune.torque_tilt.strength>
+        <tune.torque_tilt.strength_regen>
             <longName>Strength Decel</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1433,7 +1408,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;How much &lt;span style=&quot; font-weight:600;&quot;&gt;Nose Lowering&lt;/span&gt; should be applied based on output current &lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;(Negative / Regen Current Only!)&lt;/span&gt;. Can be used alongside ATR to increase aggressiveness on flat and downhill braking, or on its own to ensure some downhill nose lowering is applied in the absence of ATR.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Values: 0 - 0.35&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TORQUETILT_STRENGTH_REGEN</cDefine>
+            <cDefine>CFG_DFLT_TUNE_TORQUETILT_STRENGTH_REGEN</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1445,8 +1420,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix> °/A</suffix>
             <vTx>7</vTx>
-        </torquetilt_strength_regen>
-        <torquetilt_strength_boost>
+        </tune.torque_tilt.strength_regen>
+        <tune.torque_tilt.strength_boost>
             <longName>Strength at Speed</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1455,7 +1430,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Torque Tilt strength multiplier at 10K ERPM. Applied exponentially.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TORQUETILT_STRENGTH_BOOST</cDefine>
+            <cDefine>CFG_DFLT_TUNE_TORQUETILT_STRENGTH_BOOST</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1467,8 +1442,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix>x</suffix>
             <vTx>7</vTx>
-        </torquetilt_strength_boost>
-        <torquetilt_start_current>
+        </tune.torque_tilt.strength_boost>
+        <tune.torque_tilt.start_current>
             <longName>Start Current Threshold</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1477,7 +1452,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Minimum output current threshold for Torque Tiltback to start applying.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TORQUETILT_START_CURRENT</cDefine>
+            <cDefine>CFG_DFLT_TUNE_TORQUETILT_START_CURRENT</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1489,8 +1464,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> A</suffix>
             <vTx>7</vTx>
-        </torquetilt_start_current>
-        <torquetilt_angle_limit>
+        </tune.torque_tilt.start_current>
+        <tune.torque_tilt.angle_limit>
             <longName>Tiltback Angle Limit</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1499,7 +1474,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Maximum angle to which Torque Tiltback will tilt.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TORQUETILT_ANGLE_LIMIT</cDefine>
+            <cDefine>CFG_DFLT_TUNE_TORQUETILT_ANGLE_LIMIT</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1511,8 +1486,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °</suffix>
             <vTx>7</vTx>
-        </torquetilt_angle_limit>
-        <torquetilt_speed>
+        </tune.torque_tilt.angle_limit>
+        <tune.torque_tilt.speed>
             <longName>Responsiveness</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1521,7 +1496,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Speed proportional to distance from target. The resulting speed is then limited by Max Tiltback Speed. Lower values will respond slowly, higher values more aggressively.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TORQUETILT_SPEED</cDefine>
+            <cDefine>CFG_DFLT_TUNE_TORQUETILT_SPEED</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1533,8 +1508,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>10</vTxDoubleScale>
             <suffix> Hz</suffix>
             <vTx>7</vTx>
-        </torquetilt_speed>
-        <torquetilt_speed_max_on>
+        </tune.torque_tilt.speed>
+        <tune.torque_tilt.speed_max>
             <longName>Max Response</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1543,7 +1518,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Max Rate at which Torque Tiltback will tilt to the desired angle (tilt will be slower if current increases slowly).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TORQUETILT_SPEED_MAX_ON</cDefine>
+            <cDefine>CFG_DFLT_TUNE_TORQUETILT_SPEED_MAX</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1555,7 +1530,7 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °/s</suffix>
             <vTx>7</vTx>
-        </torquetilt_speed_max_on>
+        </tune.torque_tilt.speed_max>
         <!-- <torquetilt_speed_max_off>
             <longName>Max Tiltback Release Speed</longName>
             <type>1</type>
@@ -1565,7 +1540,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Max Rate at which Torque Tiltback will release from the desired angle back to 0 (tilt will be slower if current decreases slowly).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TORQUETILT_SPEED_MAX_OFF</cDefine>
+            <cDefine>CFG_DFLT_TUNE_TORQUETILT_SPEED_MAX_OFF</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1578,7 +1553,7 @@ p, li { white-space: pre-wrap; }
             <suffix> °/s</suffix>
             <vTx>7</vTx>
         </torquetilt_speed_max_off> -->
-        <torquetilt_method>
+        <tune.torque_tilt.method>
             <longName>Method (Classic / Accel.)</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1587,7 +1562,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;EXPERIMENTAL: 0.0 is the classic Amp based Torque Tilt, 1.0 incorporates measured ERPM acceleration as well. That way it doesn't interfere with setpoint when simply maintaining speed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TORQUETILT_METHOD</cDefine>
+            <cDefine>CFG_DFLT_TUNE_TORQUETILT_METHOD</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1599,8 +1574,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
-        </torquetilt_method>
-        <torquetilt_filter>
+        </tune.torque_tilt.method>
+        <tune.torque_tilt.filter>
             <longName>Current Complementary Filter</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1609,7 +1584,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Half time of current/accel complementary filtering. 0 is purely acceleration based, higher values will smooth out its influence (while still using high frequency information of current), which should make wheel locks and slashes more predictable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TORQUETILT_FILTER</cDefine>
+            <cDefine>CFG_DFLT_TUNE_TORQUETILT_FILTER</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1621,8 +1596,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>10000</vTxDoubleScale>
             <suffix> s</suffix>
             <vTx>7</vTx>
-        </torquetilt_filter>
-        <torquetilt_turn_boost>
+        </tune.torque_tilt.filter>
+        <tune.torque_tilt.turn_boost>
             <longName>Turn Boost</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1631,7 +1606,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Intensifies Torque Tilt based on Yaw Rate. Similar effect to Turn Tilt, but reversed for regen - that way the corner that's closest to the ground gets lifted.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_TORQUETILT_TURN_BOOST</cDefine>
+            <cDefine>CFG_DFLT_TUNE_TORQUETILT_TURN_BOOST</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1643,8 +1618,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
-        </torquetilt_turn_boost>
-        <atr_strength_up>
+        </tune.torque_tilt.turn_boost>
+        <tune.atr.strength_up>
             <longName>Strength Uphill</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1653,7 +1628,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;0.1 should feel similar to 1.0 in Float/Refloat.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_UPHILL_STRENGTH</cDefine>
+            <cDefine>CFG_DFLT_TUNE_ATR_UPHILL_STRENGTH</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1665,8 +1640,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
-        </atr_strength_up>
-        <atr_strength_down>
+        </tune.atr.strength_up>
+        <tune.atr.strength_down>
             <longName>Strength Downhill</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1675,7 +1650,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;0.1 should feel similar to 1.0 in Float/Refloat.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_DOWNHILL_STRENGTH</cDefine>
+            <cDefine>CFG_DFLT_TUNE_ATR_DOWNHILL_STRENGTH</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1687,8 +1662,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
-        </atr_strength_down>
-        <atr_strength_boost>
+        </tune.atr.strength_down>
+        <tune.atr.strength_boost>
             <longName>Strength at Speed</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1697,7 +1672,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;ATR strength multiplier at 10K ERPM. Applied exponentially.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_STRENGTH_BOOST</cDefine>
+            <cDefine>CFG_DFLT_TUNE_ATR_STRENGTH_BOOST</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1709,8 +1684,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix>x</suffix>
             <vTx>7</vTx>
-        </atr_strength_boost>
-        <atr_threshold>
+        </tune.atr.strength_boost>
+        <tune.atr.threshold>
             <longName>Threshold Current</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1723,7 +1698,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Once the ATR target angle exceeds the threshold, setpoint changes will be produced. &lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Example: If the threshold is 2 and the computed ATR angle is 3 then a 1 degree setpoint adjustment will be performed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_THRESHOLD</cDefine>
+            <cDefine>CFG_DFLT_TUNE_ATR_THRESHOLD</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1735,8 +1710,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> A</suffix>
             <vTx>7</vTx>
-        </atr_threshold>
-        <atr_angle_limit>
+        </tune.atr.threshold>
+        <tune.atr.angle_limit>
             <longName>Tiltback Angle Limit</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1745,7 +1720,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Maximum angle to which ATR is permitted to tilt.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_ANGLE_LIMIT</cDefine>
+            <cDefine>CFG_DFLT_TUNE_ATR_ANGLE_LIMIT</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1757,8 +1732,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °</suffix>
             <vTx>7</vTx>
-        </atr_angle_limit>
-        <atr_speed>
+        </tune.atr.angle_limit>
+        <tune.atr.speed>
             <longName>Responsiveness</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1767,7 +1742,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Speed proportional to distance from target. The resulting speed is then limited by Max Tiltback Speed. Lower values will respond slowly, higher values more aggressively.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_SPEED</cDefine>
+            <cDefine>CFG_DFLT_TUNE_ATR_SPEED</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1775,12 +1750,12 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>5</stepDouble>
-            <valDouble>30</valDouble>
+            <valDouble>25</valDouble>
             <vTxDoubleScale>10</vTxDoubleScale>
             <suffix> Hz</suffix>
             <vTx>7</vTx>
-        </atr_speed>
-        <atr_speed_max_on>
+        </tune.atr.speed>
+        <tune.atr.speed_max>
             <longName>Max Response</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1789,7 +1764,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Max Rate at which ATR will tilt to the desired angle.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_SPEED_MAX_ON</cDefine>
+            <cDefine>CFG_DFLT_TUNE_ATR_SPEED_MAX</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1801,30 +1776,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °/s</suffix>
             <vTx>7</vTx>
-        </atr_speed_max_on>
-        <!-- <atr_speed_max_off>
-            <longName>Max Tiltback Release Speed</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Max Rate at which ATR will release from the desired angle back to 0.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_SPEED_MAX_OFF</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>100</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>0.5</stepDouble>
-            <valDouble>3</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> °/s</suffix>
-            <vTx>7</vTx>
-        </atr_speed_max_off> -->
-        <atr_speed_boost>
+        </tune.atr.speed_max>
+        <tune.atr.speed_boost>
             <longName>Response at Speed</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1833,7 +1786,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;ATR responsiveness multiplier at 10K ERPM. Applied exponentially.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_SPEED_BOOST</cDefine>
+            <cDefine>CFG_DFLT_TUNE_ATR_SPEED_BOOST</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1845,8 +1798,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix>x</suffix>
             <vTx>7</vTx>
-        </atr_speed_boost>
-        <atr_amps_accel_ratio>
+        </tune.atr.speed_boost>
+        <tune.atr.amps_accel_ratio>
             <longName>Amps to Acceleration Ratio</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1861,7 +1814,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Recommended Hypercore Motor Value: 9&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; font-style:italic;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Recommended Values: 8-18&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_AMPS_ACCEL_RATIO</cDefine>
+            <cDefine>CFG_DFLT_TUNE_ATR_AMPS_ACCEL_RATIO</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1873,8 +1826,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
-        </atr_amps_accel_ratio>
-        <atr_amp_offset_constant>
+        </tune.atr.amps_accel_ratio>
+        <tune.atr.amp_offset_constant>
             <longName>Amp Offset Constant</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1883,7 +1836,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Current needed for riding at very low speed. To tune, ride at constant speed of 500-1000 ERPM on flat ground and take note of Motor Current.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_AMP_OFFSET_CONSTANT</cDefine>
+            <cDefine>CFG_DFLT_TUNE_ATR_AMP_OFFSET_CONSTANT</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1895,8 +1848,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> A</suffix>
             <vTx>7</vTx>
-        </atr_amp_offset_constant>
-        <atr_amp_offset_variable>
+        </tune.atr.amp_offset_constant>
+        <tune.atr.amp_offset_variable>
             <longName>Amp Offset Variable</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1905,7 +1858,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Current per ERPM needed for maintaining speed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_AMP_OFFSET_VARIABLE</cDefine>
+            <cDefine>CFG_DFLT_TUNE_ATR_AMP_OFFSET_VARIABLE</cDefine>
             <editorDecimalsDouble>4</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1917,8 +1870,8 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100000</vTxDoubleScale>
             <suffix> A/ERPM</suffix>
             <vTx>7</vTx>
-        </atr_amp_offset_variable>
-        <atr_filter>
+        </tune.atr.amp_offset_variable>
+        <tune.atr.filter>
             <longName>Current Filter</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1927,7 +1880,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Half time of current filtering. Used for ATR and Torque Tilt.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_ATR_FILTER</cDefine>
+            <cDefine>CFG_DFLT_TUNE_ATR_FILTER</cDefine>
             <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
@@ -1939,7 +1892,7 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>1000</vTxDoubleScale>
             <suffix> s</suffix>
             <vTx>7</vTx>
-        </atr_filter>
+        </tune.atr.filter>
         <turntilt_strength>
             <longName>Strength</longName>
             <type>1</type>
@@ -3309,7 +3262,7 @@ p, li { white-space: pre-wrap; }
             <cDefine>CFG_DFLT_HARDWARE_LEDS_REAR_REVERSE</cDefine>
             <valInt>0</valInt>
         </hardware.leds.rear.reverse>
-        <is_beeper_enabled>
+        <hardware.esc.is_beeper_enabled>
             <longName>Enable Beeper on Servo/PPM</longName>
             <type>5</type>
             <transmittable>1</transmittable>
@@ -3318,9 +3271,9 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Enable/disable beeper. Beeper is controlled by Servo/PPM. Active beeper required, 3pin version recommended.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_IS_BEEPER_ENABLED</cDefine>
+            <cDefine>CFG_DFLT_HW_ESC_IS_BEEPER_ENABLED</cDefine>
             <valInt>0</valInt>
-        </is_beeper_enabled>
+        </hardware.esc.is_beeper_enabled>
         <disabled>
             <longName>Disable Package</longName>
             <type>5</type>
@@ -3336,57 +3289,49 @@ p, li { white-space: pre-wrap; }
         </disabled>
     </Params>
     <SerOrder>
-        <ser>kp</ser>
-        <ser>kp2</ser>
-        <ser>kp2_filter</ser>
-        <ser>ki</ser>
-        <ser>mahony_kp</ser>
-        <ser>mahony_kp_roll</ser>
-        <ser>mahony_kp_yaw</ser>
-        <ser>bf_accel_confidence_decay</ser>
-        <ser>kp_brake</ser>
-        <ser>kp2_brake</ser>
-        <ser>hertz</ser>
-        <ser>fault_pitch</ser>
-        <ser>fault_roll</ser>
-        <ser>fault_adc1</ser>
-        <ser>fault_adc2</ser>
-        <ser>is_footbeep_enabled</ser>
-        <ser>fault_delay_pitch</ser>
-        <ser>fault_delay_roll</ser>
-        <ser>fault_delay_switch_half</ser>
-        <ser>fault_delay_switch_full</ser>
-        <ser>fault_adc_half_erpm</ser>
-        <ser>fault_is_dual_switch</ser>
-        <ser>fault_moving_fault_disabled</ser>
-        <ser>fault_reversestop_enabled</ser>
-        <ser>tiltback_duty_angle</ser>
-        <ser>tiltback_duty_speed</ser>
-        <ser>tiltback_duty</ser>
-        <ser>is_dutybeep_enabled</ser>
+        <ser>tune.pid.kp</ser>
+        <ser>tune.pid.kd</ser>
+        <ser>tune.pid.kd_filter</ser>
+        <ser>tune.pid.ki</ser>
+        <ser>tune.pid.ki_limit</ser>
+        <ser>tune.pid.kp_brake</ser>
+        <ser>tune.pid.kd_brake</ser>
+        <ser>tune.balance_filter.mahony_kp</ser>
+        <ser>tune.balance_filter.mahony_kp_roll</ser>
+        <ser>tune.balance_filter.mahony_kp_yaw</ser>
+        <ser>tune.balance_filter.accel_confidence_decay</ser>
+        <ser>faults.pitch_threshold</ser>
+        <ser>faults.pitch_delay</ser>
+        <ser>faults.roll_threshold</ser>
+        <ser>faults.roll_delay</ser>
+        <ser>faults.adc1_threshold</ser>
+        <ser>faults.adc2_threshold</ser>
+        <ser>faults.switch_half_delay</ser>
+        <ser>faults.switch_full_delay</ser>
+        <ser>faults.switch_half_erpm</ser>
+        <ser>faults.is_posi_enabled</ser>
+        <ser>faults.fault_moving_fault_disabled</ser>
+        <ser>faults.is_reversestop_enabled</ser>
+        <ser>warnings.duty.threshold</ser>
+        <ser>warnings.duty.tiltback_angle</ser>
+        <ser>warnings.duty.tiltback_speed</ser>
+        <ser>warnings.hv.threshold</ser>
+        <ser>warnings.hv.tiltback_angle</ser>
+        <ser>warnings.hv.tiltback_speed</ser>
+        <ser>warnings.lv.threshold</ser>
+        <ser>warnings.lv.tiltback_angle</ser>
+        <ser>warnings.lv.tiltback_speed</ser>
+        <ser>warnings.tiltback_return_speed</ser>
+        <ser>warnings.is_dutybeep_enabled</ser>
+        <ser>warnings.is_footbeep_enabled</ser>
+        <ser>warnings.is_surgebeep_enabled</ser>
         <ser>surge_angle</ser>
         <ser>surge_duty_start</ser>
-        <ser>is_surgebeep_enabled</ser>
-        <ser>tiltback_hv_angle</ser>
-        <ser>tiltback_hv_speed</ser>
-        <ser>tiltback_hv</ser>
-        <ser>tiltback_lv_angle</ser>
-        <ser>tiltback_lv_speed</ser>
-        <ser>tiltback_lv</ser>
-        <ser>tiltback_return_speed</ser>
-        <ser>speedtilt_constant</ser>
-        <!-- <ser>speedtilt_constant_erpm</ser> -->
-        <ser>speedtilt_variable</ser>
-        <ser>speedtilt_variable_max</ser>
-        <ser>speedtilt_speed</ser>
-        <ser>speedtilt_speed_max</ser>
-        <ser>inputtilt_remote_type</ser>
-        <ser>inputtilt_angle_limit</ser>
-        <ser>inputtilt_speed</ser>
-        <ser>inputtilt_speed_max</ser>
-        <ser>inputtilt_invert_throttle</ser>
-        <ser>inputtilt_deadband</ser>
-        <ser>inputtilt_filter</ser>
+        <ser>tune.input_tilt.angle_limit</ser>
+        <ser>tune.input_tilt.speed</ser>
+        <ser>tune.input_tilt.speed_max</ser>
+        <ser>tune.input_tilt.deadband</ser>
+        <ser>tune.input_tilt.filter</ser>
         <ser>remote_throttle_current_max</ser>
         <ser>remote_throttle_grace_period</ser>
         <ser>startup_pitch_tolerance</ser>
@@ -3396,39 +3341,42 @@ p, li { white-space: pre-wrap; }
         <ser>startup_pushstart_enabled</ser>
         <ser>startup_dirtylandings_enabled</ser>
         <ser>brake_current</ser>
-        <ser>ki_limit</ser>
-        <ser>torquetilt_strength</ser>
-        <ser>torquetilt_strength_regen</ser>
-        <ser>torquetilt_strength_boost</ser>
-        <ser>torquetilt_speed</ser>
-        <ser>torquetilt_speed_max_on</ser>
-        <!-- <ser>torquetilt_speed_max_off</ser> -->
-        <ser>torquetilt_start_current</ser>
-        <ser>torquetilt_angle_limit</ser>
-        <ser>torquetilt_turn_boost</ser>
-        <ser>torquetilt_method</ser>
-        <ser>torquetilt_filter</ser>
-        <ser>turntilt_strength</ser>
-        <ser>turntilt_strength_boost</ser>
-        <ser>turntilt_speed</ser>
-        <ser>turntilt_speed_max</ser>
-        <ser>turntilt_angle_limit</ser>
-        <ser>turntilt_start_angle</ser>
-        <ser>turntilt_start_erpm</ser>
-        <ser>turntilt_filter</ser>
-        <ser>atr_strength_up</ser>
-        <ser>atr_strength_down</ser>
-        <ser>atr_strength_boost</ser>
-        <ser>atr_speed</ser>
-        <ser>atr_speed_max_on</ser>
-        <!-- <ser>atr_speed_max_off</ser> -->
-        <ser>atr_speed_boost</ser>
-        <ser>atr_threshold</ser>
-        <ser>atr_angle_limit</ser>
-        <ser>atr_amps_accel_ratio</ser>
-        <ser>atr_amp_offset_constant</ser>
-        <ser>atr_amp_offset_variable</ser>
-        <ser>atr_filter</ser>
+        <ser>tune.atr.strength_up</ser>
+        <ser>tune.atr.strength_down</ser>
+        <ser>tune.atr.strength_boost</ser>
+        <ser>tune.atr.speed</ser>
+        <ser>tune.atr.speed_max</ser>
+        <ser>tune.atr.speed_boost</ser>
+        <ser>tune.atr.threshold</ser>
+        <ser>tune.atr.angle_limit</ser>
+        <ser>tune.atr.amps_accel_ratio</ser>
+        <ser>tune.atr.amp_offset_constant</ser>
+        <ser>tune.atr.amp_offset_variable</ser>
+        <ser>tune.atr.filter</ser>
+        <ser>tune.torque_tilt.strength</ser>
+        <ser>tune.torque_tilt.strength_regen</ser>
+        <ser>tune.torque_tilt.strength_boost</ser>
+        <ser>tune.torque_tilt.speed</ser>
+        <ser>tune.torque_tilt.speed_max</ser>
+        <ser>tune.torque_tilt.start_current</ser>
+        <ser>tune.torque_tilt.angle_limit</ser>
+        <ser>tune.torque_tilt.turn_boost</ser>
+        <ser>tune.torque_tilt.method</ser>
+        <ser>tune.torque_tilt.filter</ser>
+        <ser>tune.turn_tilt.strength</ser>
+        <ser>tune.turn_tilt.strength_boost</ser>
+        <ser>tune.turn_tilt.speed</ser>
+        <ser>tune.turn_tilt.speed_max</ser>
+        <ser>tune.turn_tilt.angle_limit</ser>
+        <ser>tune.turn_tilt.start_angle</ser>
+        <ser>tune.turn_tilt.start_erpm</ser>
+        <ser>tune.turn_tilt.filter</ser>
+        <ser>tune.speed_tilt.constant</ser>
+        <ser>tune.speed_tilt.variable</ser>
+        <ser>tune.speed_tilt.variable_max</ser>
+        <ser>tune.speed_tilt.speed</ser>
+        <ser>tune.speed_tilt.speed_max</ser>
+        <!-- <ser>tune.speed_tilt.constant_erpm</ser> -->
         <ser>leds.on</ser>
         <ser>leds.headlights_on</ser>
         <ser>leds.headlights_transition</ser>
@@ -3466,6 +3414,10 @@ p, li { white-space: pre-wrap; }
         <ser>leds.status_idle.color1</ser>
         <ser>leds.status_idle.color2</ser>
         <ser>leds.status_idle.speed</ser>
+        <ser>hardware.esc.hertz</ser>
+        <ser>hardware.esc.is_beeper_enabled</ser>
+        <ser>hardware.remote.remote_type</ser>
+        <ser>hardware.remote.invert_throttle</ser>
         <ser>hardware.leds.type</ser>
         <ser>hardware.leds.pin</ser>
         <ser>hardware.leds.status.count</ser>
@@ -3474,7 +3426,6 @@ p, li { white-space: pre-wrap; }
         <ser>hardware.leds.front.reverse</ser>
         <ser>hardware.leds.rear.count</ser>
         <ser>hardware.leds.rear.reverse</ser>
-        <ser>is_beeper_enabled</ser>
         <ser>disabled</ser>
     </SerOrder>
     <Grouping>
@@ -3484,73 +3435,71 @@ p, li { white-space: pre-wrap; }
                 <subgroupName>Tune</subgroupName>
                 <subgroupParams>
                     <param>::sep::PID</param>
-                    <param>kp</param>
-                    <param>kp2</param>
-                    <param>kp2_filter</param>
-                    <param>ki</param>
-                    <param>ki_limit</param>
+                    <param>tune.pid.kp</param>
+                    <param>tune.pid.kd</param>
+                    <param>tune.pid.kd_filter</param>
+                    <param>tune.pid.ki</param>
+                    <param>tune.pid.ki_limit</param>
                     <param>::sep::Balance Filter</param>
-                    <param>mahony_kp</param>
-                    <param>mahony_kp_roll</param>
-                    <param>mahony_kp_yaw</param>
-                    <param>bf_accel_confidence_decay</param>
+                    <param>tune.balance_filter.mahony_kp</param>
+                    <param>tune.balance_filter.mahony_kp_roll</param>
+                    <param>tune.balance_filter.mahony_kp_yaw</param>
+                    <param>tune.balance_filter.accel_confidence_decay</param>
                     <param>::sep::Brake Scaling</param>
-                    <param>kp_brake</param>
-                    <param>kp2_brake</param>
+                    <param>tune.pid.kp_brake</param>
+                    <param>tune.pid.kd_brake</param>
                 </subgroupParams>
             </subgroup>
             <subgroup>
                 <subgroupName>ATR</subgroupName>
                 <subgroupParams>
                     <param>::sep::Adaptive Torque Response</param>
-                    <param>atr_strength_up</param>
-                    <param>atr_strength_down</param>
-                    <param>atr_strength_boost</param>
+                    <param>tune.atr.strength_up</param>
+                    <param>tune.atr.strength_down</param>
+                    <param>tune.atr.strength_boost</param>
                     <param>::sep::Nose Angling</param>
-                    <param>atr_speed</param>
-                    <param>atr_speed_max_on</param>
-                    <!-- <param>atr_speed_max_off</param> -->
-                    <param>atr_speed_boost</param>
-                    <param>atr_threshold</param>
-                    <param>atr_angle_limit</param>
+                    <param>tune.atr.speed</param>
+                    <param>tune.atr.speed_max</param>
+                    <param>tune.atr.speed_boost</param>
+                    <param>tune.atr.threshold</param>
+                    <param>tune.atr.angle_limit</param>
                     <param>::sep::Advanced</param>
-                    <param>atr_amps_accel_ratio</param>
-                    <param>atr_amp_offset_constant</param>
-                    <param>atr_amp_offset_variable</param>
-                    <param>atr_filter</param>
+                    <param>tune.atr.amps_accel_ratio</param>
+                    <param>tune.atr.amp_offset_constant</param>
+                    <param>tune.atr.amp_offset_variable</param>
+                    <param>tune.atr.filter</param>
                 </subgroupParams>
             </subgroup>
             <subgroup>
                 <subgroupName>Tune Modifiers</subgroupName>
                 <subgroupParams>
                     <param>::sep::Torque Tiltback</param>
-                    <param>torquetilt_strength</param>
-                    <param>torquetilt_strength_regen</param>
-                    <param>torquetilt_strength_boost</param>
-                    <param>torquetilt_speed</param>
-                    <param>torquetilt_speed_max_on</param>
-                    <!-- <param>torquetilt_speed_max_off</param> -->
-                    <param>torquetilt_start_current</param>
-                    <param>torquetilt_angle_limit</param>
-                    <param>torquetilt_turn_boost</param>
-                    <param>torquetilt_method</param>
-                    <param>torquetilt_filter</param>
+                    <param>tune.torque_tilt.strength</param>
+                    <param>tune.torque_tilt.strength_regen</param>
+                    <param>tune.torque_tilt.strength_boost</param>
+                    <param>tune.torque_tilt.speed</param>
+                    <param>tune.torque_tilt.speed_max</param>
+                    <param>tune.torque_tilt.start_current</param>
+                    <param>tune.torque_tilt.angle_limit</param>
+                    <param>tune.torque_tilt.turn_boost</param>
+                    <param>tune.torque_tilt.method</param>
+                    <param>tune.torque_tilt.filter</param>
                     <param>::sep::Turn Tiltback</param>
-                    <param>turntilt_strength</param>
-                    <param>turntilt_strength_boost</param>
-                    <param>turntilt_speed</param>
-                    <param>turntilt_speed_max</param>
-                    <param>turntilt_angle_limit</param>
-                    <param>turntilt_start_angle</param>
-                    <param>turntilt_start_erpm</param>
-                    <param>turntilt_filter</param>
+                    <param>tune.turn_tilt.strength</param>
+                    <param>tune.turn_tilt.strength_boost</param>
+                    <param>tune.turn_tilt.speed</param>
+                    <param>tune.turn_tilt.speed_max</param>
+                    <param>tune.turn_tilt.angle_limit</param>
+                    <param>tune.turn_tilt.start_angle</param>
+                    <param>tune.turn_tilt.start_erpm</param>
+                    <param>tune.turn_tilt.filter</param>
                     <param>::sep::Nose Angling</param>
-                    <param>speedtilt_constant</param>
-                    <!-- <param>speedtilt_constant_erpm</param> -->
-                    <param>speedtilt_variable</param>
-                    <param>speedtilt_variable_max</param>
-                    <param>speedtilt_speed</param>
-                    <param>speedtilt_speed_max</param>
+                    <param>tune.speed_tilt._constant</param>
+                    <!-- <param>tune.speed_tilt.constant_erpm</param> -->
+                    <param>tune.speed_tilt.variable</param>
+                    <param>tune.speed_tilt.variable_max</param>
+                    <param>tune.speed_tilt.speed</param>
+                    <param>tune.speed_tilt.speed_max</param>
                 </subgroupParams>
             </subgroup>
             <subgroup>
@@ -3573,50 +3522,50 @@ p, li { white-space: pre-wrap; }
                 <subgroupName>Stop</subgroupName>
                 <subgroupParams>
                     <param>::sep::Angle Faults</param>
-                    <param>fault_pitch</param>
-                    <param>fault_delay_pitch</param>
-                    <param>fault_roll</param>
-                    <param>fault_delay_roll</param>
+                    <param>faults.pitch_threshold</param>
+                    <param>faults.pitch_delay</param>
+                    <param>faults.roll_threshold</param>
+                    <param>faults.roll_delay</param>
                     <param>::sep::Switches</param>
-                    <param>fault_delay_switch_half</param>
-                    <param>fault_delay_switch_full</param>
-                    <param>fault_adc_half_erpm</param>
-                    <param>fault_is_dual_switch</param>
-                    <param>fault_moving_fault_disabled</param>
+                    <param>faults.switch_half_delay</param>
+                    <param>faults.switch_full_delay</param>
+                    <param>faults.switch_half_erpm</param>
+                    <param>faults.is_posi_enabled</param>
+                    <param>faults.fault_moving_fault_disabled</param>
                     <param>::sep::Features</param>
-                    <param>fault_reversestop_enabled</param>
+                    <param>faults.is_reversestop_enabled</param>
                 </subgroupParams>
             </subgroup>
             <subgroup>
                 <subgroupName>Pushback Alerts</subgroupName>
                 <subgroupParams>
                     <param>::sep::General Config</param>
-                    <param>tiltback_return_speed</param>
+                    <param>warnings.tiltback_return_speed</param>
                     <param>::sep::Duty Cycle Alert Pushback</param>
-                    <param>tiltback_duty</param>
-                    <param>tiltback_duty_angle</param>
-                    <param>tiltback_duty_speed</param>
+                    <param>warnings.duty</param>
+                    <param>warnings.duty.tiltback_angle</param>
+                    <param>warnings.duty.tiltback_speed</param>
                     <param>is_dutybeep_enabled</param>
                     <param>::sep::Duty Surge</param>
                     <param>surge_duty_start</param>
                     <param>surge_angle</param>
                     <param>is_surgebeep_enabled</param>
                     <param>::sep::High Voltage Alert Pushback</param>
-                    <param>tiltback_hv_angle</param>
-                    <param>tiltback_hv_speed</param>
+                    <param>warnings.hv.tiltback_angle</param>
+                    <param>warnings.hv.tiltback_speed</param>
                     <param>::sep::Low Voltage Alert Pushback</param>
-                    <param>tiltback_lv_angle</param>
-                    <param>tiltback_lv_speed</param>
+                    <param>warnings.lv.tiltback_angle</param>
+                    <param>warnings.lv.tiltback_speed</param>
                 </subgroupParams>
             </subgroup>
             <subgroup>
                 <subgroupName>Remote</subgroupName>
                 <subgroupParams>
                     <param>::sep::Remote Tiltback</param>
-                    <param>inputtilt_remote_type</param>
-                    <param>inputtilt_angle_limit</param>
-                    <param>inputtilt_speed</param>
-                    <param>inputtilt_speed_max</param>
+                    <param>tune.input_tilt.remote_type</param>
+                    <param>tune.input_tilt.angle_limit</param>
+                    <param>tune.input_tilt.speed</param>
+                    <param>tune.input_tilt.speed_max</param>
                     <param>inputtilt_invert_throttle</param>
                     <param>inputtilt_deadband</param>
                     <param>inputtilt_filter</param>
@@ -3680,16 +3629,16 @@ p, li { white-space: pre-wrap; }
                     <param>::sep::Refloat Package Details</param>
                     <param>disabled</param>
                     <param>::sep::Balance Loop</param>
-                    <param>hertz</param>
+                    <param>hardware.esc.hertz</param>
                     <param>::sep::Voltage Pushbacks</param>
-                    <param>tiltback_hv</param>
-                    <param>tiltback_lv</param>
+                    <param>warnings.hv.threshold</param>
+                    <param>warnings.lv.threshold</param>
                     <param>::sep::Foot Sensors</param>
-                    <param>fault_adc1</param>
-                    <param>fault_adc2</param>
+                    <param>faults.adc1_threshold</param>
+                    <param>faults.adc2_threshold</param>
                     <param>is_footbeep_enabled</param>
                     <param>::sep::Miscellaneous</param>
-                    <param>is_beeper_enabled</param>
+                    <param>hardware.esc.is_beeper_enabled</param>
                     <param>::sep::Leds (changes require reboot)</param>
                     <param>hardware.leds.type</param>
                     <param>hardware.leds.pin</param>

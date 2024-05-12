@@ -38,6 +38,6 @@ typedef struct {
 
 void imu_data_reset(IMUData *imu);
 
-void imu_data_configure(IMUData *imu, const RefloatConfig *cfg);
+void imu_data_configure(IMUData *imu, const CfgTurnTilt *cfg, float dt);
 
 void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter);

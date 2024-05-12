@@ -28,8 +28,8 @@ typedef struct {
 
 void speed_tilt_reset(SpeedTilt *tt);
 
-void speed_tilt_configure(SpeedTilt *tt, const RefloatConfig *config);
+void speed_tilt_configure(SpeedTilt *tt, const CfgSpeedTilt *cfg);
 
-void speed_tilt_update(SpeedTilt *tt, const MotorData *motor, const RefloatConfig *config);
+void speed_tilt_update(SpeedTilt *tt, const MotorData *mot, const CfgSpeedTilt *cfg, float dt);
 
 void speed_tilt_winddown(SpeedTilt *tt);

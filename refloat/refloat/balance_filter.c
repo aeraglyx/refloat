@@ -60,7 +60,7 @@ void balance_filter_init(BalanceFilterData *data) {
     data->acc_mag = 1.0;
 }
 
-void balance_filter_configure(BalanceFilterData *data, const RefloatConfig *config) {
+void balance_filter_configure(BalanceFilterData *data, const CfgBalanceFilter *config) {
     data->acc_confidence_decay = config->bf_accel_confidence_decay;
     data->kp_pitch = config->mahony_kp;
     data->kp_roll = config->mahony_kp_roll;

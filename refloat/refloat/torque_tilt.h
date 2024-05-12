@@ -34,6 +34,13 @@ void torque_tilt_reset(TorqueTilt *tt);
 
 void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *config);
 
-void torque_tilt_update(TorqueTilt *tt, const MotorData *motor, const RefloatConfig *config, const IMUData *imu);
+void torque_tilt_update(
+    TorqueTilt *tt,
+    const MotorData *mot,
+    const IMUData *imu,
+    const CfgTorqueTilt *cfg,
+    const CfgAtr *cfg_atr,
+    float dt
+);
 
 void torque_tilt_winddown(TorqueTilt *tt);

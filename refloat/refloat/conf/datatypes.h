@@ -138,67 +138,171 @@ typedef struct {
 } CfgHwLeds;
 
 typedef struct {
+    FLOAT_INPUTTILT_REMOTE_TYPE remote_type;
+    bool invert_throttle;
+    float deadband;
+} CfgHwRemote;
+
+typedef struct {
+    uint16_t hertz;
+    bool is_beeper_enabled;
+} CfgHwEsc;
+
+typedef struct {
+    CfgHwEsc esc;
+    CfgHwRemote remote;
     CfgHwLeds leds;
 } CfgHardware;
 
-typedef struct {
-    float version;
-    bool disabled;
-    float kp;
-    float kp2;
-    float kp2_filter;
-    float ki;
-    float ki_limit;
+// typedef struct {
+//     float angle;
+//     float speed;
+//     float start;
+// } Tiltback;
 
+typedef struct {
+    float threshold;
+    float tiltback_angle;
+    float tiltback_speed;
+    // TODO haptic buzz
+} Warning;
+
+typedef struct {
+    Warning duty;
+    Warning lv;
+    Warning hv;
+    float tiltback_return_speed;
+
+    bool is_dutybeep_enabled;
+    bool is_footbeep_enabled;
+    bool is_surgebeep_enabled;
+} CfgWarnings;
+
+// typedef struct {
+//     float tiltback_duty_angle;
+//     float tiltback_duty_speed;
+//     float tiltback_duty;
+//     float tiltback_hv_angle;
+//     float tiltback_hv_speed;
+//     float tiltback_hv;
+//     float tiltback_lv_angle;
+//     float tiltback_lv_speed;
+//     float tiltback_lv;
+//     float tiltback_return_speed;
+// } CfgWarnings;
+
+typedef struct {
+    float pitch;
+    float roll_threshold;
+    float adc1_threshold;
+    float adc2_threshold;
+    uint16_t pitch_delay;
+    uint16_t roll_delay;
+    uint16_t switch_half_delay;
+    uint16_t switch_full_delay;
+    uint16_t switch_half_erpm;
+    bool is_posi_enabled;
+    bool fault_moving_fault_disabled;
+    bool fault_reversestop_enabled;
+} CfgFaults;
+
+typedef struct {
     float mahony_kp;
     float mahony_kp_roll;
     float mahony_kp_yaw;
     float bf_accel_confidence_decay;
+} CfgBalanceFilter;
 
+typedef struct {
+    float kp;
+    float kd;
+    float kd_filter;
+    float ki;
+    float ki_limit;
     float kp_brake;
-    float kp2_brake;
-    uint16_t kp_brake_erpm;
-    uint16_t hertz;
-    float fault_pitch;
-    float fault_roll;
-    float fault_adc1;
-    float fault_adc2;
-    uint16_t fault_delay_pitch;
-    uint16_t fault_delay_roll;
-    uint16_t fault_delay_switch_half;
-    uint16_t fault_delay_switch_full;
-    uint16_t fault_adc_half_erpm;
-    bool fault_is_dual_switch;
-    bool fault_moving_fault_disabled;
-    bool fault_reversestop_enabled;
+    float kd_brake;
+} CfgPid;
 
-    float tiltback_duty_angle;
-    float tiltback_duty_speed;
-    float tiltback_duty;
-    float tiltback_hv_angle;
-    float tiltback_hv_speed;
-    float tiltback_hv;
-    float tiltback_lv_angle;
-    float tiltback_lv_speed;
-    float tiltback_lv;
-    float tiltback_return_speed;
+typedef struct {
+    float strength_up;
+    float strength_down;
+    float strength_boost;
+    float threshold;
+    float angle_limit;
+    float speed;
+    float speed_max;
+    float speed_boost;
+    float transition_boost;
+    float amps_accel_ratio;
+    float amp_offset_constant;
+    float amp_offset_variable;
+    float filter;
+} CfgAtr;
 
-    float speedtilt_constant;
-    float speedtilt_variable;
-    float speedtilt_variable_max;
-    float speedtilt_speed;
-    float speedtilt_speed_max;
-    
-    FLOAT_INPUTTILT_REMOTE_TYPE inputtilt_remote_type;
-    float inputtilt_speed;
-    float inputtilt_speed_max;
-    float inputtilt_angle_limit;
-    uint16_t inputtilt_smoothing_factor;
-    bool inputtilt_invert_throttle;
-    float inputtilt_deadband;
-    float inputtilt_filter;
+typedef struct {
+    float strength;
+    float strength_regen;
+    float strength_boost;
+    float start_current;
+    float angle_limit;
+    float speed;
+    float speed_max;
+    float turn_boost;
+    float method;
+    float filter;
+} CfgTorqueTilt;
+
+typedef struct {
+    float strength;
+    float strength_boost;
+    float angle_limit;
+    float speed;
+    float speed_max;
+    float start_angle;
+    uint16_t start_erpm;
+    float filter;
+} CfgTurnTilt;
+
+typedef struct {
+    float constant;
+    float variable;
+    float variable_max;
+    float speed;
+    float speed_max;
+} CfgSpeedTilt;
+
+typedef struct {
+    float speed;
+    float speed_max;
+    float angle_limit;
+    float filter;
     float remote_throttle_current_max;
     float remote_throttle_grace_period;
+} CfgInputTilt;
+
+typedef struct {
+    CfgBalanceFilter balance_filter;
+    CfgPid pid;
+    CfgAtr atr;
+    CfgTorqueTilt torque_tilt;
+    CfgTurnTilt turn_tilt;
+    CfgSpeedTilt speed_tilt;
+    CfgInputTilt input_tilt;
+} CfgTune;
+
+typedef struct {
+    float version;
+    bool disabled;
+
+    // uint16_t hertz;
+
+    CfgHardware hardware;
+
+    CfgTune tune;
+    CfgFaults faults;
+    CfgWarnings warnings;
+
+    CfgLeds leds;
 
     float startup_pitch_tolerance;
     float startup_roll_tolerance;
@@ -208,51 +312,9 @@ typedef struct {
     bool startup_dirtylandings_enabled;
 
     float brake_current;
-    float torquetilt_strength;
-    float torquetilt_strength_regen;
-    float torquetilt_strength_boost;
-    float torquetilt_start_current;
-    float torquetilt_angle_limit;
-    float torquetilt_speed;
-    float torquetilt_speed_max_on;
-    // float torquetilt_speed_max_off;
-    float torquetilt_turn_boost;
-    float torquetilt_method;
-    float torquetilt_filter;
 
-    float atr_strength_up;
-    float atr_strength_down;
-    float atr_strength_boost;
-    float atr_threshold;
-    float atr_angle_limit;
-    float atr_speed;
-    float atr_speed_max_on;
-    // float atr_speed_max_off;
-    float atr_speed_boost;
-    float atr_transition_boost;
-    float atr_amps_accel_ratio;
-    float atr_amp_offset_constant;
-    float atr_amp_offset_variable;
-    float atr_filter;
-
-    float turntilt_strength;
-    float turntilt_strength_boost;
-    float turntilt_angle_limit;
-    float turntilt_speed;
-    float turntilt_speed_max;
-    float turntilt_start_angle;
-    uint16_t turntilt_start_erpm;
-    float turntilt_filter;
-
-    bool is_beeper_enabled;
-    bool is_dutybeep_enabled;
-    bool is_footbeep_enabled;
-    bool is_surgebeep_enabled;
     float surge_duty_start;
     float surge_angle;
-
-    CfgLeds leds;
-    CfgHardware hardware;
 } RefloatConfig;
 
 // DATATYPES_H_

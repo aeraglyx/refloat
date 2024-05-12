@@ -32,6 +32,6 @@ void turn_tilt_reset(TurnTilt *tt);
 
 void turn_tilt_configure(TurnTilt *tt, const RefloatConfig *config);
 
-void turn_tilt_update(TurnTilt *tt, const MotorData *motor, const IMUData *imu, const ATR *atr, const RefloatConfig *config);
+void turn_tilt_update(TurnTilt *tt, const MotorData *motor, const IMUData *imu, const ATR *atr, const CfgTurnTilt *config, float dt);
 
 void turn_tilt_winddown(TurnTilt *tt);

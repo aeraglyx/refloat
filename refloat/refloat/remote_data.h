@@ -30,6 +30,6 @@ typedef struct {
 
 void remote_data_reset(RemoteData *remote);
 
-void remote_data_configure(RemoteData *remote, const RefloatConfig *cfg);
+void remote_data_configure(RemoteData *remote, const RefloatConfig *cfg, float dt);
 
-void remote_data_update(RemoteData *remote, const RefloatConfig *cfg);
+void remote_data_update(RemoteData *remote, const CfgHwRemote *cfg);

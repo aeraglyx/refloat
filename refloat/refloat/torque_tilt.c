@@ -28,38 +28,43 @@ void torque_tilt_reset(TorqueTilt *tt) {
 }
 
 void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *cfg) {
-    // tt->step_size_on = cfg->torquetilt_speed_max_on / cfg->hertz;
-    // tt->step_size_off = cfg->torquetilt_speed_max_off / cfg->hertz;
 }
 
-void torque_tilt_update(TorqueTilt *tt, const MotorData *mot, const RefloatConfig *cfg, const IMUData *imu) {
+void torque_tilt_update(
+    TorqueTilt *tt,
+    const MotorData *mot,
+    const IMUData *imu,
+    const CfgTorqueTilt *cfg,
+    const CfgAtr *cfg_atr,
+    float dt
+) {
     float current = mot->current_filtered;
-    float accel_factor = cfg->atr_amps_accel_ratio;
+    float accel_factor = cfg_atr->amps_accel_ratio;
     float current_based_on_accel = mot->accel_clamped * accel_factor;
 
-    float alpha = half_time_to_alpha(cfg->torquetilt_filter, cfg->hertz);
+    float alpha = half_time_to_alpha(cfg->filter, dt);
     float accel_offset = current_based_on_accel - current;
     filter_ema(&tt->accel_offset_smooth, accel_offset, alpha);
-    float target = current + tt->accel_offset_smooth * cfg->torquetilt_method;
+    float target = current + tt->accel_offset_smooth * cfg->method;
 
-    dead_zonef(&target, cfg->torquetilt_start_current);
+    dead_zonef(&target, cfg->start_current);
     float strength =
-        mot->braking ? cfg->torquetilt_strength_regen : cfg->torquetilt_strength;
+        mot->braking ? cfg->strength_regen : cfg->strength;
     
-    const float strength_boost = powf(cfg->torquetilt_strength_boost, mot->erpm_abs_10k);
+    const float strength_boost = powf(cfg->strength_boost, mot->erpm_abs_10k);
     strength *= strength_boost;
 
-    float turn_boost = 1.0f + fabsf(imu->yaw_rate) * cfg->torquetilt_turn_boost * 0.00125f;
+    float turn_boost = 1.0f + fabsf(imu->yaw_rate) * cfg->turn_boost * 0.00125f;
     strength *= turn_boost;
 
     target *= strength;
-    target = clamp_sym(target, cfg->torquetilt_angle_limit);
+    target = clamp_sym(target, cfg->angle_limit);
 
     const float offset = target - tt->interpolated;
-    float speed = offset * cfg->torquetilt_speed;
-    speed = clamp_sym(speed, cfg->torquetilt_speed_max_on);
+    float speed = offset * cfg->speed;
+    speed = clamp_sym(speed, cfg->speed_max);
 
-    tt->interpolated += speed / cfg->hertz;
+    tt->interpolated += speed * dt;
 
     tt->debug = imu->yaw_rate;
 }

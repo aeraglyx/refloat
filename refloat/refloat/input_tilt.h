@@ -30,4 +30,4 @@ void input_tilt_reset(InputTilt *tt);
 
 void input_tilt_configure(InputTilt *tt, const RefloatConfig *config);
 
-void input_tilt_update(InputTilt *tt, const RemoteData *remote, const RefloatConfig *config);
+void input_tilt_update(InputTilt *tt, const RemoteData *remote, const CfgInputTilt *config, float dt);

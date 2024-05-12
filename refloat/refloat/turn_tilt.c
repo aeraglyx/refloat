@@ -27,20 +27,19 @@ void turn_tilt_reset(TurnTilt *tt) {
 }
 
 void turn_tilt_configure(TurnTilt *tt, const RefloatConfig *cfg) {
-    // tt->step_size = cfg->turntilt_speed_max / cfg->hertz;
 }
 
-void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, const ATR *atr, const RefloatConfig *cfg) {
-    if (cfg->turntilt_strength == 0) {
+void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, const ATR *atr, const CfgTurnTilt *cfg, float dt) {
+    if (cfg->strength == 0) {
         return;
     }
 
-    tt->target = fabsf(imu->yaw_rate) * cfg->turntilt_strength * 0.00125;
+    tt->target = fabsf(imu->yaw_rate) * cfg->strength * 0.00125;
 
-    float speed_boost = powf(cfg->turntilt_strength_boost, mot->erpm_abs_10k);
+    float speed_boost = powf(cfg->strength_boost, mot->erpm_abs_10k);
     tt->target *= speed_boost;
 
-    float start_erpm = max(cfg->turntilt_start_erpm, 10);
+    float start_erpm = max(cfg->start_erpm, 10);
     float direction = clamp_sym(mot->erpm_smooth / start_erpm, 1.0f);
     tt->target *= direction;
 
@@ -60,14 +59,14 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
     //     tt->target = 0;
     // }
 
-    tt->target = clamp_sym(tt->target, cfg->turntilt_angle_limit);
+    tt->target = clamp_sym(tt->target, cfg->angle_limit);
 
     const float offset = tt->target - tt->interpolated;
-    float speed = offset * cfg->turntilt_speed;
+    float speed = offset * cfg->speed;
     // clamp_sym(&speed, cfg->turntilt_speed_max);
-    speed = clamp_sym(speed, cfg->turntilt_speed_max);
+    speed = clamp_sym(speed, cfg->speed_max);
 
-    tt->interpolated += speed / cfg->hertz;
+    tt->interpolated += speed * dt;
 }
 
 void turn_tilt_winddown(TurnTilt *tt) {

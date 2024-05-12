@@ -26,8 +26,8 @@ void imu_data_reset(IMUData *imu) {
     imu->yaw_rate = 0.0f;
 }
 
-void imu_data_configure(IMUData *imu, const RefloatConfig *cfg) {
-    imu->yaw_rate_alpha = half_time_to_alpha(cfg->turntilt_filter, cfg->hertz);
+void imu_data_configure(IMUData *imu, const CfgTurnTilt *cfg, float dt) {
+    imu->yaw_rate_alpha = half_time_to_alpha(cfg->filter, dt);
 }
 
 void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter) {

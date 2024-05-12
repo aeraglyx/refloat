@@ -19,7 +19,7 @@
 
 #include "vesc_c_if.h"
 
-void footpad_sensor_update(FootpadSensor *fs, const RefloatConfig *config) {
+void footpad_sensor_update(FootpadSensor *fs, const CfgFaults *config) {
     fs->adc1 = VESC_IF->io_read_analog(VESC_PIN_ADC1);
     // Returns -1.0 if the pin is missing on the hardware
     fs->adc2 = VESC_IF->io_read_analog(VESC_PIN_ADC2);
@@ -27,27 +27,30 @@ void footpad_sensor_update(FootpadSensor *fs, const RefloatConfig *config) {
         fs->adc2 = 0.0;
     }
 
+    // const float adc1_threshold = config->adc1_threshold;
+    // const float adc2_threshold = config->adc2_threshold;
+
     fs->state = FS_NONE;
 
-    if (config->fault_adc1 == 0 && config->fault_adc2 == 0) {  // No sensors
+    if (config->adc1_threshold == 0 && config->adc2_threshold == 0) {  // No sensors
         fs->state = FS_BOTH;
-    } else if (config->fault_adc2 == 0) {  // Single sensor on ADC1
-        if (fs->adc1 > config->fault_adc1) {
+    } else if (config->adc2_threshold == 0) {  // Single sensor on ADC1
+        if (fs->adc1 > config->adc1_threshold) {
             fs->state = FS_BOTH;
         }
-    } else if (config->fault_adc1 == 0) {  // Single sensor on ADC2
-        if (fs->adc2 > config->fault_adc2) {
+    } else if (config->adc1_threshold == 0) {  // Single sensor on ADC2
+        if (fs->adc2 > config->adc2_threshold) {
             fs->state = FS_BOTH;
         }
     } else {  // Double sensor
-        if (fs->adc1 > config->fault_adc1) {
-            if (fs->adc2 > config->fault_adc2) {
+        if (fs->adc1 > config->adc1_threshold) {
+            if (fs->adc2 > config->adc2_threshold) {
                 fs->state = FS_BOTH;
             } else {
                 fs->state = FS_LEFT;
             }
         } else {
-            if (fs->adc2 > config->fault_adc2) {
+            if (fs->adc2 > config->adc2_threshold) {
                 fs->state = FS_RIGHT;
             }
         }

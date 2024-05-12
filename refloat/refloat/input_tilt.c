@@ -26,15 +26,14 @@ void input_tilt_reset(InputTilt *it) {
 }
 
 void input_tilt_configure(InputTilt *it, const RefloatConfig *cfg) {
-    // it->inputtilt_step_size = cfg->inputtilt_speed_max / cfg->hertz;
 }
 
-void input_tilt_update(InputTilt *it, const RemoteData *remote, const RefloatConfig *cfg) {
-    float target = remote->throttle_filtered * cfg->inputtilt_angle_limit;
+void input_tilt_update(InputTilt *it, const RemoteData *remote, const CfgInputTilt *cfg, float dt) {
+    float target = remote->throttle_filtered * cfg->angle_limit;
 
     const float offset = target - it->interpolated;
-    float speed = offset * cfg->inputtilt_speed;
-    speed = clamp_sym(speed, cfg->inputtilt_speed_max);
+    float speed = offset * cfg->speed;
+    speed = clamp_sym(speed, cfg->speed_max);
 
-    it->interpolated += speed / cfg->hertz;
+    it->interpolated += speed * dt;
 }

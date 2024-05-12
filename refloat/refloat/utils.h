@@ -102,7 +102,7 @@ float clamp_sym(float angle_in, float angle_limit);
 
 void dead_zonef(float *value, float threshold);
 
-float half_time_to_alpha(float half_time_sec, uint16_t loop_freq);
+float half_time_to_alpha(float half_time, float dt);
 void filter_ema(float *value_smooth, float value_current, float alpha);
 
 // float sigmoid(float x, float radius);

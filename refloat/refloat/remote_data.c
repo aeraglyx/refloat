@@ -28,15 +28,15 @@ void remote_data_reset(RemoteData *remote) {
     remote->throttle_filtered = 0.0f;
 }
 
-void remote_data_configure(RemoteData *remote, const RefloatConfig *cfg) {
-    remote->throttle_filter_alpha = half_time_to_alpha(cfg->inputtilt_filter, cfg->hertz);
+void remote_data_configure(RemoteData *remote, const RefloatConfig *cfg, float dt) {
+    remote->throttle_filter_alpha = half_time_to_alpha(cfg->inputtilt_filter, dt);  // TODO
 }
 
-void remote_data_update(RemoteData *remote, const RefloatConfig *cfg) {
+void remote_data_update(RemoteData *remote, const CfgHwRemote *cfg) {
     bool remote_connected = false;
     float servo_val = 0.0f;
 
-    switch (d->float_conf.inputtilt_remote_type) {
+    switch (cfg->remote_type) {
         case (INPUTTILT_PPM):
             servo_val = VESC_IF->get_ppm();
             remote_connected = VESC_IF->get_ppm_age() < 1;
@@ -52,14 +52,14 @@ void remote_data_update(RemoteData *remote, const RefloatConfig *cfg) {
     }
 
     if (remote_connected) {
-        float deadband = cfg->inputtilt_deadband;
+        float deadband = cfg->deadband;
         if (fabsf(servo_val) < deadband) {
             servo_val = 0.0f;
         } else {
             servo_val = sign(servo_val) * (fabsf(servo_val) - deadband) / (1.0f - deadband);
         }
 
-        if (cfg->inputtilt_invert_throttle) {
+        if (cfg->invert_throttle) {
             servo_val *= -1.0f;
         }
     }

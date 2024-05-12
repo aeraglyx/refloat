@@ -33,9 +33,9 @@ typedef struct {
     float pitch_rate_filtered;
 
     float kp_brake_scale;
-    float kp2_brake_scale;
+    float kd_brake_scale;
     float kp_accel_scale;
-    float kp2_accel_scale;
+    float kd_accel_scale;
 
     float ki;
 
@@ -45,6 +45,6 @@ typedef struct {
 
 void pid_reset(PID *pid);
 
-void pid_configure(PID *pid, const RefloatConfig *config);
+void pid_configure(PID *pid, const CfgPid *cfg, float dt);
 
-void pid_update(PID *pid, const IMUData *imu, const MotorData *motor, const RefloatConfig *config, float setpoint);
+void pid_update(PID *pid, const IMUData *imu, const MotorData *mot, const CfgPid *cfg, float setpoint);

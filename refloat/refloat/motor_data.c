@@ -37,11 +37,11 @@ void motor_data_reset(MotorData *m) {
     m->current_filtered = 0.0f;
 }
 
-void motor_data_configure(MotorData *m, RefloatConfig *cfg) {
-    m->atr_filter_alpha = half_time_to_alpha(cfg->atr_filter, cfg->hertz);
-    m->erpm_filter_alpha = half_time_to_alpha(0.2f, cfg->hertz);
+void motor_data_configure(MotorData *m, const CfgTune *cfg, float dt) {
+    m->atr_filter_alpha = half_time_to_alpha(cfg->atr.filter, dt);
+    m->erpm_filter_alpha = half_time_to_alpha(0.2f, dt);
 
-    // float frequency = cfg->atr_filter / cfg->hertz;
+    // float frequency = cfg->atr.filter * dt;
     // if (frequency > 0) {
     //     biquad_configure(&m->atr_current_biquad, BQ_LOWPASS, frequency);
     //     m->atr_filter_enabled = true;

@@ -22,6 +22,8 @@
 #include "conf/datatypes.h"
 #include "motor_data.h"
 
+#include <stdint.h>
+
 typedef struct {
     float target;
     float speed;
@@ -34,8 +36,8 @@ typedef struct {
 
 void atr_reset(ATR *atr);
 
-void atr_configure(ATR *atr, const RefloatConfig *config);
+void atr_configure(ATR *atr, const CfgAtr *cfg);
 
-void atr_update(ATR *atr, const MotorData *motor, const RefloatConfig *config);
+void atr_update(ATR *atr, const MotorData *mot, const CfgAtr *cfg, float dt);
 
 void atr_winddown(ATR *atr);
