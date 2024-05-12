@@ -144,7 +144,7 @@ typedef struct {
 } CfgHwRemote;
 
 typedef struct {
-    uint16_t hertz;
+    uint16_t frequency;
     bool is_beeper_enabled;
 } CfgHwEsc;
 
@@ -178,21 +178,8 @@ typedef struct {
     bool is_surgebeep_enabled;
 } CfgWarnings;
 
-// typedef struct {
-//     float tiltback_duty_angle;
-//     float tiltback_duty_speed;
-//     float tiltback_duty;
-//     float tiltback_hv_angle;
-//     float tiltback_hv_speed;
-//     float tiltback_hv;
-//     float tiltback_lv_angle;
-//     float tiltback_lv_speed;
-//     float tiltback_lv;
-//     float tiltback_return_speed;
-// } CfgWarnings;
-
 typedef struct {
-    float pitch;
+    float pitch_threshold;
     float roll_threshold;
     float adc1_threshold;
     float adc2_threshold;
@@ -210,7 +197,7 @@ typedef struct {
     float mahony_kp;
     float mahony_kp_roll;
     float mahony_kp_yaw;
-    float bf_accel_confidence_decay;
+    float accel_confidence_decay;
 } CfgBalanceFilter;
 
 typedef struct {
@@ -294,7 +281,7 @@ typedef struct {
     float version;
     bool disabled;
 
-    // uint16_t hertz;
+    // uint16_t frequency;
 
     CfgHardware hardware;
 

@@ -248,8 +248,8 @@ static void configure(data *d) {
     d->disengage_timer = d->current_time;
 
     // Loop time in seconds and microseconds
-    d->loop_time = 1.0f / d->config.hardware.esc.hertz;
-    d->loop_time_us = 1e6 / d->config.hardware.esc.hertz;
+    d->loop_time = 1.0f / d->config.hardware.esc.frequency;
+    d->loop_time_us = 1e6 / d->config.hardware.esc.frequency;
 
     d->last_time = VESC_IF->system_time();
 
