@@ -36,14 +36,13 @@ void pid_reset(PID *pid) {
     pid->kp_accel_scale = 1.0f;
     pid->kd_accel_scale = 1.0f;
 
-    pid->softstart_pid_limit = 0.0f;
+    pid->soft_start_factor = 0.0f;
 }
 
 void pid_configure(PID *pid, const CfgPid *cfg, float dt) {
     pid->pitch_rate_alpha = half_time_to_alpha(cfg->kd_filter, dt);
     pid->ki = cfg->ki * dt;
-    const float softstart_ramp = 0.2f;  // in seconds
-    pid->softstart_ramp_step_size = dt / softstart_ramp;
+    pid->soft_start_step_size = dt / cfg->soft_start;
 }
 
 void pid_update(PID *pid, const IMUData *imu, const MotorData *mot, const CfgPid *cfg, float setpoint) {
@@ -127,14 +126,14 @@ void pid_update(PID *pid, const IMUData *imu, const MotorData *mot, const CfgPid
     // TODO speed boost
 
     // SOFT START
-    if (pid->softstart_pid_limit < 1.0f) {
-        new_pid_value *= pid->softstart_pid_limit;
-        const float limit_new = pid->softstart_pid_limit + pid->softstart_ramp_step_size;
-        pid->softstart_pid_limit = clamp(limit_new, 0.0f, 1.0f);
+    if (pid->soft_start_factor < 1.0f) {
+        new_pid_value *= pid->soft_start_factor;
+        const float limit_new = pid->soft_start_factor + pid->soft_start_step_size;
+        pid->soft_start_factor = clamp(limit_new, 0.0f, 1.0f);
     }
-    // if (pid->softstart_pid_limit < mot->current_max) {
-    //     pid->rate_p = fminf(fabs(pid->rate_p), pid->softstart_pid_limit) * sign(pid->rate_p);
-    //     pid->softstart_pid_limit += pid->softstart_ramp_step_size;
+    // if (pid->soft_start_factor < mot->current_max) {
+    //     pid->rate_p = fminf(fabs(pid->rate_p), pid->soft_start_factor) * sign(pid->rate_p);
+    //     pid->soft_start_factor += pid->soft_start_step_size;
     // }
 
     // CURRENT LIMITING

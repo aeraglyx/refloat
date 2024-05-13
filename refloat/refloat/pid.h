@@ -39,8 +39,8 @@ typedef struct {
 
     float ki;
 
-    float softstart_ramp_step_size;
-    float softstart_pid_limit;
+    float soft_start_step_size;
+    float soft_start_factor;
 } PID;
 
 void pid_reset(PID *pid);

@@ -61,7 +61,7 @@ void balance_filter_init(BalanceFilterData *data) {
 }
 
 void balance_filter_configure(BalanceFilterData *data, const CfgBalanceFilter *config) {
-    data->acc_confidence_decay = config->bf_accel_confidence_decay;
+    data->acc_confidence_decay = config->accel_confidence_decay;
     data->kp_pitch = config->mahony_kp;
     data->kp_roll = config->mahony_kp_roll;
     data->kp_yaw = config->mahony_kp_yaw;

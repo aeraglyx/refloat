@@ -203,14 +203,14 @@ Item {
             if (!checkConfig()) return;
 
             var tuneBlacklist = [
-                "inputtilt_remote_type",
-                "inputtilt_deadband",
+                "hardware.remote.type",
+                "hardware.remote.deadband",
                 "disabled",
-                "hertz",
-                "tiltback_hv",
-                "tiltback_lv",
-                "fault_adc1",
-                "fault_adc2",
+                "hardware.esc.frequency",
+                "warnings.hv.threshold",
+                "warnings.lv.threshold",
+                "faults.adc1_threshold",
+                "faults.adc2_threshold",
             ];
 
             var settings = [];
@@ -283,8 +283,8 @@ Item {
         function setInputTiltRemoteType(type) {
             if (!checkConfig()) return;
 
-            if (pkgConfig.getParamEnum("inputtilt_remote_type", 0) != 1) {
-                pkgConfig.updateParamEnum("inputtilt_remote_type", 1);
+            if (pkgConfig.getParamEnum("hardware.remote.type", 0) != 1) {
+                pkgConfig.updateParamEnum("hardware.remote.type", 1);
                 vescCommands.customConfigSet(0, pkgConfig);
             }
         }
@@ -3375,9 +3375,9 @@ Item {
 
                             RealValue {id: debugAtrSetpoint; label: "Interpolated"; unit: "°";}
                             RealValue {id: debugTorqueTiltSetpoint; label: "Speed"; unit: "°";}
-                            RealValue {id: debugTurnTiltSetpoint; label: "Target"; unit: "°";}
-                            RealValue {id: debugSpeedTiltSetpoint; label: "ERPM abs 10k"; unit: "°";}
-                            RealValue {id: debugRemoteTiltSetpoint; label: "Frequency"; unit: " Hz";}
+                            RealValue {id: debugTurnTiltSetpoint; label: "CPU Usage"; unit: "°";}
+                            RealValue {id: debugSpeedTiltSetpoint; label: "Angle Offset"; unit: "°";}
+                            RealValue {id: debugRemoteTiltSetpoint; label: "Soft Start"; unit: " s";}
                         }
                     }
 

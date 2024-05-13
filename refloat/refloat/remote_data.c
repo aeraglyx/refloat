@@ -23,20 +23,20 @@
 
 #include <math.h>
 
-void remote_data_reset(RemoteData *remote) {
+void remote_data_reset(RemoteData *rem) {
     // TODO should initialize to throttle?
-    remote->throttle_filtered = 0.0f;
+    rem->throttle_filtered = 0.0f;
 }
 
-void remote_data_configure(RemoteData *remote, const RefloatConfig *cfg, float dt) {
-    remote->throttle_filter_alpha = half_time_to_alpha(cfg->inputtilt_filter, dt);  // TODO
+void remote_data_configure(RemoteData *rem, const CfgInputTilt *cfg, float dt) {
+    rem->throttle_filter_alpha = half_time_to_alpha(cfg->filter, dt);
 }
 
-void remote_data_update(RemoteData *remote, const CfgHwRemote *cfg) {
+void remote_data_update(RemoteData *rem, const CfgHwRemote *cfg) {
     bool remote_connected = false;
     float servo_val = 0.0f;
 
-    switch (cfg->remote_type) {
+    switch (cfg->type) {
         case (INPUTTILT_PPM):
             servo_val = VESC_IF->get_ppm();
             remote_connected = VESC_IF->get_ppm_age() < 1;
@@ -64,6 +64,6 @@ void remote_data_update(RemoteData *remote, const CfgHwRemote *cfg) {
         }
     }
 
-    remote->throttle = servo_val;
-    filter_ema(&remote->throttle_filtered, remote->throttle, remote->throttle_filter_alpha);
+    rem->throttle = servo_val;
+    filter_ema(&rem->throttle_filtered, rem->throttle, rem->throttle_filter_alpha);
 }

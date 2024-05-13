@@ -138,7 +138,7 @@ typedef struct {
 } CfgHwLeds;
 
 typedef struct {
-    FLOAT_INPUTTILT_REMOTE_TYPE remote_type;
+    FLOAT_INPUTTILT_REMOTE_TYPE type;
     bool invert_throttle;
     float deadband;
 } CfgHwRemote;
@@ -153,12 +153,6 @@ typedef struct {
     CfgHwRemote remote;
     CfgHwLeds leds;
 } CfgHardware;
-
-// typedef struct {
-//     float angle;
-//     float speed;
-//     float start;
-// } Tiltback;
 
 typedef struct {
     float threshold;
@@ -209,6 +203,7 @@ typedef struct {
     float ki_limit;
     float kp_brake;
     float kd_brake;
+    float soft_start;
 } CfgPid;
 
 typedef struct {

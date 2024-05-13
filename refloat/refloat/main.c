@@ -119,18 +119,22 @@ typedef struct {
 
     float current_time;
     float last_time;
+    float dt_raw;
     float dt;
 
-    float startup_pitch_trickmargin
+    float startup_pitch_trickmargin;
     float startup_pitch_tolerance;
     float startup_step_size;
 
-    float tiltback_duty_step_size,
-    float tiltback_hv_step_size,
-    float tiltback_lv_step_size,
+    float tiltback_duty_step_size;
+    float tiltback_hv_step_size;
+    float tiltback_lv_step_size;
     float tiltback_return_step_size;
 
-    float surge_angle, surge_angle2, surge_angle3, surge_adder;
+    float surge_angle;
+    float surge_angle2;
+    float surge_angle3;
+    float surge_adder;
     bool surge_enable;
     bool duty_beeping;
 
@@ -138,18 +142,24 @@ typedef struct {
 
     FootpadSensor footpad_sensor;
 
-    float setpoint, setpoint_target, setpoint_target_interpolated;
-    float disengage_timer, nag_timer;
+    float setpoint;
+    float setpoint_target;
+    float setpoint_target_interpolated;
+
+    float disengage_timer;
+    float nag_timer;
     float idle_voltage;
-    float fault_angle_pitch_timer, fault_angle_roll_timer, fault_switch_timer,
-        fault_switch_half_timer;
+    float fault_angle_pitch_timer, fault_angle_roll_timer;
+    float fault_switch_timer, fault_switch_half_timer;
     float motor_timeout_s;
     float brake_timeout;
     float wheelslip_timer, tb_highvoltage_timer;
     float switch_warn_beep_erpm;
 
     // Feature: Reverse Stop
-    float reverse_stop_step_size, reverse_tolerance, reverse_total_erpm;
+    float reverse_stop_step_size;
+    float reverse_tolerance;
+    float reverse_total_erpm;
     float reverse_timer;
 
     // Odometer
@@ -234,6 +244,7 @@ static void configure(data *d) {
 
     motor_data_configure(&d->motor, &d->config.tune, d->loop_time);
     imu_data_configure(&d->imu, &d->config.tune.turn_tilt, d->loop_time);
+    remote_data_configure(&d->remote, &d->config.tune.input_tilt, d->loop_time);
     balance_filter_configure(&d->balance_filter, &d->config.tune.balance_filter);
 
     atr_configure(&d->atr, &d->config.tune.atr);
@@ -316,7 +327,7 @@ static void reset_vars(data *d) {
     torque_tilt_reset(&d->torque_tilt);
     turn_tilt_reset(&d->turn_tilt);
     speed_tilt_reset(&d->speed_tilt);
-    input_tilt_reset(&d->input_tilt);
+    input_tilt_reset(&d->input_tilt, &d->remote);
 
     pid_reset(&d->pid);
 
@@ -379,12 +390,12 @@ static void do_rc_move(data *d) {
         // Throttle must be greater than 2% (Help mitigate lingering throttle)
         // TODO
         if ((d->config.tune.input_tilt.remote_throttle_current_max > 0) &&
-            (d->current_time - d->disengage_timer > d->config.remote_throttle_grace_period) &&
-            (fabsf(d->remote.throttle_filtered) > 0.02)) {
+            (d->current_time - d->disengage_timer > d->config.tune.input_tilt.remote_throttle_grace_period) &&
+            (fabsf(d->remote.throttle) > 0.02)) {
             // float servo_val = d->throttle_val;
             // servo_val *= (d->config.inputtilt_invert_throttle ? -1.0 : 1.0);
-            d->rc_current = d->rc_current * 0.95 +
-                (d->config.tune.input_tilt.remote_throttle_current_max * d->remote.throttle_filtered) * 0.05;
+            const float max = d->config.tune.input_tilt.remote_throttle_current_max;
+            filter_ema(&d->rc_current, max * d->remote.throttle, 0.05f);
             set_current(d, d->rc_current);
         } else {
             d->rc_current = 0;
@@ -770,23 +781,31 @@ static void imu_ref_callback(float *acc, float *gyro, [[maybe_unused]] float *ma
     balance_filter_update(&d->balance_filter, gyro, acc, dt);
 }
 
+static void time_vars_update(data *d) {
+    d->current_time = VESC_IF->system_time();
+    d->dt_raw = d->current_time - d->last_time;
+    filter_ema(&d->dt, d->dt_raw, 0.1f);
+    d->last_time = d->current_time;
+}
+
 static void refloat_thd(void *arg) {
     data *d = (data *) arg;
 
     configure(d);
 
     while (!VESC_IF->should_terminate()) {
+        time_vars_update(d);
         beeper_update(d);
 
         charging_timeout(&d->charging, &d->state);
 
-        d->current_time = VESC_IF->system_time();
-        d->dt = d->current_time - d->last_time;
-        d->last_time = d->current_time;
+        // d->current_time = VESC_IF->system_time();
+        // d->dt = d->current_time - d->last_time;
+        // d->last_time = d->current_time;
         
         imu_data_update(&d->imu, &d->balance_filter);
         motor_data_update(&d->motor);
-        remote_data_update(&d->remote, &d->config.hardware.remote, d->loop_time);
+        remote_data_update(&d->remote, &d->config.hardware.remote);
 
         footpad_sensor_update(&d->footpad_sensor, &d->config.faults);
 
@@ -813,7 +832,7 @@ static void refloat_thd(void *arg) {
 
                 // if within 5V of LV tiltback threshold, issue 1 beep for each volt below that
                 float bat_volts = VESC_IF->mc_get_input_voltage_filtered();
-                float threshold = d->config.tiltback_lv + 5;
+                float threshold = d->config.warnings.lv.threshold + 5;
                 if (bat_volts < threshold) {
                     int beeps = (int) fminf(6, threshold - bat_volts);
                     beep_alert(d, beeps + 1, true);
@@ -862,8 +881,17 @@ static void refloat_thd(void *arg) {
                     &d->config.tune.atr,
                     d->loop_time
                 );
-                turn_tilt_update(&d->turn_tilt, &d->motor, &d->imu, &d->atr, &d->config.tune.turn_tilt);
-                speed_tilt_update(&d->speed_tilt, &d->motor, &d->config.tune.speed_tilt, d->loop_time);
+                turn_tilt_update(
+                    &d->turn_tilt,
+                    &d->motor,
+                    &d->imu,
+                    &d->atr,
+                    &d->config.tune.turn_tilt,
+                    d->loop_time
+                );
+                speed_tilt_update(
+                    &d->speed_tilt, &d->motor, &d->config.tune.speed_tilt, d->loop_time
+                );
             }
 
             aggregate_tiltbacks(d);
@@ -873,8 +901,10 @@ static void refloat_thd(void *arg) {
             break;
 
         case (STATE_READY):
-            if (d->current_time - d->disengage_timer > 1800) {  // alert user after 30 minutes
-                if (d->current_time - d->nag_timer > 60) {  // beep every 60 seconds
+            // alert user after 30 minutes
+            if (d->current_time - d->disengage_timer > 1800) {
+                // beep every 60 seconds
+                if (d->current_time - d->nag_timer > 60) {
                     d->nag_timer = d->current_time;
                     float input_voltage = VESC_IF->mc_get_input_voltage_filtered();
                     if (input_voltage > d->idle_voltage) {
@@ -1179,9 +1209,10 @@ static void send_realtime_data(data *d) {
 
         buffer_append_float32_auto(buffer, d->atr.interpolated, &ind);
         buffer_append_float32_auto(buffer, d->atr.speed, &ind);
-        buffer_append_float32_auto(buffer, d->atr.target, &ind);
-        buffer_append_float32_auto(buffer, d->motor.erpm_abs_10k, &ind);
-        buffer_append_float32_auto(buffer, 1.0f / max(d->dt, 0.0001f), &ind);
+        // buffer_append_float32_auto(buffer, d->atr.target, &ind);
+        buffer_append_float32_auto(buffer, d->loop_time / max(d->dt, 0.00001f), &ind);
+        buffer_append_float32_auto(buffer, d->pid.proportional / d->config.tune.pid.kp, &ind);
+        buffer_append_float32_auto(buffer, d->config.tune.pid.soft_start, &ind);
         // buffer_append_float32_auto(buffer, d->torque_tilt.interpolated, &ind);
         // buffer_append_float32_auto(buffer, d->turn_tilt.interpolated, &ind);
         // buffer_append_float32_auto(buffer, d->speed_tilt.interpolated, &ind);
@@ -1477,7 +1508,7 @@ INIT_FUN(lib_info *info) {
     VESC_IF->conf_custom_add_config(get_cfg, set_cfg, get_cfg_xml);
 
     if ((d->config.hardware.esc.is_beeper_enabled) ||
-        (d->config.hardware.remote.remote_type != INPUTTILT_PPM)) {
+        (d->config.hardware.remote.type != INPUTTILT_PPM)) {
         beeper_init();
     }
 

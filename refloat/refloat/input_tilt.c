@@ -21,8 +21,9 @@
 
 #include <math.h>
 
-void input_tilt_reset(InputTilt *it) {
+void input_tilt_reset(InputTilt *it, const RemoteData *remote) {
     it->interpolated = 0.0f;
+    it->throttle_filtered = remote->throttle;
 }
 
 void input_tilt_configure(InputTilt *it, const RefloatConfig *cfg) {
