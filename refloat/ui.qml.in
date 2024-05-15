@@ -3373,11 +3373,11 @@ Item {
                             //     font.bold = true
                             // }
 
-                            RealValue {id: debugAtrSetpoint; label: "Interpolated"; unit: "°";}
-                            RealValue {id: debugTorqueTiltSetpoint; label: "Speed"; unit: "°";}
-                            RealValue {id: debugTurnTiltSetpoint; label: "CPU Usage"; unit: "°";}
-                            RealValue {id: debugSpeedTiltSetpoint; label: "Angle Offset"; unit: "°";}
-                            RealValue {id: debugRemoteTiltSetpoint; label: "Soft Start"; unit: " s";}
+                            RealValue {id: debugAtrSetpoint; label: "ATR"; unit: "°";}
+                            RealValue {id: debugTorqueTiltSetpoint; label: "Sleep"; unit: " ms";}
+                            RealValue {id: debugTurnTiltSetpoint; label: "Freq"; unit: "";}
+                            RealValue {id: debugSpeedTiltSetpoint; label: "Expo"; unit: "°";}
+                            RealValue {id: debugRemoteTiltSetpoint; label: "Expo Pivot"; unit: " s";}
                         }
                     }
 

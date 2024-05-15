@@ -27,15 +27,16 @@ typedef struct {
 
     float proportional;
     float integral;
-    float rate_p;
+    float derivative;
 
-    float pitch_rate_alpha;
-    float pitch_rate_filtered;
+    float kd_alpha;
+    float kd_filtered;
 
-    float kp_brake_scale;
-    float kd_brake_scale;
-    float kp_accel_scale;
-    float kd_accel_scale;
+    float kp_scale;
+    float kd_scale;
+
+    float expo_a;
+    float expo_b;
 
     float ki;
 

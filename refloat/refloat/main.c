@@ -121,6 +121,8 @@ typedef struct {
     float last_time;
     float dt_raw;
     float dt;
+    float time_diff;
+    uint32_t time_sleep_us;
 
     float startup_pitch_trickmargin;
     float startup_pitch_tolerance;
@@ -238,31 +240,27 @@ void beep_on(data *d, bool force) {
 }
 
 static void configure(data *d) {
+    // Loop time in seconds and microseconds
+    d->loop_time = 1.0f / d->config.hardware.esc.frequency;
+    d->loop_time_us = 1e6 / d->config.hardware.esc.frequency;
+
     state_init(&d->state, d->config.disabled);
 
     lcm_configure(&d->lcm, &d->config.leds);
-
     motor_data_configure(&d->motor, &d->config.tune, d->loop_time);
     imu_data_configure(&d->imu, &d->config.tune.turn_tilt, d->loop_time);
     remote_data_configure(&d->remote, &d->config.tune.input_tilt, d->loop_time);
-    balance_filter_configure(&d->balance_filter, &d->config.tune.balance_filter);
 
+    balance_filter_configure(&d->balance_filter, &d->config.tune.balance_filter);
     atr_configure(&d->atr, &d->config.tune.atr);
     // torque_tilt_configure(&d->torque_tilt, &d->config);
     // turn_tilt_configure(&d->turn_tilt, &d->config);
     speed_tilt_configure(&d->speed_tilt, &d->config.tune.speed_tilt);
     // input_tilt_configure(&d->input_tilt, &d->config);
-
     pid_configure(&d->pid, &d->config.tune.pid, d->loop_time);
 
     // This timer is used to determine how long the board has been disengaged / idle
     d->disengage_timer = d->current_time;
-
-    // Loop time in seconds and microseconds
-    d->loop_time = 1.0f / d->config.hardware.esc.frequency;
-    d->loop_time_us = 1e6 / d->config.hardware.esc.frequency;
-
-    d->last_time = VESC_IF->system_time();
 
     // Loop time in seconds times 20 for a nice long grace period
     d->motor_timeout_s = 20.0f * d->loop_time;
@@ -446,6 +444,8 @@ bool is_engaged(const data *d) {
 // Fault checking order does not really matter. From a UX perspective, switch should be before
 // angle.
 static bool check_faults(data *d) {
+    // CfgFaults faults = d->config.faults;
+
     bool disable_switch_faults = d->config.faults.moving_fault_disabled &&
         // Rolling forward (not backwards!)
         d->motor.erpm > (d->config.faults.switch_half_erpm * 2) &&
@@ -456,7 +456,7 @@ static bool check_faults(data *d) {
     // Switch fully open
     if (d->footpad_sensor.state == FS_NONE) {
         if (!disable_switch_faults) {
-            if ((1000.0 * (d->current_time - d->fault_switch_timer)) >
+            if ((1000.0f * (d->current_time - d->fault_switch_timer)) >
                 d->config.faults.switch_full_delay) {
                 state_stop(&d->state, STOP_SWITCH_FULL);
                 return true;
@@ -464,7 +464,7 @@ static bool check_faults(data *d) {
             // low speed (below 6 x half-fault threshold speed):
             else if (
                 (d->motor.erpm_abs < d->config.faults.switch_half_erpm * 6) &&
-                (1000.0 * (d->current_time - d->fault_switch_timer) >
+                (1000.0f * (d->current_time - d->fault_switch_timer) >
                     d->config.faults.switch_half_delay)) {
                 state_stop(&d->state, STOP_SWITCH_FULL);
                 return true;
@@ -505,7 +505,7 @@ static bool check_faults(data *d) {
             state_stop(&d->state, STOP_REVERSE_STOP);
             return true;
         }
-        if (fabsf(d->imu.pitch) < 5) {
+        if (fabsf(d->imu.pitch) <= 5) {
             d->reverse_timer = d->current_time;
         }
     }
@@ -513,7 +513,7 @@ static bool check_faults(data *d) {
     // Switch partially open and stopped
     if (!d->config.faults.is_posi_enabled) {
         if (!is_engaged(d) && d->motor.erpm_abs < d->config.faults.switch_half_erpm) {
-            if ((1000.0 * (d->current_time - d->fault_switch_half_timer)) >
+            if ((1000.0f * (d->current_time - d->fault_switch_half_timer)) >
                 d->config.faults.switch_half_delay) {
                 state_stop(&d->state, STOP_SWITCH_HALF);
                 return true;
@@ -525,7 +525,7 @@ static bool check_faults(data *d) {
 
     // Check roll angle
     if (fabsf(d->imu.roll) > d->config.faults.roll_threshold) {
-        if ((1000.0 * (d->current_time - d->fault_angle_roll_timer)) >
+        if ((1000.0f * (d->current_time - d->fault_angle_roll_timer)) >
             d->config.faults.roll_delay) {
             state_stop(&d->state, STOP_ROLL);
             return true;
@@ -536,7 +536,7 @@ static bool check_faults(data *d) {
 
     // Check pitch angle
     if (fabsf(d->imu.pitch) > d->config.faults.pitch_threshold && fabsf(d->input_tilt.interpolated) < 30) {
-        if ((1000.0 * (d->current_time - d->fault_angle_pitch_timer)) >
+        if ((1000.0f * (d->current_time - d->fault_angle_pitch_timer)) >
             d->config.faults.pitch_delay) {
             state_stop(&d->state, STOP_PITCH);
             return true;
@@ -784,29 +784,30 @@ static void imu_ref_callback(float *acc, float *gyro, [[maybe_unused]] float *ma
 static void time_vars_update(data *d) {
     d->current_time = VESC_IF->system_time();
     d->dt_raw = d->current_time - d->last_time;
-    filter_ema(&d->dt, d->dt_raw, 0.1f);
     d->last_time = d->current_time;
+    filter_ema(&d->dt, d->dt_raw, 0.1f);
 }
 
 static void refloat_thd(void *arg) {
     data *d = (data *) arg;
 
     configure(d);
+    d->last_time = VESC_IF->system_time() - d->loop_time;
 
     while (!VESC_IF->should_terminate()) {
-        time_vars_update(d);
+        d->current_time = VESC_IF->system_time();
+        d->dt_raw = d->current_time - d->last_time;
+        d->last_time = d->current_time;
+        filter_ema(&d->dt, d->dt_raw, 0.1f);
+        
+        // time_vars_update(d);
         beeper_update(d);
 
         charging_timeout(&d->charging, &d->state);
 
-        // d->current_time = VESC_IF->system_time();
-        // d->dt = d->current_time - d->last_time;
-        // d->last_time = d->current_time;
-        
         imu_data_update(&d->imu, &d->balance_filter);
         motor_data_update(&d->motor);
         remote_data_update(&d->remote, &d->config.hardware.remote);
-
         footpad_sensor_update(&d->footpad_sensor, &d->config.faults);
 
         if (d->footpad_sensor.state == FS_NONE && d->state.state == STATE_RUNNING &&
@@ -952,7 +953,9 @@ static void refloat_thd(void *arg) {
             break;
         }
 
-        VESC_IF->sleep_us(d->loop_time_us);
+        d->time_diff = VESC_IF->system_time() - d->current_time;
+        d->time_sleep_us = max(d->loop_time_us - 1e6 * d->time_diff, 0);
+        VESC_IF->sleep_us(d->time_sleep_us);
     }
 }
 
@@ -1055,7 +1058,7 @@ static float app_get_debug(int index) {
     case (3):
         return d->pid.integral;
     case (4):
-        return d->pid.rate_p;
+        return d->pid.derivative;
     case (5):
         return d->setpoint;
     case (6):
@@ -1208,10 +1211,10 @@ static void send_realtime_data(data *d) {
         buffer_append_float32_auto(buffer, d->setpoint, &ind);
 
         buffer_append_float32_auto(buffer, d->atr.interpolated, &ind);
-        buffer_append_float32_auto(buffer, d->atr.speed, &ind);
+        buffer_append_float32_auto(buffer, 69, &ind);
         // buffer_append_float32_auto(buffer, d->atr.target, &ind);
-        buffer_append_float32_auto(buffer, d->loop_time / max(d->dt, 0.00001f), &ind);
-        buffer_append_float32_auto(buffer, d->pid.proportional / d->config.tune.pid.kp, &ind);
+        buffer_append_float32_auto(buffer, 1.0f / max(d->dt, 0.00001f), &ind);
+        buffer_append_float32_auto(buffer, d->config.tune.pid.kp_expo, &ind);
         buffer_append_float32_auto(buffer, d->config.tune.pid.soft_start, &ind);
         // buffer_append_float32_auto(buffer, d->torque_tilt.interpolated, &ind);
         // buffer_append_float32_auto(buffer, d->turn_tilt.interpolated, &ind);

@@ -17,7 +17,7 @@
             (define pid_value (ext-dbg 1))
             (define proportional (ext-dbg 2))
             (define integral (ext-dbg 3))
-            (define rate_p (ext-dbg 4))
+            (define derivative (ext-dbg 4))
             (define setpoint (ext-dbg 5))
             (define atr_offset (ext-dbg 6))
             (define erpm (ext-dbg 7))

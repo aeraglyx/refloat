@@ -27,48 +27,27 @@ void pid_reset(PID *pid) {
 
     pid->proportional = 0.0f;
     pid->integral = 0.0f;
-    pid->rate_p = 0.0f;
+    pid->derivative = 0.0f;
 
-    pid->pitch_rate_filtered = 0.0f;
+    pid->kd_filtered = 0.0f;
 
-    pid->kp_brake_scale = 1.0f;
-    pid->kd_brake_scale = 1.0f;
-    pid->kp_accel_scale = 1.0f;
-    pid->kd_accel_scale = 1.0f;
+    pid->kp_scale = 1.0f;
+    pid->kd_scale = 1.0f;
 
     pid->soft_start_factor = 0.0f;
 }
 
 void pid_configure(PID *pid, const CfgPid *cfg, float dt) {
-    pid->pitch_rate_alpha = half_time_to_alpha(cfg->kd_filter, dt);
+    pid->kd_alpha = half_time_to_alpha(cfg->kd_filter, dt);
     pid->ki = cfg->ki * dt;
-    pid->soft_start_step_size = dt / cfg->soft_start;
+    pid->soft_start_step_size = dt / max(cfg->soft_start, dt);
+    pid->expo_a = 1.0f - cfg->kp_expo;
+    pid->expo_b = cfg->kp_expo / (cfg->kp_expo_pivot * cfg->kp_expo_pivot);
 }
 
-void pid_update(PID *pid, const IMUData *imu, const MotorData *mot, const CfgPid *cfg, float setpoint) {
-    // Prepare Brake Scaling (ramp scale values as needed for smooth transitions)
-    // if (mot->erpm_abs < 500) {
-    //     // All scaling should roll back to 1.0x when near a stop for a smooth stand-still
-    //     // and back-forth transition
-    //     pid->kp_brake_scale = 0.01f + 0.99f * pid->kp_brake_scale;
-    //     pid->kd_brake_scale = 0.01f + 0.99f * pid->kd_brake_scale;
-    //     pid->kp_accel_scale = 0.01f + 0.99f * pid->kp_accel_scale;
-    //     pid->kd_accel_scale = 0.01f + 0.99f * pid->kd_accel_scale;
-    // } else if (mot->erpm > 0) {
-    //     // Once rolling forward, brakes should transition to scaled values
-    //     pid->kp_brake_scale = 0.01f * cfg->kp_brake + 0.99f * pid->kp_brake_scale;
-    //     pid->kd_brake_scale = 0.01f * cfg->kd_brake + 0.99f * pid->kd_brake_scale;
-    //     pid->kp_accel_scale = 0.01f + 0.99f * pid->kp_accel_scale;
-    //     pid->kd_accel_scale = 0.01f + 0.99f * pid->kd_accel_scale;
-    // } else {
-    //     // Once rolling backward, the NEW brakes (we will use kp_accel) should transition to
-    //     // scaled values
-    //     pid->kp_brake_scale = 0.01f + 0.99f * pid->kp_brake_scale;
-    //     pid->kd_brake_scale = 0.01f + 0.99f * pid->kd_brake_scale;
-    //     pid->kp_accel_scale = 0.01f * cfg->kp_brake + 0.99f * pid->kp_accel_scale;
-    //     pid->kd_accel_scale = 0.01f * cfg->kd_brake + 0.99f * pid->kd_accel_scale;
-    // }
-
+void pid_update(
+    PID *pid, const IMUData *imu, const MotorData *mot, const CfgPid *cfg, float setpoint
+) {
     const float brake_scale_factor = clamp(fabsf(mot->erpm_smooth) * 0.001f, 0.0f, 1.0f);
     const float kp_brake_scale = 1.0f + (cfg->kp_brake - 1.0f) * brake_scale_factor;
     const float kd_brake_scale = 1.0f + (cfg->kd_brake - 1.0f) * brake_scale_factor;
@@ -77,69 +56,61 @@ void pid_update(PID *pid, const IMUData *imu, const MotorData *mot, const CfgPid
     const int8_t direction = sign(mot->erpm_smooth);
 
     // PROPORTIONAL
-    // float kp_scale;
-    // if (pitch_offset < 0.0f) {
-    //     kp_scale = cfg->kp * pid->kp_brake_scale;
-    // } else {
-    //     kp_scale = cfg->kp * pid->kp_accel_scale;
-    // }
-    // pid->proportional = pitch_offset * kp_scale;
-
-    float kp_scale = cfg->kp;
+    float kp = cfg->kp;
     if (sign(pitch_offset) != direction) {
-        kp_scale *= kp_brake_scale;
+        // TODO only when kp_brake_scale != 0 ?
+        kp *= kp_brake_scale;
     }
-    pid->proportional = pitch_offset * kp_scale;
-    // TODO expo
+    if (cfg->kp_expo > 0.0f) {
+        const float pitch_offset_sq = pitch_offset * pitch_offset;
+        const float expo = pid->expo_a + pid->expo_b * pitch_offset_sq;
+        kp *= expo;
+    }
+    filter_ema(&pid->kp_scale, kp, 0.01f);
+    pid->proportional = pitch_offset * pid->kp_scale;
 
     // INTEGRAL
     pid->integral += pitch_offset * pid->ki;
     if (cfg->ki_limit > 0.0f && fabsf(pid->integral) > cfg->ki_limit) {
         pid->integral = cfg->ki_limit * sign(pid->integral);
     }
+    // TODO
     // Quickly ramp down integral component during reverse stop
     // if (d->state.sat == SAT_REVERSESTOP) {
     //     pid->integral = pid->integral * 0.9;
     // }
 
     // DERIVATIVE
-    filter_ema(&pid->pitch_rate_filtered, -imu->gyro[1], pid->pitch_rate_alpha); 
-    const float rate_prop = pid->pitch_rate_filtered;
-    // const float rate_prop = -imu->gyro[1];
+    filter_ema(&pid->kd_filtered, -imu->gyro[1], pid->kd_alpha); 
+    const float kd_input = pid->kd_filtered;
+    // const float kd_input = -imu->gyro[1];
+    // TODO rate p limiting?
 
-    float kd_scale = cfg->kd;
-    if (sign(rate_prop) != direction) {
-        kd_scale *= kd_brake_scale;
+    float kd = cfg->kd;
+    if (sign(kd_input) != direction) {
+        kd *= kd_brake_scale;
     }
-    pid->rate_p = rate_prop * kd_scale;
+    filter_ema(&pid->kd_scale, kd, 0.01f);
+    pid->derivative = kd_input * pid->kd_scale;
 
-    // float rate_p_scale;
-    // if (rate_prop < 0.0f) {
-    //     rate_p_scale = cfg->kd * pid->kd_brake_scale;
-    // } else {
-    //     rate_p_scale = cfg->kd * pid->kd_accel_scale;
-    // }
-    // pid->rate_p = rate_prop * rate_p_scale;
+    // FEED FORWARD
+    // TODO
 
     // AGGREGATE
-    float new_pid_value = pid->proportional + pid->integral + pid->rate_p;
+    float new_pid_value = pid->proportional + pid->integral + pid->derivative;
     // TODO speed boost
 
     // SOFT START
     if (pid->soft_start_factor < 1.0f) {
         new_pid_value *= pid->soft_start_factor;
-        const float limit_new = pid->soft_start_factor + pid->soft_start_step_size;
-        pid->soft_start_factor = clamp(limit_new, 0.0f, 1.0f);
+        const float factor_new = pid->soft_start_factor + pid->soft_start_step_size;
+        pid->soft_start_factor = clamp(factor_new, 0.0f, 1.0f);
     }
-    // if (pid->soft_start_factor < mot->current_max) {
-    //     pid->rate_p = fminf(fabs(pid->rate_p), pid->soft_start_factor) * sign(pid->rate_p);
-    //     pid->soft_start_factor += pid->soft_start_step_size;
-    // }
 
     // CURRENT LIMITING
     float current_limit = mot->braking ? mot->current_min : mot->current_max;
     new_pid_value = clamp_sym(new_pid_value, current_limit);
     // TODO soft max?
 
-    filter_ema(&pid->pid_value, new_pid_value, 0.2f); 
+    filter_ema(&pid->pid_value, new_pid_value, 0.2f);
 }
