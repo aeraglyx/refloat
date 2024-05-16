@@ -26,7 +26,7 @@ p, li { white-space: pre-wrap; }
             <cDefine></cDefine>
         </hw_name>
         <tune.pid.kp>
-            <longName>P</longName>
+            <longName>P Term</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -53,7 +53,7 @@ p, li { white-space: pre-wrap; }
             <vTx>7</vTx>
         </tune.pid.kp>
         <tune.pid.kp_expo>
-            <longName>Expo</longName>
+            <longName>P Expo</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -97,7 +97,7 @@ p, li { white-space: pre-wrap; }
             <vTx>7</vTx>
         </tune.pid.kp_expo_pivot>
         <tune.pid.kd>
-            <longName>D</longName>
+            <longName>D Term</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -149,7 +149,7 @@ p, li { white-space: pre-wrap; }
             <vTx>7</vTx>
         </tune.pid.kd_filter>
         <tune.pid.ki>
-            <longName>I</longName>
+            <longName>I Term</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -1310,7 +1310,7 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>0.5</stepDouble>
-            <valDouble>4</valDouble>
+            <valDouble>5</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °</suffix>
             <vTx>7</vTx>
@@ -1331,7 +1331,7 @@ p, li { white-space: pre-wrap; }
             <maxDouble>80</maxDouble>
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>0.5</stepDouble>
+            <stepDouble>5</stepDouble>
             <valDouble>45</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °</suffix>
@@ -1354,7 +1354,7 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>5</stepDouble>
-            <valDouble>30</valDouble>
+            <valDouble>50</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °/s</suffix>
             <vTx>7</vTx>
