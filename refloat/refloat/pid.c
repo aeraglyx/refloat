@@ -22,7 +22,7 @@
 #include <math.h>
 #include <stdint.h>
 
-void pid_reset(PID *pid) {
+void pid_reset(PID *pid, const CfgPid *cfg) {
     pid->pid_value = 0.0f;
 
     pid->proportional = 0.0f;
@@ -31,8 +31,8 @@ void pid_reset(PID *pid) {
 
     pid->kd_filtered = 0.0f;
 
-    pid->kp_scale = 1.0f;
-    pid->kd_scale = 1.0f;
+    pid->kp_scale = cfg->kp;
+    pid->kd_scale = cfg->kd;
 
     pid->soft_start_factor = 0.0f;
 }
@@ -45,20 +45,11 @@ void pid_configure(PID *pid, const CfgPid *cfg, float dt) {
     pid->expo_b = cfg->kp_expo / (cfg->kp_expo_pivot * cfg->kp_expo_pivot);
 }
 
-void pid_update(
-    PID *pid, const IMUData *imu, const MotorData *mot, const CfgPid *cfg, float setpoint
-) {
-    const float brake_scale_factor = clamp(fabsf(mot->erpm_smooth) * 0.001f, 0.0f, 1.0f);
-    const float kp_brake_scale = 1.0f + (cfg->kp_brake - 1.0f) * brake_scale_factor;
-    const float kd_brake_scale = 1.0f + (cfg->kd_brake - 1.0f) * brake_scale_factor;
-
-    const float pitch_offset = setpoint - imu->pitch_balance;
-    const int8_t direction = sign(mot->erpm_smooth);
-
-    // PROPORTIONAL
+static void p_update(PID *pid, const CfgPid *cfg, float pitch_offset, int8_t direction, float brake_factor) {
     float kp = cfg->kp;
     if (sign(pitch_offset) != direction) {
         // TODO only when kp_brake_scale != 0 ?
+        const float kp_brake_scale = 1.0f + (cfg->kp_brake - 1.0f) * brake_factor;
         kp *= kp_brake_scale;
     }
     if (cfg->kp_expo > 0.0f) {
@@ -68,49 +59,62 @@ void pid_update(
     }
     filter_ema(&pid->kp_scale, kp, 0.01f);
     pid->proportional = pitch_offset * pid->kp_scale;
+}
 
-    // INTEGRAL
+static void i_update(PID *pid, const CfgPid *cfg, float pitch_offset) {
     pid->integral += pitch_offset * pid->ki;
     if (cfg->ki_limit > 0.0f && fabsf(pid->integral) > cfg->ki_limit) {
         pid->integral = cfg->ki_limit * sign(pid->integral);
     }
-    // TODO
     // Quickly ramp down integral component during reverse stop
     // if (d->state.sat == SAT_REVERSESTOP) {
     //     pid->integral = pid->integral * 0.9;
     // }
+}
 
-    // DERIVATIVE
-    filter_ema(&pid->kd_filtered, -imu->gyro[1], pid->kd_alpha); 
+static void d_update(PID *pid, const CfgPid *cfg, float gyro_y, int8_t direction, float brake_factor) {
+    filter_ema(&pid->kd_filtered, -gyro_y, pid->kd_alpha); 
     const float kd_input = pid->kd_filtered;
-    // const float kd_input = -imu->gyro[1];
     // TODO rate p limiting?
-
     float kd = cfg->kd;
     if (sign(kd_input) != direction) {
+        const float kd_brake_scale = 1.0f + (cfg->kd_brake - 1.0f) * brake_factor;
         kd *= kd_brake_scale;
     }
     filter_ema(&pid->kd_scale, kd, 0.01f);
     pid->derivative = kd_input * pid->kd_scale;
+}
+
+void pid_update(
+    PID *pid, const IMUData *imu, const MotorData *mot, const CfgPid *cfg, float setpoint
+) {
+    const float brake_factor = clamp(fabsf(mot->erpm_smooth) * 0.001f, 0.0f, 1.0f);
+
+    const float pitch_offset = setpoint - imu->pitch_balance;
+    const int8_t direction = sign(mot->erpm_smooth);
+
+    p_update(pid, cfg, pitch_offset, direction, brake_factor);
+    i_update(pid, cfg, pitch_offset);
+    d_update(pid, cfg, imu->gyro[1], direction, brake_factor);
 
     // FEED FORWARD
     // TODO
 
-    // AGGREGATE
     float new_pid_value = pid->proportional + pid->integral + pid->derivative;
     // TODO speed boost
-
-    // SOFT START
-    if (pid->soft_start_factor < 1.0f) {
-        new_pid_value *= pid->soft_start_factor;
-        const float factor_new = pid->soft_start_factor + pid->soft_start_step_size;
-        pid->soft_start_factor = clamp(factor_new, 0.0f, 1.0f);
-    }
 
     // CURRENT LIMITING
     float current_limit = mot->braking ? mot->current_min : mot->current_max;
     new_pid_value = clamp_sym(new_pid_value, current_limit);
     // TODO soft max?
+
+    // SOFT START
+    // after limiting, otherwise soft start wouldn't be effective with aggressive PIDs
+    if (pid->soft_start_factor < 1.0f) {
+        new_pid_value *= pid->soft_start_factor;
+        const float factor_new = pid->soft_start_factor + pid->soft_start_step_size;
+        pid->soft_start_factor = clamp(factor_new, 0.0f, 1.0f);
+    }
 
     filter_ema(&pid->pid_value, new_pid_value, 0.2f);
 }

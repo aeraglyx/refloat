@@ -44,7 +44,7 @@ typedef struct {
     float soft_start_factor;
 } PID;
 
-void pid_reset(PID *pid);
+void pid_reset(PID *pid, const CfgPid *cfg);
 
 void pid_configure(PID *pid, const CfgPid *cfg, float dt);
 

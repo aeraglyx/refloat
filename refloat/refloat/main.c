@@ -327,7 +327,7 @@ static void reset_vars(data *d) {
     speed_tilt_reset(&d->speed_tilt);
     input_tilt_reset(&d->input_tilt, &d->remote);
 
-    pid_reset(&d->pid);
+    pid_reset(&d->pid, &d->config.tune.pid);
 
     // Set values for startup
     d->setpoint = d->imu.pitch_balance;
