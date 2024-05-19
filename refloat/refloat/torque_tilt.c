@@ -38,12 +38,12 @@ void torque_tilt_update(
     const CfgAtr *cfg_atr,
     float dt
 ) {
-    float current = mot->current_filtered;
-    float accel_factor = cfg_atr->amps_accel_ratio;
-    float current_based_on_accel = mot->accel_clamped * accel_factor;
+    const float current = mot->current_filtered;
+    const float accel_factor = cfg_atr->amps_accel_ratio;
+    const float current_based_on_accel = mot->accel_clamped * accel_factor;
 
-    float alpha = half_time_to_alpha(cfg->filter, dt);
-    float accel_offset = current_based_on_accel - current;
+    const float alpha = half_time_to_alpha(cfg->filter, dt);
+    const float accel_offset = current_based_on_accel - current;
     filter_ema(&tt->accel_offset_smooth, accel_offset, alpha);
     float target = current + tt->accel_offset_smooth * cfg->method;
 
@@ -54,7 +54,7 @@ void torque_tilt_update(
     const float strength_boost = powf(cfg->strength_boost, mot->erpm_abs_10k);
     strength *= strength_boost;
 
-    float turn_boost = 1.0f + fabsf(imu->yaw_rate) * cfg->turn_boost * 0.00125f;
+    const float turn_boost = 1.0f + fabsf(imu->yaw_rate) * cfg->turn_boost * 0.00125f;
     strength *= turn_boost;
 
     target *= strength;
