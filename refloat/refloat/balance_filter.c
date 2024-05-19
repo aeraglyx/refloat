@@ -78,7 +78,7 @@ void balance_filter_update(BalanceFilterData *data, float *gyro_xyz, float *acce
 
     float accel_norm = sqrtf(ax * ax + ay * ay + az * az);
 
-    // Compute feedback only if accelerometer abs(vector)is not too small to avoid a division
+    // Compute feedback only if accelerometer abs(vector) is not too small to avoid a division
     // by a small number
     if (accel_norm > 0.01) {
         float accel_confidence = calculate_acc_confidence(accel_norm, data);
