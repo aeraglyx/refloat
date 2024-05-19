@@ -54,7 +54,7 @@ void motor_data_configure(MotorData *m, const CfgTune *cfg, float dt) {
     m->current_min = fabsf(VESC_IF->get_cfg_float(CFG_PARAM_l_current_min));
 }
 
-void motor_data_update(MotorData *m) {
+void motor_data_update(MotorData *m, uint16_t frequency) {
     m->erpm = VESC_IF->mc_get_rpm();
     m->erpm_filtered = m->erpm_filtered * 0.9f + m->erpm * 0.1f;
     m->erpm_abs = fabsf(m->erpm_filtered);
@@ -62,11 +62,11 @@ void motor_data_update(MotorData *m) {
     filter_ema(&m->erpm_smooth, m->erpm, m->erpm_filter_alpha);
     m->erpm_abs_10k = fabsf(m->erpm_smooth) * 0.0001f;
 
-    float current_acceleration = m->erpm - m->erpm_last;
-    float current_accel_clamped = clamp_sym(current_acceleration, 5.0f);
+    const float accel_raw = (m->erpm - m->erpm_last) * frequency;  // ERPM/s
+    const float accel_raw_clamped = clamp_sym(accel_raw, 4000.0f);
 
-    filter_ema(&m->acceleration, current_acceleration, m->atr_filter_alpha);
-    filter_ema(&m->accel_clamped, current_accel_clamped, m->atr_filter_alpha);
+    filter_ema(&m->acceleration, accel_raw, m->atr_filter_alpha);
+    filter_ema(&m->accel_clamped, accel_raw_clamped, m->atr_filter_alpha);
     m->erpm_last = m->erpm;
 
     m->current = VESC_IF->mc_get_tot_current_directional_filtered();

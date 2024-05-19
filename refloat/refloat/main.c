@@ -577,7 +577,7 @@ static void calculate_setpoint_target(data *d) {
             }
         }
     } else if (
-        fabsf(d->motor.acceleration) > 15 &&  // not normal, either wheelslip or wheel getting stuck
+        fabsf(d->motor.acceleration) > 12000 &&  // not normal, either wheelslip or wheel getting stuck
         sign(d->motor.acceleration) == d->motor.erpm_sign && d->motor.duty_cycle > 0.3 &&
         d->motor.erpm_abs > 2000)  // acceleration can jump a lot at very low speeds
     {
@@ -811,7 +811,7 @@ static void refloat_thd(void *arg) {
         charging_timeout(&d->charging, &d->state);
 
         imu_data_update(&d->imu, &d->balance_filter);
-        motor_data_update(&d->motor);
+        motor_data_update(&d->motor, d->config.hardware.esc.frequency);
         remote_data_update(&d->remote, &d->config.hardware.remote);
         footpad_sensor_update(&d->footpad_sensor, &d->config.faults);
 

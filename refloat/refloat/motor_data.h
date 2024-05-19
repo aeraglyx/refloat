@@ -60,4 +60,4 @@ void motor_data_reset(MotorData *m);
 
 void motor_data_configure(MotorData *m, const CfgTune *cfg, float dt);
 
-void motor_data_update(MotorData *m);
+void motor_data_update(MotorData *m, uint16_t frequency);
