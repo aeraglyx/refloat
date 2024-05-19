@@ -191,7 +191,6 @@ typedef struct {
 typedef struct {
     float mahony_kp;
     float mahony_kp_roll;
-    float mahony_kp_yaw;
     float accel_confidence_decay;
 } CfgBalanceFilter;
 

@@ -64,7 +64,7 @@ void balance_filter_configure(BalanceFilterData *data, const CfgBalanceFilter *c
     data->acc_confidence_decay = config->accel_confidence_decay;
     data->kp_pitch = config->mahony_kp;
     data->kp_roll = config->mahony_kp_roll;
-    data->kp_yaw = config->mahony_kp_yaw;
+    data->kp_yaw = 0.5f * (config->mahony_kp + config->mahony_kp_roll);
 }
 
 void balance_filter_update(BalanceFilterData *data, float *gyro_xyz, float *accel_xyz, float dt) {
