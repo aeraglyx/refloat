@@ -48,8 +48,7 @@ void torque_tilt_update(
     float target = current + tt->accel_offset_smooth * cfg->method;
 
     dead_zonef(&target, cfg->start_current);
-    float strength =
-        mot->braking ? cfg->strength_regen : cfg->strength;
+    float strength = mot->braking ? cfg->strength_regen : cfg->strength;
     
     const float strength_boost = powf(cfg->strength_boost, mot->erpm_abs_10k);
     strength *= strength_boost;

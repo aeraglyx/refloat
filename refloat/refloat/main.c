@@ -715,18 +715,12 @@ static void calculate_setpoint_interpolated(data *d) {
     }
 }
 
-void aggregate_tiltbacks(data *d){
+void aggregate_tiltbacks(data *d) {
     d->setpoint += d->atr.interpolated;
     d->setpoint += d->torque_tilt.interpolated;
     d->setpoint += d->turn_tilt.interpolated;
     d->setpoint += d->speed_tilt.interpolated;
     d->setpoint += d->input_tilt.interpolated;
-    // if (sign(d->atr.interpolated) == sign(d->torque_tilt.interpolated)) {
-    //     d->setpoint +=
-    //         sign(d->atr.interpolated) * fmaxf(fabsf(d->atr.interpolated), fabsf(d->torque_tilt.interpolated));
-    // } else {
-    //     d->setpoint += d->atr.interpolated + d->torque_tilt.interpolated;
-    // }
 }
 
 static void add_surge(data *d) {
