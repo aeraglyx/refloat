@@ -122,7 +122,6 @@ typedef struct {
     float dt_raw;
     float dt;
     float time_diff;
-    uint32_t time_sleep_us;
 
     float startup_pitch_trickmargin;
     float startup_pitch_tolerance;
@@ -954,8 +953,8 @@ static void refloat_thd(void *arg) {
         }
 
         d->time_diff = VESC_IF->system_time() - d->current_time;
-        d->time_sleep_us = max(d->loop_time_us - 1e6 * d->time_diff, 0);
-        VESC_IF->sleep_us(d->time_sleep_us);
+        const uint32_t time_sleep_us = max(d->loop_time_us - 1e6 * d->time_diff, 0);
+        VESC_IF->sleep_us(time_sleep_us);
     }
 }
 
