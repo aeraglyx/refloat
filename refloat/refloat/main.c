@@ -422,7 +422,7 @@ static float get_setpoint_adjustment_step_size(data *d) {
     }
 }
 
-bool is_engaged(const data *d) {
+bool is_sensor_engaged(const data *d) {
     if (d->footpad_sensor.state == FS_BOTH) {
         return true;
     }
@@ -511,7 +511,7 @@ static bool check_faults(data *d) {
 
     // Switch partially open and stopped
     if (!d->config.faults.is_posi_enabled) {
-        if (!is_engaged(d) && d->motor.erpm_abs < d->config.faults.switch_half_erpm) {
+        if (!is_sensor_engaged(d) && d->motor.erpm_abs < d->config.faults.switch_half_erpm) {
             if ((1000.0f * (d->current_time - d->fault_switch_half_timer)) >
                 d->config.faults.switch_half_delay) {
                 state_stop(&d->state, STOP_SWITCH_HALF);
@@ -929,13 +929,13 @@ static void refloat_thd(void *arg) {
 
             // Check for valid startup position and switch state
             if (fabsf(d->imu.pitch_balance) < d->startup_pitch_tolerance &&
-                fabsf(d->imu.roll) < d->config.startup_roll_tolerance && is_engaged(d)) {
+                fabsf(d->imu.roll) < d->config.startup_roll_tolerance && is_sensor_engaged(d)) {
                 reset_vars(d);
                 break;
             }
             // Push-start aka dirty landing Part II
             if (d->config.startup_pushstart_enabled && d->motor.erpm_abs > 1000 &&
-                is_engaged(d)) {
+                is_sensor_engaged(d)) {
                 if ((fabsf(d->imu.pitch_balance) < 45) && (fabsf(d->imu.roll) < 45)) {
                     // 45 to prevent board engaging when upright or laying sideways
                     // 45 degree tolerance is more than plenty for tricks / extreme mounts
