@@ -440,6 +440,12 @@ bool is_sensor_engaged(const data *d) {
     return false;
 }
 
+static bool is_orientation_valid(const data *d) {
+    const bool is_pitch_valid = fabsf(d->imu.pitch_balance) < d->startup_pitch_tolerance;
+    const bool is_roll_valid = fabsf(d->imu.roll) < d->config.startup_roll_tolerance;
+    return (is_pitch_valid && is_roll_valid);
+}
+
 // Fault checking order does not really matter. From a UX perspective, switch should be before
 // angle.
 static bool check_faults(data *d) {
@@ -928,8 +934,7 @@ static void refloat_thd(void *arg) {
             check_odometer(d);
 
             // Check for valid startup position and switch state
-            if (fabsf(d->imu.pitch_balance) < d->startup_pitch_tolerance &&
-                fabsf(d->imu.roll) < d->config.startup_roll_tolerance && is_sensor_engaged(d)) {
+            if (is_orientation_valid(d) && is_sensor_engaged(d)) {
                 reset_vars(d);
                 break;
             }
