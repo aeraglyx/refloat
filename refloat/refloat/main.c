@@ -1209,15 +1209,10 @@ static void send_realtime_data(data *d) {
         buffer_append_float32_auto(buffer, d->setpoint, &ind);
 
         buffer_append_float32_auto(buffer, d->atr.interpolated, &ind);
-        buffer_append_float32_auto(buffer, 69, &ind);
-        // buffer_append_float32_auto(buffer, d->atr.target, &ind);
-        buffer_append_float32_auto(buffer, 1.0f / max(d->dt, 0.00001f), &ind);
-        buffer_append_float32_auto(buffer, d->config.tune.pid.kp_expo, &ind);
-        buffer_append_float32_auto(buffer, d->config.tune.pid.soft_start, &ind);
-        // buffer_append_float32_auto(buffer, d->torque_tilt.interpolated, &ind);
-        // buffer_append_float32_auto(buffer, d->turn_tilt.interpolated, &ind);
-        // buffer_append_float32_auto(buffer, d->speed_tilt.interpolated, &ind);
-        // buffer_append_float32_auto(buffer, d->input_tilt.interpolated, &ind);
+        buffer_append_float32_auto(buffer, d->torque_tilt.interpolated, &ind);
+        buffer_append_float32_auto(buffer, d->turn_tilt.interpolated, &ind);
+        buffer_append_float32_auto(buffer, d->speed_tilt.interpolated, &ind);
+        buffer_append_float32_auto(buffer, d->input_tilt.interpolated, &ind);
 
         // DEBUG
         buffer_append_float32_auto(buffer, d->pid.pid_value, &ind);

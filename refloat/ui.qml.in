@@ -3364,20 +3364,100 @@ Item {
 
                         Column {
                             width: parent.width / 2
-                            spacing: 5
+                            spacing: unit * 0.15
                             clip: true
 
-                            // LText {
-                            //     widht: parent.width
-                            //     text: "Setpoints"
-                            //     font.bold = true
-                            // }
+                            // RealValue {id: debugAtrSetpoint; label: "ATR"; unit: "°";}
+                            // RealValue {id: debugTorqueTiltSetpoint; label: "Speed"; unit: "";}
+                            // RealValue {id: debugTurnTiltSetpoint; label: "Freq"; unit: "";}
+                            // RealValue {id: debugSpeedTiltSetpoint; label: "Speed Rat"; unit: "";}
+                            // RealValue {id: debugRemoteTiltSetpoint; label: "ATR Ratio"; unit: "";}
 
-                            RealValue {id: debugAtrSetpoint; label: "ATR"; unit: "°";}
-                            RealValue {id: debugTorqueTiltSetpoint; label: "Sleep"; unit: " ms";}
-                            RealValue {id: debugTurnTiltSetpoint; label: "Freq"; unit: "";}
-                            RealValue {id: debugSpeedTiltSetpoint; label: "Expo"; unit: "°";}
-                            RealValue {id: debugRemoteTiltSetpoint; label: "Expo Pivot"; unit: " s";}
+                            component Setpoint: Item {
+                                property string label
+                                property real rValue
+                                property string unitString
+ 
+                                implicitHeight: setpointLabel.implicitHeight + setpointBar.height + unit * 0.05
+                                implicitWidth: debugColumn.itemWidth
+
+                                LText {
+                                    id: setpointLabel
+                                    anchors.top: parent.top
+                                    anchors.left: parent.left
+                                    font.pixelSize: hudLeft.fontSizeBars
+                                    text: parent.label
+                                }
+ 
+                                DText {
+                                    id: setpointColumn
+                                    anchors.top: parent.top
+                                    anchors.left: setpointLabel.right
+                                    font.pixelSize: hudLeft.fontSizeBars
+                                    text: ":"
+                                }
+ 
+                                LText {
+                                    id: setpointValue
+                                    anchors.top: parent.top
+                                    anchors.right: setpointUnit.left
+                                    font.pixelSize: hudLeft.fontSizeBars
+                                    text: toFixed1Zero(parent.rValue)
+                                }
+
+                                DText {
+                                    id: setpointUnit
+                                    anchors.top: parent.top
+                                    anchors.right: parent.right
+                                    font.pixelSize: hudLeft.fontSizeBars
+                                    text: parent.unitString
+                                }
+
+                                Rectangle {
+                                    id: setpointBar
+                                    width: parent.implicitWidth
+                                    height: 0.13 * unit
+                                    anchors.top: setpointLabel.bottom
+                                    anchors.topMargin: 0.05 * unit
+                                    color: Utility.getAppHexColor("lightBackground")
+ 
+                                    property var valueRemapped: Math.tanh(Math.abs(parent.rValue) * 0.25)
+                                    property var positiveSetpoint: parent.rValue > 0 ? valueRemapped : 0
+                                    property var negativeSetpoint: parent.rValue < 0 ? valueRemapped : 0
+
+                                    Rectangle {
+                                        anchors.left: parent.horizontalCenter
+                                        width: parent.width * 0.5 * parent.positiveSetpoint
+                                        height: parent.height
+                                        z: 1
+                                        color: Utility.getAppHexColor("lightAccent")
+                                    }
+
+                                    Rectangle {
+                                        anchors.right: parent.horizontalCenter
+                                        width: parent.width * 0.5 * parent.negativeSetpoint
+                                        height: parent.height
+                                        z: 1
+                                        color: "#c4a"
+                                    }
+                                    
+                                    Rectangle {
+                                        anchors.bottom: parent.bottom
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        width: 2
+                                        height: parent.height
+                                        z: 2
+                                        color: Utility.getAppHexColor("lightText")
+                                    }
+                                }
+                            }
+
+                            Setpoint {id: debugAtrSetpoint; label: "ATR"; unitString: "°"}
+                            Setpoint {id: debugTorqueTiltSetpoint; label: "Torque"; unitString: "°"}
+                            Setpoint {id: debugTurnTiltSetpoint; label: "Turn"; unitString: "°"}
+                            Setpoint {id: debugSpeedTiltSetpoint; label: "Speed"; unitString: "°"}
+                            Setpoint {id: debugRemoteTiltSetpoint; label: "Remote"; unitString: "°"}
+
                         }
                     }
 
