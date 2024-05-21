@@ -22,8 +22,9 @@
 
 #include <math.h>
 
-void imu_data_reset(IMUData *imu) {
-    imu->yaw_rate = 0.0f;
+void imu_data_reset(IMUData *imu, float cooldown_alpha) {
+    // imu->yaw_rate = 0.0f;
+    filter_ema(&imu->yaw_rate, 0.0f, cooldown_alpha);
 }
 
 void imu_data_configure(IMUData *imu, const CfgTurnTilt *cfg, float dt) {
@@ -38,7 +39,7 @@ void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter) {
     imu->yaw = rad2deg(VESC_IF->imu_get_yaw());
 
     imu->pitch_balance = rad2deg(balance_filter_get_pitch(balance_filter));
-    
+
     VESC_IF->imu_get_gyro(imu->gyro);
 
     const float yaw_rate_new = clamp_sym(imu->gyro[2], 200.0f);

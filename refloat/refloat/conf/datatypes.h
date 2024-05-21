@@ -196,8 +196,8 @@ typedef struct {
 
 typedef struct {
     float kp;
-    float kp_expo;
-    float kp_expo_pivot;
+    // float kp_expo;
+    // float kp_expo_pivot;
     float kd;
     float kd_filter;
     float ki;

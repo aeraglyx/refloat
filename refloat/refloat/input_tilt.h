@@ -24,11 +24,11 @@
 
 typedef struct {
     float interpolated;
-    float throttle_filtered;
+    // float throttle_filtered;
 } InputTilt;
 
-void input_tilt_reset(InputTilt *tt, const RemoteData *remote);
+void input_tilt_reset(InputTilt *tt, const RemoteData *remote, float cooldown_alpha);
 
-void input_tilt_configure(InputTilt *tt, const RefloatConfig *config);
+// void input_tilt_configure(InputTilt *tt, const RefloatConfig *config);
 
 void input_tilt_update(InputTilt *tt, const RemoteData *remote, const CfgInputTilt *config, float dt);

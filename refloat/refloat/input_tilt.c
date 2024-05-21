@@ -21,13 +21,14 @@
 
 #include <math.h>
 
-void input_tilt_reset(InputTilt *it, const RemoteData *remote) {
+void input_tilt_reset(InputTilt *it, const RemoteData *remote, float cooldown_alpha) {
     it->interpolated = 0.0f;
-    it->throttle_filtered = remote->throttle;
+    // filter_ema(&it->interpolated, 0.0f, cooldown_alpha);
+    // it->throttle_filtered = remote->throttle;
 }
 
-void input_tilt_configure(InputTilt *it, const RefloatConfig *cfg) {
-}
+// void input_tilt_configure(InputTilt *it, const RefloatConfig *cfg) {
+// }
 
 void input_tilt_update(InputTilt *it, const RemoteData *remote, const CfgInputTilt *cfg, float dt) {
     float target = remote->throttle_filtered * cfg->angle_limit;

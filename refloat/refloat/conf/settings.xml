@@ -52,8 +52,8 @@ p, li { white-space: pre-wrap; }
             <suffix></suffix>
             <vTx>7</vTx>
         </tune.pid.kp>
-        <tune.pid.kp_expo>
-            <longName>P Expo</longName>
+        <!-- <tune.pid.kp_expo>
+            <longName>Center Strength</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -69,13 +69,13 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>0.1</stepDouble>
-            <valDouble>0</valDouble>
+            <valDouble>1</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix></suffix>
+            <suffix>x</suffix>
             <vTx>7</vTx>
         </tune.pid.kp_expo>
         <tune.pid.kp_expo_pivot>
-            <longName>Expo Pivot</longName>
+            <longName>Center Spread</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -95,7 +95,7 @@ p, li { white-space: pre-wrap; }
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> °</suffix>
             <vTx>7</vTx>
-        </tune.pid.kp_expo_pivot>
+        </tune.pid.kp_expo_pivot> -->
         <tune.pid.kd>
             <longName>D Term</longName>
             <type>1</type>
@@ -3305,14 +3305,14 @@ p, li { white-space: pre-wrap; }
     </Params>
     <SerOrder>
         <ser>tune.pid.kp</ser>
-        <ser>tune.pid.kp_expo</ser>
-        <ser>tune.pid.kp_expo_pivot</ser>
+        <!-- <ser>tune.pid.kp_expo</ser>
+        <ser>tune.pid.kp_expo_pivot</ser> -->
+        <ser>tune.pid.kp_brake</ser>
         <ser>tune.pid.kd</ser>
         <ser>tune.pid.kd_filter</ser>
+        <ser>tune.pid.kd_brake</ser>
         <ser>tune.pid.ki</ser>
         <ser>tune.pid.ki_limit</ser>
-        <ser>tune.pid.kp_brake</ser>
-        <ser>tune.pid.kd_brake</ser>
         <ser>tune.balance_filter.mahony_kp</ser>
         <ser>tune.balance_filter.mahony_kp_roll</ser>
         <ser>tune.balance_filter.accel_confidence_decay</ser>
@@ -3454,8 +3454,8 @@ p, li { white-space: pre-wrap; }
                     <!-- <param>::sep::PID</param> -->
                     <param>::sep::Proportional</param>
                     <param>tune.pid.kp</param>
-                    <param>tune.pid.kp_expo</param>
-                    <param>tune.pid.kp_expo_pivot</param>
+                    <!-- <param>tune.pid.kp_expo</param>
+                    <param>tune.pid.kp_expo_pivot</param> -->
                     <param>tune.pid.kp_brake</param>
                     <param>::sep::Derivative</param>
                     <param>tune.pid.kd</param>

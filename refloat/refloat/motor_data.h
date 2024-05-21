@@ -56,7 +56,7 @@ typedef struct {
     float current_max;
 } MotorData;
 
-void motor_data_reset(MotorData *m);
+void motor_data_reset(MotorData *m, float cooldown_alpha);
 
 void motor_data_configure(MotorData *m, const CfgTune *cfg, float dt);
 

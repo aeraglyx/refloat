@@ -21,8 +21,9 @@
 
 #include <math.h>
 
-void speed_tilt_reset(SpeedTilt *st) {
-    st->interpolated = 0.0f;
+void speed_tilt_reset(SpeedTilt *st, float cooldown_alpha) {
+    // st->interpolated = 0.0f;
+    filter_ema(&st->interpolated, 0.0f, cooldown_alpha);
 }
 
 void speed_tilt_configure(SpeedTilt *st, const CfgSpeedTilt *cfg) {

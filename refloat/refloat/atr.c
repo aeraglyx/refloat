@@ -21,13 +21,15 @@
 
 #include <math.h>
 
-void atr_reset(ATR *atr) {
-    atr->target = 0.0f;
-    atr->speed = 0.0f;
-    atr->interpolated = 0.0f;
-
-    atr->amp_diff = 0.0f;
-    atr->debug = 0.0f;
+void atr_reset(ATR *atr, float cooldown_alpha) {
+    // atr->target = 0.0f;
+    // atr->speed = 0.0f;
+    // atr->interpolated = 0.0f;
+    filter_ema(&atr->interpolated, 0.0f, cooldown_alpha);
+    // atr->amp_diff = 0.0f;
+    filter_ema(&atr->amp_diff, 0.0f, cooldown_alpha);
+    // atr->debug = 0.0f;
+    atr->debug = cooldown_alpha;
 }
 
 void atr_configure(ATR *atr, const CfgAtr *cfg) {
@@ -65,7 +67,7 @@ void atr_update(ATR *atr, const MotorData *mot, const CfgAtr *cfg, float dt) {
     atr->speed = clamp_sym(atr->speed, cfg->speed_max);
 
     atr->interpolated += atr->speed * dt;
-    atr->debug = amps;
+    // atr->debug = amps;
 }
 
 void atr_winddown(ATR *atr) {

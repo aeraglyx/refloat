@@ -21,14 +21,16 @@
 
 #include <math.h>
 
-void torque_tilt_reset(TorqueTilt *tt) {
-    tt->interpolated = 0.0f;
-    tt->debug = 0.0f;
-    tt->accel_offset_smooth = 0.0f;
+void torque_tilt_reset(TorqueTilt *tt, float cooldown_alpha) {
+    // tt->interpolated = 0.0f;
+    filter_ema(&tt->interpolated, 0.0f, cooldown_alpha);
+    // tt->accel_offset_smooth = 0.0f;
+    filter_ema(&tt->accel_offset_smooth, 0.0f, cooldown_alpha);
+    // tt->debug = 0.0f;
 }
 
-void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *cfg) {
-}
+// void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *cfg) {
+// }
 
 void torque_tilt_update(
     TorqueTilt *tt,
@@ -65,7 +67,7 @@ void torque_tilt_update(
 
     tt->interpolated += speed * dt;
 
-    tt->debug = imu->yaw_rate;
+    // tt->debug = imu->yaw_rate;
 }
 
 void torque_tilt_winddown(TorqueTilt *tt) {

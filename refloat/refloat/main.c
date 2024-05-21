@@ -317,20 +317,26 @@ static void configure(data *d) {
 }
 
 static void reset_vars(data *d) {
-    imu_data_reset(&d->imu);
-    motor_data_reset(&d->motor);
+    const float time_disengaged = d->current_time - d->disengage_timer;
+    const float cooldown_alpha = half_time_to_alpha(0.75f, time_disengaged);
 
-    atr_reset(&d->atr);
-    torque_tilt_reset(&d->torque_tilt);
-    turn_tilt_reset(&d->turn_tilt);
-    speed_tilt_reset(&d->speed_tilt);
-    input_tilt_reset(&d->input_tilt, &d->remote);
+    imu_data_reset(&d->imu, cooldown_alpha);
+    motor_data_reset(&d->motor, cooldown_alpha);
+    remote_data_reset(&d->remote, cooldown_alpha);
 
-    pid_reset(&d->pid, &d->config.tune.pid);
+    atr_reset(&d->atr, cooldown_alpha);
+    torque_tilt_reset(&d->torque_tilt, cooldown_alpha);
+    turn_tilt_reset(&d->turn_tilt, cooldown_alpha);
+    speed_tilt_reset(&d->speed_tilt, cooldown_alpha);
+    input_tilt_reset(&d->input_tilt, &d->remote, cooldown_alpha);
+
+    pid_reset(&d->pid, &d->config.tune.pid, cooldown_alpha);
 
     // Set values for startup
-    d->setpoint = d->imu.pitch_balance;
-    d->setpoint_target_interpolated = d->imu.pitch_balance;
+    // d->setpoint = d->imu.pitch_balance;
+    filter_ema(&d->setpoint, d->imu.pitch_balance, cooldown_alpha);
+    // d->setpoint_target_interpolated = d->imu.pitch_balance;
+    filter_ema(&d->setpoint_target_interpolated, d->imu.pitch_balance, cooldown_alpha);
     d->setpoint_target = 0.0f;
     
     d->brake_timeout = 0.0f;
@@ -794,12 +800,8 @@ static void refloat_thd(void *arg) {
     d->last_time = VESC_IF->system_time() - d->loop_time;
 
     while (!VESC_IF->should_terminate()) {
-        d->current_time = VESC_IF->system_time();
-        d->dt_raw = d->current_time - d->last_time;
-        d->last_time = d->current_time;
-        filter_ema(&d->dt, d->dt_raw, 0.1f);
+        time_vars_update(d);
         
-        // time_vars_update(d);
         beeper_update(d);
 
         charging_timeout(&d->charging, &d->state);

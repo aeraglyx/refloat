@@ -23,9 +23,10 @@
 
 #include <math.h>
 
-void remote_data_reset(RemoteData *rem) {
+void remote_data_reset(RemoteData *rem, float cooldown_alpha) {
     // TODO should initialize to throttle?
     rem->throttle_filtered = 0.0f;
+    // filter_ema(&rem->throttle_filtered, 0.0f, cooldown_alpha);
 }
 
 void remote_data_configure(RemoteData *rem, const CfgInputTilt *cfg, float dt) {

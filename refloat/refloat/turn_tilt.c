@@ -21,13 +21,14 @@
 
 #include <math.h>
 
-void turn_tilt_reset(TurnTilt *tt) {
-    tt->target = 0.0f;
-    tt->interpolated = 0.0f;
+void turn_tilt_reset(TurnTilt *tt, float cooldown_alpha) {
+    // tt->target = 0.0f;
+    // tt->interpolated = 0.0f;
+    filter_ema(&tt->interpolated, 0.0f, cooldown_alpha);
 }
 
-void turn_tilt_configure(TurnTilt *tt, const RefloatConfig *cfg) {
-}
+// void turn_tilt_configure(TurnTilt *tt, const RefloatConfig *cfg) {
+// }
 
 void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, const ATR *atr, const CfgTurnTilt *cfg, float dt) {
     if (cfg->strength == 0) {

@@ -29,7 +29,7 @@ typedef struct {
     float throttle_filter_alpha;
 } RemoteData;
 
-void remote_data_reset(RemoteData *remote);
+void remote_data_reset(RemoteData *remote, float cooldown_alpha);
 
 void remote_data_configure(RemoteData *remote, const CfgInputTilt *cfg, float dt);
 

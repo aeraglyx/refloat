@@ -35,8 +35,8 @@ typedef struct {
     float kp_scale;
     float kd_scale;
 
-    float expo_a;
-    float expo_b;
+    // float expo_a;
+    // float expo_b;
 
     float ki;
 
@@ -44,7 +44,7 @@ typedef struct {
     float soft_start_factor;
 } PID;
 
-void pid_reset(PID *pid, const CfgPid *cfg);
+void pid_reset(PID *pid, const CfgPid *cfg, float cooldown_alpha);
 
 void pid_configure(PID *pid, const CfgPid *cfg, float dt);
 

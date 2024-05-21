@@ -25,14 +25,12 @@
 typedef struct {
     float interpolated;
     float accel_offset_smooth;
-    float debug;
-    // float step_size_on;
-    // float step_size_off;
+    // float debug;
 } TorqueTilt;
 
-void torque_tilt_reset(TorqueTilt *tt);
+void torque_tilt_reset(TorqueTilt *tt, float cooldown_alpha);
 
-void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *config);
+// void torque_tilt_configure(TorqueTilt *tt, const RefloatConfig *config);
 
 void torque_tilt_update(
     TorqueTilt *tt,

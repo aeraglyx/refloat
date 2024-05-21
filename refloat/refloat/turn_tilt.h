@@ -28,9 +28,9 @@ typedef struct {
     float interpolated;
 } TurnTilt;
 
-void turn_tilt_reset(TurnTilt *tt);
+void turn_tilt_reset(TurnTilt *tt, float cooldown_alpha);
 
-void turn_tilt_configure(TurnTilt *tt, const RefloatConfig *config);
+// void turn_tilt_configure(TurnTilt *tt, const RefloatConfig *config);
 
 void turn_tilt_update(TurnTilt *tt, const MotorData *motor, const IMUData *imu, const ATR *atr, const CfgTurnTilt *config, float dt);
 

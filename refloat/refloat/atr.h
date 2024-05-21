@@ -34,7 +34,7 @@ typedef struct {
     float debug;
 } ATR;
 
-void atr_reset(ATR *atr);
+void atr_reset(ATR *atr, float cooldown_alpha);
 
 void atr_configure(ATR *atr, const CfgAtr *cfg);
 

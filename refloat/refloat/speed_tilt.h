@@ -26,7 +26,7 @@ typedef struct {
     float linear_converted;
 } SpeedTilt;
 
-void speed_tilt_reset(SpeedTilt *tt);
+void speed_tilt_reset(SpeedTilt *tt, float cooldown_alpha);
 
 void speed_tilt_configure(SpeedTilt *tt, const CfgSpeedTilt *cfg);
 
