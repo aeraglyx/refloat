@@ -152,7 +152,6 @@ typedef struct {
     float idle_voltage;
     float fault_angle_pitch_timer, fault_angle_roll_timer;
     float fault_switch_timer, fault_switch_half_timer;
-    float motor_timeout_s;
     float brake_timeout;
     float wheelslip_timer, tb_highvoltage_timer;
     float switch_warn_beep_erpm;
@@ -177,7 +176,7 @@ typedef struct {
 } data;
 
 static void brake(data *d);
-static void set_current(data *d, float current);
+static void set_current(float current);
 
 const VESC_PIN beeper_pin = VESC_PIN_PPM;
 
@@ -260,9 +259,6 @@ static void configure(data *d) {
 
     // This timer is used to determine how long the board has been disengaged / idle
     d->disengage_timer = d->current_time;
-
-    // Loop time in seconds times 20 for a nice long grace period
-    d->motor_timeout_s = 20.0f * d->loop_time;
 
     d->startup_step_size = d->config.startup_speed * d->loop_time;
 
@@ -381,7 +377,7 @@ static void do_rc_move(data *d) {
         if (d->motor.erpm_abs > 800) {
             d->rc_current = 0;
         }
-        set_current(d, d->rc_current);
+        set_current(d->rc_current);
         d->rc_steps--;
         d->rc_counter++;
         if ((d->rc_counter == 500) && (d->rc_current_target > 2)) {
@@ -399,7 +395,7 @@ static void do_rc_move(data *d) {
             // servo_val *= (d->config.inputtilt_invert_throttle ? -1.0 : 1.0);
             const float max = d->config.tune.input_tilt.remote_throttle_current_max;
             filter_ema(&d->rc_current, max * d->remote.throttle, 0.05f);
-            set_current(d, d->rc_current);
+            set_current(d->rc_current);
         } else {
             d->rc_current = 0;
             // Disable output
@@ -775,9 +771,9 @@ static void brake(data *d) {
     VESC_IF->mc_set_brake_current(d->config.brake_current);
 }
 
-static void set_current(data *d, float current) {
+static void set_current(float current) {
     VESC_IF->timeout_reset();
-    VESC_IF->mc_set_current_off_delay(d->motor_timeout_s);
+    VESC_IF->mc_set_current_off_delay(0.025f);
     VESC_IF->mc_set_current(current);
 }
 
@@ -899,7 +895,7 @@ static void refloat_thd(void *arg) {
             aggregate_tiltbacks(d);
 
             pid_update(&d->pid, &d->imu, &d->motor, &d->config.tune.pid, d->setpoint);
-            set_current(d, d->pid.pid_value);
+            set_current(d->pid.pid_value);
             break;
 
         case (STATE_READY):
