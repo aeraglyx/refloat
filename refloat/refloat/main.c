@@ -442,12 +442,6 @@ bool is_sensor_engaged(const data *d) {
     return false;
 }
 
-static bool is_orientation_valid(const data *d) {
-    const bool is_pitch_valid = fabsf(d->imu.pitch_balance) < d->startup_pitch_tolerance;
-    const bool is_roll_valid = fabsf(d->imu.roll) < d->config.startup_roll_tolerance;
-    return (is_pitch_valid && is_roll_valid);
-}
-
 // Fault checking order does not really matter. From a UX perspective, switch should be before
 // angle.
 static bool check_faults(data *d) {
@@ -756,6 +750,28 @@ static void add_surge(data *d) {
     }
 }
 
+static bool startup_conditions_met(data *d) {
+    if (!is_sensor_engaged(d)) {
+        return false;
+    }
+
+    // if (d->state.stop_condition == STOP_SWITCH_FULL) {
+
+    const bool is_pitch_valid = fabsf(d->imu.pitch_balance) < d->startup_pitch_tolerance;
+    const bool is_roll_valid = fabsf(d->imu.roll) < d->config.startup_roll_tolerance;
+
+    if (is_pitch_valid && is_roll_valid) {
+        return true;
+    }
+
+    const bool is_push_start = d->config.startup_pushstart_enabled && d->motor.erpm_abs > 1000;
+    if (is_push_start && (fabsf(d->imu.pitch_balance) < 45) && is_roll_valid) {
+        return true;
+    }
+
+    return false;
+}
+
 static void brake(data *d) {
     // Brake timeout logic
     float brake_timeout_length = 1;  // Brake Timeout hard-coded to 1s
@@ -925,20 +941,9 @@ static void refloat_thd(void *arg) {
 
             check_odometer(d);
 
-            // Check for valid startup position and switch state
-            if (is_orientation_valid(d) && is_sensor_engaged(d)) {
+            if (startup_conditions_met(d)) {
                 reset_vars(d);
                 break;
-            }
-            // Push-start aka dirty landing Part II
-            if (d->config.startup_pushstart_enabled && d->motor.erpm_abs > 1000 &&
-                is_sensor_engaged(d)) {
-                if ((fabsf(d->imu.pitch_balance) < 45) && (fabsf(d->imu.roll) < 45)) {
-                    // 45 to prevent board engaging when upright or laying sideways
-                    // 45 degree tolerance is more than plenty for tricks / extreme mounts
-                    reset_vars(d);
-                    break;
-                }
             }
 
             // Set RC current or maintain brake current (and keep WDT happy!)
