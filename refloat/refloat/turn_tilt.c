@@ -71,5 +71,5 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
 }
 
 void turn_tilt_winddown(TurnTilt *tt) {
-    tt->interpolated *= 0.998;
+    tt->interpolated *= 0.995;
 }

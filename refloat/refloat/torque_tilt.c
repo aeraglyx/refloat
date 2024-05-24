@@ -72,4 +72,5 @@ void torque_tilt_update(
 
 void torque_tilt_winddown(TorqueTilt *tt) {
     tt->interpolated *= 0.995;
+    tt->accel_offset_smooth *= 0.995;
 }

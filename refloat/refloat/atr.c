@@ -72,7 +72,7 @@ void atr_update(ATR *atr, const MotorData *mot, const CfgAtr *cfg, float dt) {
 
 void atr_winddown(ATR *atr) {
     atr->interpolated *= 0.995f;
-    atr->target *= 0.99f;
+    atr->amp_diff *= 0.995f;
 }
 
 // static void get_wheelslip_probability(MotorData *mot, const RefloatConfig *cfg) {
