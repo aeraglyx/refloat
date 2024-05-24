@@ -1951,6 +1951,7 @@ Item {
                 id: batteryBar
                 Layout.fillWidth: true
                 Layout.preferredHeight: 0.8 * unit
+                radius: 0.15 * unit
 
                 color: Utility.getAppHexColor("lightBackground")
 
@@ -1964,55 +1965,62 @@ Item {
                     }
                 }
 
-                LText {
-                    id: batteryBarValue
-                    anchors.centerIn: parent
-                    z: 2
+                // LText {
+                //     id: batteryBarValue
+                //     anchors.centerIn: parent
+                //     z: 2
 
-                    font.pixelSize: parent.height * 0.7
-                    text: Math.round(parent.value) + "%"
-                }
+                //     font.pixelSize: parent.height * 0.7
+                //     text: Math.round(parent.value) + "%"
+                // }
 
                 Rectangle {
                     id: batteryBarFill
-                    width: parent.width * parent.value / 100
+                    width: Math.max(parent.width * parent.value / 100, 2 * parent.radius)
                     height: parent.height
+                    radius: parent.radius
                     z: 1
 
-                    color: Utility.getAppHexColor("lightAccent")
+                    color: state.charging ? "#4C7" : (parent.value < 25 ? "#C59" : Utility.getAppHexColor("lightAccent"))
                 }
 
                 LText {
                     id: batteryBarVoltageValue
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.horizontalCenterOffset: -parent.width / 4
-                    anchors.baseline: batteryBarValue.baseline
+                    property var below25: parent.value < 25
+
+                    anchors.left: below25 ? undefined : parent.left
+                    anchors.horizontalCenter: below25 ? parent.horizontalCenter : undefined
                     anchors.leftMargin: 0.3 * unit
+                    anchors.verticalCenter: parent.verticalCenter
                     z: 2
 
-                    font.pixelSize: fontSizeNormal
+                    // color: Utility.getAppHexColor("darkBackground")
+                    color: below25 ? Utility.getAppHexColor("lightText") : Utility.getAppHexColor("darkBackground")
+                    font.pixelSize: fontSizeBig
+                    font.weight: Font.Medium
+                    
                     text: {
                         var voltageString = "";
-
                         if (preferences.showBattVoltage) {
-                            voltageString = parent.voltage.toFixed(1) + "V";
-                        }
-
                         if (preferences.showBattVoltagePerCell) {
-                            if (preferences.showBattVoltage) {
-                                voltageString += " / ";
+                                voltageString = (parent.voltage / motorConfig.batteryCells).toFixed(2);
+                            } else {
+                                voltageString = parent.voltage.toFixed(1);
                             }
-                            voltageString += (parent.voltage / motorConfig.batteryCells).toFixed(2) + "V";
+                            voltageString += " V";
                         }
-
                         return voltageString;
                     }
                 }
 
                 Item {
                     id: chargingInfo
-                    anchors.centerIn: parent
-                    anchors.horizontalCenterOffset: parent.width / 4
+                    property var above75: parent.value > 75
+
+                    anchors.right: above75 ? undefined : parent.right
+                    anchors.horizontalCenter: above75 ? parent.horizontalCenter : undefined
+                    // anchors.centerIn: parent
+                    // anchors.horizontalCenterOffset: parent.width / 4
                     height: parent.height - 0.08 * unit
                     width: 2 * unit
                     z: 2
@@ -2021,10 +2029,12 @@ Item {
                     property real voltage: 0
                     visible: state.charging
 
+                    property var textColor: above75 ? Utility.getAppHexColor("darkBackground") : Utility.getAppHexColor("lightText")
                     LText {
                         anchors.horizontalCenter: parent.horizontalCenter
                         font.pixelSize: fontSizeSmall
                         text: "charging"
+                        color: parent.textColor
                     }
 
                     LText {
@@ -2033,6 +2043,7 @@ Item {
                         font.pixelSize: fontSizeSmall
                         horizontalAlignment: Text.AlignHCenter
                         text: "%1A".arg(toFixed1Zero(parent.current))
+                        color: parent.textColor
                     }
 
                     LText {
@@ -2042,6 +2053,7 @@ Item {
                         font.pixelSize: fontSizeSmall
                         horizontalAlignment: Text.AlignHCenter
                         text: "%1V".arg(toFixed1Zero(parent.voltage))
+                        color: parent.textColor
                     }
                 }
             }
@@ -3438,7 +3450,7 @@ Item {
                                         width: parent.width * 0.5 * parent.negativeSetpoint
                                         height: parent.height
                                         z: 1
-                                        color: "#c4a"
+                                        color: "#C59"
                                     }
                                     
                                     Rectangle {
