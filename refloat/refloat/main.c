@@ -115,13 +115,14 @@ typedef struct {
 
     // Config values
     float loop_time;
-    uint32_t loop_time_us;
+    // uint32_t loop_time_us;
 
     float current_time;
     float last_time;
-    float dt_raw;
-    float dt;
-    float time_diff;
+    float loop_time_measured;
+    float loop_time_measured_filtered;
+    float loop_overshoot_filtered;
+    float computation_time;
 
     float startup_pitch_trickmargin;
     float startup_pitch_tolerance;
@@ -264,11 +265,10 @@ void beep_on(data *d, bool force) {
 }
 
 static void configure(data *d) {
-    // Loop time in seconds and microseconds
-    d->loop_time = 1.0f / d->config.hardware.esc.frequency;
-    d->loop_time_us = 1e6 / d->config.hardware.esc.frequency;
-
     state_init(&d->state, d->config.disabled);
+
+    d->loop_time = 1.0f / d->config.hardware.esc.frequency;
+    // d->loop_time_us = 1e6 / d->config.hardware.esc.frequency;
 
     lcm_configure(&d->lcm, &d->config.leds);
     motor_data_configure(&d->motor, &d->config.tune, d->loop_time);
@@ -832,9 +832,13 @@ static void imu_ref_callback(float *acc, float *gyro, [[maybe_unused]] float *ma
 
 static void time_vars_update(data *d) {
     d->current_time = VESC_IF->system_time();
-    d->dt_raw = d->current_time - d->last_time;
+    d->loop_time_measured = d->current_time - d->last_time;
     d->last_time = d->current_time;
-    filter_ema(&d->dt, d->dt_raw, 0.1f);
+
+    filter_ema(&d->loop_time_measured_filtered, d->loop_time_measured, 0.1f);
+    const float loop_overshoot = d->loop_time_measured - d->loop_time;
+    const float loop_overshoot_alpha = half_time_to_alpha(0.1f, d->loop_time);
+    filter_ema(&d->loop_overshoot_filtered, loop_overshoot, loop_overshoot_alpha);
 }
 
 static void refloat_thd(void *arg) {
@@ -977,9 +981,10 @@ static void refloat_thd(void *arg) {
             break;
         }
 
-        d->time_diff = VESC_IF->system_time() - d->current_time;
-        const uint32_t time_sleep_us = max(d->loop_time_us - 1e6 * d->time_diff, 0);
-        VESC_IF->sleep_us(time_sleep_us);
+        // d->computation_time = VESC_IF->system_time() - d->current_time;
+        // const float loop_time_correction = d->computation_time + d->loop_overshoot_filtered;
+        // VESC_IF->sleep_us(1e6 * max(d->loop_time - loop_time_correction, 0));
+        VESC_IF->sleep_us(1e6 * max(d->loop_time - d->loop_overshoot_filtered, 0));
     }
 }
 
