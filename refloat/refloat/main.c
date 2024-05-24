@@ -150,8 +150,12 @@ typedef struct {
     float disengage_timer;
     float nag_timer;
     float idle_voltage;
-    float fault_angle_pitch_timer, fault_angle_roll_timer;
-    float fault_switch_timer, fault_switch_half_timer;
+
+    float fault_angle_pitch_timer;
+    float fault_angle_roll_timer;
+    float fault_switch_full_timer;
+    float fault_switch_half_timer;
+
     float brake_timeout;
     float wheelslip_timer, tb_highvoltage_timer;
     float switch_warn_beep_erpm;
@@ -442,43 +446,41 @@ bool is_sensor_engaged(const data *d) {
     return false;
 }
 
-// Fault checking order does not really matter. From a UX perspective, switch should be before
-// angle.
 static bool check_faults(data *d) {
     // CfgFaults faults = d->config.faults;
 
-    bool disable_switch_faults = d->config.faults.moving_fault_disabled &&
+    const bool disable_switch_faults =
+        d->config.faults.moving_fault_disabled &&
         // Rolling forward (not backwards!)
         d->motor.erpm > (d->config.faults.switch_half_erpm * 2) &&
-        // Not tipped over
-        fabsf(d->imu.roll) < 40;
+        fabsf(d->imu.pitch) < 40 && fabsf(d->imu.roll) < 75;
 
-    // Check switch
     // Switch fully open
     if (d->footpad_sensor.state == FS_NONE) {
         if (!disable_switch_faults) {
-            if ((1000.0f * (d->current_time - d->fault_switch_timer)) >
-                d->config.faults.switch_full_delay) {
+            const float switch_full_time = d->current_time - d->fault_switch_full_timer;
+            const float switch_full_delay = 0.001f * d->config.faults.switch_full_delay;
+
+            const float switch_half_delay = 0.001f * d->config.faults.switch_half_delay;
+            const bool is_slow = d->motor.erpm_abs < d->config.faults.switch_half_erpm * 6;
+
+            if (switch_full_time > switch_full_delay) {
                 state_stop(&d->state, STOP_SWITCH_FULL);
                 return true;
-            }
-            // low speed (below 6 x half-fault threshold speed):
-            else if (
-                (d->motor.erpm_abs < d->config.faults.switch_half_erpm * 6) &&
-                (1000.0f * (d->current_time - d->fault_switch_timer) >
-                    d->config.faults.switch_half_delay)) {
+            } else if (switch_full_time > switch_half_delay && is_slow) {
                 state_stop(&d->state, STOP_SWITCH_FULL);
                 return true;
             }
         }
 
+        // TODO only under load?
         if (d->motor.erpm_abs < 200 && fabsf(d->imu.pitch) > 14 &&
             fabsf(d->input_tilt.interpolated) < 30 && sign(d->imu.pitch) == d->motor.erpm_sign) {
             state_stop(&d->state, STOP_QUICKSTOP);
             return true;
         }
     } else {
-        d->fault_switch_timer = d->current_time;
+        d->fault_switch_full_timer = d->current_time;
     }
 
     // Feature: Reverse-Stop
@@ -513,9 +515,13 @@ static bool check_faults(data *d) {
 
     // Switch partially open and stopped
     if (!d->config.faults.is_posi_enabled) {
-        if (!is_sensor_engaged(d) && d->motor.erpm_abs < d->config.faults.switch_half_erpm) {
-            if ((1000.0f * (d->current_time - d->fault_switch_half_timer)) >
-                d->config.faults.switch_half_delay) {
+        const bool is_above_switch_half_erpm = d->motor.erpm_abs < d->config.faults.switch_half_erpm;
+
+        if (!is_sensor_engaged(d) && is_above_switch_half_erpm) {
+            const float switch_half_time = d->current_time - d->fault_switch_half_timer;
+            const float switch_half_delay = 0.001f * d->config.faults.switch_half_delay;
+
+            if (switch_half_time > switch_half_delay) {
                 state_stop(&d->state, STOP_SWITCH_HALF);
                 return true;
             }
@@ -526,8 +532,10 @@ static bool check_faults(data *d) {
 
     // Check roll angle
     if (fabsf(d->imu.roll) > d->config.faults.roll_threshold) {
-        if ((1000.0f * (d->current_time - d->fault_angle_roll_timer)) >
-            d->config.faults.roll_delay) {
+        const float roll_time = d->current_time - d->fault_angle_roll_timer;
+        const float roll_delay = 0.001f * d->config.faults.roll_delay;
+
+        if (roll_time > roll_delay) {
             state_stop(&d->state, STOP_ROLL);
             return true;
         }
@@ -537,8 +545,10 @@ static bool check_faults(data *d) {
 
     // Check pitch angle
     if (fabsf(d->imu.pitch) > d->config.faults.pitch_threshold && fabsf(d->input_tilt.interpolated) < 30) {
-        if ((1000.0f * (d->current_time - d->fault_angle_pitch_timer)) >
-            d->config.faults.pitch_delay) {
+        const float pitch_time = d->current_time - d->fault_angle_pitch_timer;
+        const float pitch_delay = d->config.faults.pitch_delay;
+
+        if (pitch_time > pitch_delay) {
             state_stop(&d->state, STOP_PITCH);
             return true;
         }
