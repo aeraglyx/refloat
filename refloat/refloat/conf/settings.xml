@@ -518,7 +518,7 @@ p, li { white-space: pre-wrap; }
             <minInt>0</minInt>
             <showDisplay>0</showDisplay>
             <stepInt>50</stepInt>
-            <valInt>250</valInt>
+            <valInt>300</valInt>
             <suffix> ms</suffix>
             <vTx>3</vTx>
         </faults.switch_half_delay>
@@ -560,7 +560,7 @@ p, li { white-space: pre-wrap; }
             <minInt>0</minInt>
             <showDisplay>0</showDisplay>
             <stepInt>50</stepInt>
-            <valInt>200</valInt>
+            <valInt>150</valInt>
             <suffix> ERPM</suffix>
             <vTx>3</vTx>
         </faults.switch_half_erpm>
