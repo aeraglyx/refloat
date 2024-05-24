@@ -22,10 +22,14 @@
 
 #include <math.h>
 
-void imu_data_reset(IMUData *imu, float cooldown_alpha) {
-    // imu->yaw_rate = 0.0f;
-    filter_ema(&imu->yaw_rate, 0.0f, cooldown_alpha);
+void imu_data_init(IMUData *imu) {
+    imu->yaw_rate = 0.0f;
 }
+
+// void imu_data_reset(IMUData *imu, float cooldown_alpha) {
+//     // imu->yaw_rate = 0.0f;
+//     filter_ema(&imu->yaw_rate, 0.0f, cooldown_alpha);
+// }
 
 void imu_data_configure(IMUData *imu, const CfgTurnTilt *cfg, float dt) {
     imu->yaw_rate_alpha = half_time_to_alpha(cfg->filter, dt);

@@ -36,7 +36,9 @@ typedef struct {
     float yaw_rate_alpha;
 } IMUData;
 
-void imu_data_reset(IMUData *imu, float cooldown_alpha);
+void imu_data_init(IMUData *imu);
+
+// void imu_data_reset(IMUData *imu, float cooldown_alpha);
 
 void imu_data_configure(IMUData *imu, const CfgTurnTilt *cfg, float dt);
 

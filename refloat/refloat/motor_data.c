@@ -23,26 +23,36 @@
 
 #include <math.h>
 
-void motor_data_reset(MotorData *m, float cooldown_alpha) {
-    // m->erpm_filtered = 0.0f;
-    filter_ema(&m->erpm_filtered, 0.0f, cooldown_alpha);
-    // m->erpm_smooth = 0.0f;
-    filter_ema(&m->erpm_smooth, 0.0f, cooldown_alpha);
-
-    // m->erpm_last = 0.0f;
-    filter_ema(&m->erpm_last, 0.0f, cooldown_alpha);
-    // m->acceleration = 0.0f;
-    filter_ema(&m->acceleration, 0.0f, cooldown_alpha);
-    // m->accel_clamped = 0.0f;
-    filter_ema(&m->accel_clamped, 0.0f, cooldown_alpha);
-
-    // m->duty_smooth = 0.0f;
-    filter_ema(&m->duty_smooth, 0.0f, cooldown_alpha);
-
-    // biquad_reset(&m->atr_current_biquad);
-    // m->current_filtered = 0.0f;
-    filter_ema(&m->current_filtered, 0.0f, cooldown_alpha);
+void motor_data_init(MotorData *m) {
+    m->erpm_filtered = 0.0f;
+    m->erpm_smooth = 0.0f;
+    m->erpm_last = 0.0f;
+    m->acceleration = 0.0f;
+    m->accel_clamped = 0.0f;
+    m->duty_smooth = 0.0f;
+    m->current_filtered = 0.0f;
 }
+
+// void motor_data_reset(MotorData *m, float cooldown_alpha) {
+//     // m->erpm_filtered = 0.0f;
+//     filter_ema(&m->erpm_filtered, 0.0f, cooldown_alpha);
+//     // m->erpm_smooth = 0.0f;
+//     filter_ema(&m->erpm_smooth, 0.0f, cooldown_alpha);
+
+//     // m->erpm_last = 0.0f;
+//     filter_ema(&m->erpm_last, 0.0f, cooldown_alpha);
+//     // m->acceleration = 0.0f;
+//     filter_ema(&m->acceleration, 0.0f, cooldown_alpha);
+//     // m->accel_clamped = 0.0f;
+//     filter_ema(&m->accel_clamped, 0.0f, cooldown_alpha);
+
+//     // m->duty_smooth = 0.0f;
+//     filter_ema(&m->duty_smooth, 0.0f, cooldown_alpha);
+
+//     // biquad_reset(&m->atr_current_biquad);
+//     // m->current_filtered = 0.0f;
+//     filter_ema(&m->current_filtered, 0.0f, cooldown_alpha);
+// }
 
 void motor_data_configure(MotorData *m, const CfgTune *cfg, float dt) {
     m->atr_filter_alpha = half_time_to_alpha(cfg->atr.filter, dt);

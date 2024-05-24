@@ -344,9 +344,30 @@ static void configure(data *d) {
     }
 }
 
+static void board_data_init(data *d) {
+    imu_data_init(&d->imu);
+    motor_data_init(&d->motor);
+    remote_data_init(&d->remote);
+}
+
+static void init_vars(data *d) {
+    d->setpoint = d->imu.pitch_balance;
+    d->setpoint_target_interpolated = d->imu.pitch_balance;
+    d->setpoint_target = 0.0f;
+
+    d->brake_timeout = 0.0f;
+
+    d->startup_pitch_tolerance = d->config.startup_pitch_tolerance;
+    d->surge_adder = 0.0f;
+
+    // RC Move:
+    d->rc_steps = 0.0f;
+    d->rc_current = 0.0f;
+}
+
 static void reset_vars(data *d) {
     const float time_disengaged = d->current_time - d->disengage_timer;
-    const float cooldown_alpha = half_time_to_alpha(0.75f, time_disengaged);
+    const float cooldown_alpha = half_time_to_alpha(0.5f, time_disengaged);
 
     warnings_reset(&d->warnings, cooldown_alpha);
 
@@ -358,12 +379,9 @@ static void reset_vars(data *d) {
 
     pid_reset(&d->pid, &d->config.tune.pid, cooldown_alpha);
 
-    // Set values for startup
-    // d->setpoint = d->imu.pitch_balance;
     filter_ema(&d->setpoint, d->imu.pitch_balance, cooldown_alpha);
-    // d->setpoint_target_interpolated = d->imu.pitch_balance;
     filter_ema(&d->setpoint_target_interpolated, d->imu.pitch_balance, cooldown_alpha);
-    d->setpoint_target = 0.0f;
+    filter_ema(&d->setpoint_target, 0.0f, cooldown_alpha);
     
     d->brake_timeout = 0.0f;
 
@@ -374,7 +392,7 @@ static void reset_vars(data *d) {
     d->rc_steps = 0.0f;
     d->rc_current = 0.0f;
 
-    state_engage(&d->state);
+    // state_engage(&d->state);
 }
 
 /**
@@ -848,7 +866,8 @@ static void time_vars_update(data *d) {
 static void refloat_thd(void *arg) {
     data *d = (data *) arg;
 
-    configure(d);
+    configure(d);  // XXX configure before init
+    board_data_init(d);
     d->last_time = VESC_IF->system_time() - d->loop_time;
 
     while (!VESC_IF->should_terminate()) {
@@ -880,7 +899,10 @@ static void refloat_thd(void *arg) {
             // Disable output
             brake(d);
             if (VESC_IF->imu_startup_done()) {
-                reset_vars(d);
+                // TODO init setpoints...
+                // reset_vars(d);
+                init_vars(d);
+                state_engage(&d->state);
                 // set state to READY so we need to meet start conditions to start
                 d->state.state = STATE_READY;
 
@@ -975,6 +997,7 @@ static void refloat_thd(void *arg) {
 
             if (startup_conditions_met(d)) {
                 reset_vars(d);
+                state_engage(&d->state);
                 break;
             }
 
