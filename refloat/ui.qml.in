@@ -2002,7 +2002,7 @@ Item {
                     text: {
                         var voltageString = "";
                         if (preferences.showBattVoltage) {
-                            if (preferences.showBattVoltagePerCell) {
+                        if (preferences.showBattVoltagePerCell) {
                                 voltageString = (parent.voltage / motorConfig.batteryCells).toFixed(2);
                             } else {
                                 voltageString = parent.voltage.toFixed(1);
@@ -3369,7 +3369,7 @@ Item {
                             clip: true
 
                             RealValue {id: debugRequestedCurrent; label: "Requested current"; unit: "A";}
-                            RealValue {id: debugFilteredCurrent; label: "Torque (filt. current)"; unit: "A";}
+                            RealValue {id: debugFilteredCurrent; label: "Frequency"; unit: "Hz";}
                             RealValue {id: debugAtrAccDiff; label: "ATR Accel. diff.";}
                             Value {id: debugRemoteInput; label: "Remote input"; unit: "%";}
                         }

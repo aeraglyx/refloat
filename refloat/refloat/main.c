@@ -1242,8 +1242,8 @@ static void send_realtime_data(data *d) {
 
         // DEBUG
         buffer_append_float32_auto(buffer, d->pid.pid_value, &ind);
-        buffer_append_float32_auto(buffer, d->motor.current_filtered, &ind);
-        buffer_append_float32_auto(buffer, d->config.tune.atr.strength_up, &ind);
+        buffer_append_float32_auto(buffer, 1.0f / max(d->loop_time_measured, 0.0001f), &ind);
+        buffer_append_float32_auto(buffer, d->warnings.duty, &ind);
     }
 
     if (d->state.charging) {
