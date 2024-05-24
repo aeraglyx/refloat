@@ -225,6 +225,27 @@ void beep_alert(data *d, int num_beeps, bool longbeep) {
     }
 }
 
+void beep_alert_idle(data *d) {
+    // alert user after 30 minutes
+    if (d->current_time - d->disengage_timer > 1800) {
+        // beep every 60 seconds
+        if (d->current_time - d->nag_timer > 60) {
+            d->nag_timer = d->current_time;
+            const float input_voltage = VESC_IF->mc_get_input_voltage_filtered();
+            if (input_voltage > d->idle_voltage) {
+                // don't beep if the voltage keeps increasing (board is charging)
+                d->idle_voltage = input_voltage;
+            } else {
+                d->beep_reason = BEEP_IDLE;
+                beep_alert(d, 2, 1);
+            }
+        }
+    } else {
+        d->nag_timer = d->current_time;
+        d->idle_voltage = 0;
+    }
+}
+
 void beep_off(data *d, bool force) {
     // don't mess with the beeper if we're in the process of doing a multi-beep
     if (force || (d->beep_num_left == 0)) {
@@ -934,24 +955,7 @@ static void refloat_thd(void *arg) {
             break;
 
         case (STATE_READY):
-            // alert user after 30 minutes
-            if (d->current_time - d->disengage_timer > 1800) {
-                // beep every 60 seconds
-                if (d->current_time - d->nag_timer > 60) {
-                    d->nag_timer = d->current_time;
-                    float input_voltage = VESC_IF->mc_get_input_voltage_filtered();
-                    if (input_voltage > d->idle_voltage) {
-                        // don't beep if the voltage keeps increasing (board is charging)
-                        d->idle_voltage = input_voltage;
-                    } else {
-                        d->beep_reason = BEEP_IDLE;
-                        beep_alert(d, 2, 1);
-                    }
-                }
-            } else {
-                d->nag_timer = d->current_time;
-                d->idle_voltage = 0;
-            }
+            beep_alert_idle(d);
 
             if ((d->current_time - d->fault_angle_pitch_timer) > 1) {
                 // 1 second after disengaging - set startup tolerance back to normal (aka tighter)
