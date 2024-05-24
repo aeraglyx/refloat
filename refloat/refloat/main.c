@@ -125,8 +125,8 @@ typedef struct {
 
     float startup_pitch_trickmargin;
     float startup_pitch_tolerance;
-    float startup_step_size;
 
+    float startup_step_size;
     float tiltback_duty_step_size;
     float tiltback_hv_step_size;
     float tiltback_lv_step_size;
@@ -157,7 +157,8 @@ typedef struct {
     float fault_switch_half_timer;
 
     float brake_timeout;
-    float wheelslip_timer, tb_highvoltage_timer;
+    float wheelslip_timer;
+    float tb_highvoltage_timer;
     float switch_warn_beep_erpm;
 
     // Feature: Reverse Stop
@@ -584,7 +585,8 @@ static void calculate_setpoint_target(data *d) {
         }
     } else if (
         fabsf(d->motor.acceleration) > 12000 &&  // not normal, either wheelslip or wheel getting stuck
-        sign(d->motor.acceleration) == d->motor.erpm_sign && d->motor.duty_cycle > 0.3 &&
+        sign(d->motor.acceleration) == d->motor.erpm_sign &&
+        d->motor.duty_cycle > 0.3 &&
         d->motor.erpm_abs > 2000)  // acceleration can jump a lot at very low speeds
     {
         d->state.wheelslip = true;
@@ -783,8 +785,7 @@ static bool startup_conditions_met(data *d) {
 }
 
 static void brake(data *d) {
-    // Brake timeout logic
-    float brake_timeout_length = 1;  // Brake Timeout hard-coded to 1s
+    const float brake_timeout_length = 1.0f;  // Brake Timeout hard-coded to 1s
     if (d->motor.erpm_abs > 1 || d->brake_timeout == 0) {
         d->brake_timeout = d->current_time + brake_timeout_length;
     }
@@ -896,7 +897,12 @@ static void refloat_thd(void *arg) {
                 turn_tilt_winddown(&d->turn_tilt);
                 speed_tilt_winddown(&d->speed_tilt);
             } else {
-                atr_update(&d->atr, &d->motor, &d->config.tune.atr, d->loop_time);
+                atr_update(
+                    &d->atr,
+                    &d->motor,
+                    &d->config.tune.atr,
+                    d->loop_time
+                );
                 torque_tilt_update(
                     &d->torque_tilt,
                     &d->motor,
@@ -914,7 +920,10 @@ static void refloat_thd(void *arg) {
                     d->loop_time
                 );
                 speed_tilt_update(
-                    &d->speed_tilt, &d->motor, &d->config.tune.speed_tilt, d->loop_time
+                    &d->speed_tilt,
+                    &d->motor,
+                    &d->config.tune.speed_tilt,
+                    d->loop_time
                 );
             }
 
@@ -959,8 +968,8 @@ static void refloat_thd(void *arg) {
             // Set RC current or maintain brake current (and keep WDT happy!)
             do_rc_move(d);
             break;
+
         case (STATE_DISABLED):
-            // no set_current, no brake_current
             break;
         }
 
