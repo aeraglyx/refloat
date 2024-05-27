@@ -169,7 +169,7 @@ typedef struct {
     // Feature: Reverse Stop
     float reverse_stop_step_size;
     float reverse_tolerance;
-    float reverse_total_erpm;
+    float reverse_total_distance;
     float reverse_timer;
 
     // Odometer
@@ -329,7 +329,7 @@ static void configure(data *d) {
     d->max_duty_with_margin = VESC_IF->get_cfg_float(CFG_PARAM_l_max_duty) - 0.1;
 
     // Feature: Reverse Stop
-    d->reverse_tolerance = 50000;
+    d->reverse_tolerance = 60.0f;
     d->reverse_stop_step_size = 100.0 * d->loop_time;
 
     // Speed above which to warn users about an impending full switch fault
@@ -548,7 +548,7 @@ static bool check_faults(data *d) {
             state_stop(&d->state, STOP_REVERSE_STOP);
             return true;
         }
-        if (d->reverse_total_erpm > d->reverse_tolerance * 3) {
+        if (d->reverse_total_distance > d->reverse_tolerance * 3) {
             state_stop(&d->state, STOP_REVERSE_STOP);
             return true;
         }
@@ -612,15 +612,15 @@ static void calculate_setpoint_target(data *d) {
 
     if (d->state.sat == SAT_REVERSESTOP) {
         // accumalete erpms:
-        d->reverse_total_erpm += d->motor.erpm;
-        if (fabsf(d->reverse_total_erpm) > d->reverse_tolerance) {
+        d->reverse_total_distance += d->motor.erpm * d->loop_time;
+        if (fabsf(d->reverse_total_distance) > d->reverse_tolerance) {
             // tilt down by 10 degrees after 50k aggregate erpm
-            d->setpoint_target = 10 * (fabsf(d->reverse_total_erpm) - d->reverse_tolerance) / 50000;
+            d->setpoint_target = 10 * (fabsf(d->reverse_total_distance) - d->reverse_tolerance) / 60;
         } else {
-            if (fabsf(d->reverse_total_erpm) <= d->reverse_tolerance / 2) {
+            if (fabsf(d->reverse_total_distance) <= d->reverse_tolerance / 2) {
                 if (d->motor.erpm >= 0) {
                     d->state.sat = SAT_NONE;
-                    d->reverse_total_erpm = 0;
+                    d->reverse_total_distance = 0;
                     d->setpoint_target = 0;
                     d->pid.integral = 0;
                 }
@@ -649,7 +649,7 @@ static void calculate_setpoint_target(data *d) {
             // the 500ms wheelslip time can cause us to blow past the reverse stop condition!
             d->state.sat = SAT_REVERSESTOP;
             d->reverse_timer = d->current_time;
-            d->reverse_total_erpm = 0;
+            d->reverse_total_distance = 0;
         }
     } else if (d->motor.duty_cycle > d->config.warnings.duty.threshold) {
         if (d->motor.erpm > 0) {
@@ -732,7 +732,7 @@ static void calculate_setpoint_target(data *d) {
         if (d->config.faults.is_reversestop_enabled && d->motor.erpm < -200) {
             d->state.sat = SAT_REVERSESTOP;
             d->reverse_timer = d->current_time;
-            d->reverse_total_erpm = 0;
+            d->reverse_total_distance = 0;
         } else {
             d->state.sat = SAT_NONE;
         }
