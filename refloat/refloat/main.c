@@ -375,7 +375,7 @@ static void reset_vars(data *d) {
     torque_tilt_reset(&d->torque_tilt, cooldown_alpha);
     turn_tilt_reset(&d->turn_tilt, cooldown_alpha);
     speed_tilt_reset(&d->speed_tilt, cooldown_alpha);
-    input_tilt_reset(&d->input_tilt, &d->remote, cooldown_alpha);
+    input_tilt_reset(&d->input_tilt, cooldown_alpha);
 
     pid_reset(&d->pid, &d->config.tune.pid, cooldown_alpha);
 
