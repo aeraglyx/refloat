@@ -282,7 +282,7 @@ static void configure(data *d) {
     balance_filter_configure(&d->balance_filter, &d->config.tune.balance_filter);
 
     warnings_configure(&d->warnings, d->loop_time);
-    atr_configure(&d->atr, &d->config.tune.atr);
+    // atr_configure(&d->atr, &d->config.tune.atr);
     // torque_tilt_configure(&d->torque_tilt, &d->config);
     // turn_tilt_configure(&d->turn_tilt, &d->config);
     speed_tilt_configure(&d->speed_tilt, &d->config.tune.speed_tilt);
