@@ -22,7 +22,6 @@
 #include <math.h>
 
 void speed_tilt_reset(SpeedTilt *st, float cooldown_alpha) {
-    // st->interpolated = 0.0f;
     filter_ema(&st->interpolated, 0.0f, cooldown_alpha);
 }
 
@@ -37,8 +36,7 @@ void speed_tilt_update(SpeedTilt *st, const MotorData *mot, const CfgSpeedTilt *
     float target = linear + constant;
 
     const float offset = target - st->interpolated;
-    float speed = offset * cfg->speed;
-    speed = clamp_sym(speed, cfg->speed_max);
+    const float speed = clamp_sym(offset * cfg->speed, cfg->speed_max);
 
     st->interpolated += speed * dt;
 }

@@ -29,7 +29,6 @@ typedef struct {
     float speed;
     float interpolated;
 
-    float accel_amps_ratio;
     float amp_diff;
     float debug;
 } ATR;

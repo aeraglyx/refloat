@@ -35,9 +35,6 @@ typedef struct {
     float kp_scale;
     float kd_scale;
 
-    // float expo_a;
-    // float expo_b;
-
     float ki;
 
     float soft_start_step_size;

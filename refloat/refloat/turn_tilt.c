@@ -22,8 +22,6 @@
 #include <math.h>
 
 void turn_tilt_reset(TurnTilt *tt, float cooldown_alpha) {
-    // tt->target = 0.0f;
-    // tt->interpolated = 0.0f;
     filter_ema(&tt->interpolated, 0.0f, cooldown_alpha);
 }
 
@@ -55,17 +53,11 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
         }
         tt->target *= atr_scaling;
     }
-    // if (fabsf(d->imu.pitch_balance - d->noseangling_interpolated) > 4) {
-    //     // no setpoint changes during heavy acceleration or braking
-    //     tt->target = 0;
-    // }
 
     tt->target = clamp_sym(tt->target, cfg->angle_limit);
 
     const float offset = tt->target - tt->interpolated;
-    float speed = offset * cfg->speed;
-    // clamp_sym(&speed, cfg->turntilt_speed_max);
-    speed = clamp_sym(speed, cfg->speed_max);
+    const float speed = clamp_sym(offset * cfg->speed, cfg->speed_max);
 
     tt->interpolated += speed * dt;
 }

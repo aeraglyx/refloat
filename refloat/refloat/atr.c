@@ -22,18 +22,12 @@
 #include <math.h>
 
 void atr_reset(ATR *atr, float cooldown_alpha) {
-    // atr->target = 0.0f;
-    // atr->speed = 0.0f;
-    // atr->interpolated = 0.0f;
     filter_ema(&atr->interpolated, 0.0f, cooldown_alpha);
-    // atr->amp_diff = 0.0f;
     filter_ema(&atr->amp_diff, 0.0f, cooldown_alpha);
-    // atr->debug = 0.0f;
     atr->debug = cooldown_alpha;
 }
 
 void atr_configure(ATR *atr, const CfgAtr *cfg) {
-    atr->accel_amps_ratio = 1.0f / cfg->amps_accel_ratio;
 }
 
 void atr_update(ATR *atr, const MotorData *mot, const CfgAtr *cfg, float dt) {
@@ -50,24 +44,25 @@ void atr_update(ATR *atr, const MotorData *mot, const CfgAtr *cfg, float dt) {
     const float alpha = half_time_to_alpha(half_time, dt);
     filter_ema(&atr->amp_diff, amp_diff_raw, alpha);
 
-    const bool uphill = sign(atr->amp_diff) == sign(mot->erpm_smooth);
-    float strength = uphill ? cfg->strength_up : cfg->strength_down;
-    const float strength_boost = powf(cfg->strength_boost, mot->erpm_abs_10k);
-    strength *= strength_boost;
-
     atr->target = atr->amp_diff;
     dead_zonef(&atr->target, cfg->threshold);
+
+    const bool uphill = sign(atr->amp_diff) == sign(mot->erpm_smooth);
+    const float strength = uphill ? cfg->strength_up : cfg->strength_down;
     atr->target *= strength;
+
+    const float strength_boost = powf(cfg->strength_boost, mot->erpm_abs_10k);
+    atr->target *= strength_boost;
+
     atr->target = clamp_sym(atr->target, cfg->angle_limit);
     
     const float response_boost = powf(cfg->speed_boost, mot->erpm_abs_10k);
     const float speed_k = cfg->speed * response_boost;
+
     const float offset = atr->target - atr->interpolated;
-    atr->speed = offset * speed_k;
-    atr->speed = clamp_sym(atr->speed, cfg->speed_max);
+    atr->speed = clamp_sym(offset * speed_k, cfg->speed_max);
 
     atr->interpolated += atr->speed * dt;
-    // atr->debug = amps;
 }
 
 void atr_winddown(ATR *atr) {

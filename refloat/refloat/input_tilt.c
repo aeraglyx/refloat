@@ -21,10 +21,9 @@
 
 #include <math.h>
 
-void input_tilt_reset(InputTilt *it, const RemoteData *remote, float cooldown_alpha) {
+void input_tilt_reset(InputTilt *it, float cooldown_alpha) {
     it->interpolated = 0.0f;
     // filter_ema(&it->interpolated, 0.0f, cooldown_alpha);
-    // it->throttle_filtered = remote->throttle;
 }
 
 // void input_tilt_configure(InputTilt *it, const RefloatConfig *cfg) {
@@ -34,8 +33,7 @@ void input_tilt_update(InputTilt *it, const RemoteData *remote, const CfgInputTi
     float target = remote->throttle_filtered * cfg->angle_limit;
 
     const float offset = target - it->interpolated;
-    float speed = offset * cfg->speed;
-    speed = clamp_sym(speed, cfg->speed_max);
+    const float speed = clamp_sym(offset * cfg->speed, cfg->speed_max);
 
     it->interpolated += speed * dt;
 }

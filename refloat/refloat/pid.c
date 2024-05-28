@@ -44,8 +44,6 @@ void pid_configure(PID *pid, const CfgPid *cfg, float dt) {
     pid->kd_alpha = half_time_to_alpha(cfg->kd_filter, dt);
     pid->ki = cfg->ki * dt;
     pid->soft_start_step_size = dt / max(cfg->soft_start, dt);
-    // pid->expo_a = 1.0f - cfg->kp_expo;
-    // pid->expo_b = cfg->kp_expo / (cfg->kp_expo_pivot * cfg->kp_expo_pivot);
 }
 
 static void p_update(PID *pid, const CfgPid *cfg, float pitch_offset, int8_t direction, float brake_factor) {
@@ -55,13 +53,6 @@ static void p_update(PID *pid, const CfgPid *cfg, float pitch_offset, int8_t dir
         const float kp_brake_scale = 1.0f + (cfg->kp_brake - 1.0f) * brake_factor;
         kp *= kp_brake_scale;
     }
-    // if (cfg->kp_expo < 1.0f) {
-    // // if (cfg->kp_expo > 0.0f) {
-    //     // const float pitch_offset_sq = pitch_offset * pitch_offset;
-    //     // const float expo = pid->expo_a + pid->expo_b * pitch_offset_sq;
-    //     float expo = 1.0f - (1.0f - cfg->kp_expo_pivot) * powf(0.5f, powf(pitch_offset / cfg->kp_expo_pivot, 2.0f));
-    //     kp *= expo;
-    // }
     filter_ema(&pid->kp_scale, kp, 0.01f);
     pid->proportional = pitch_offset * pid->kp_scale;
 }
@@ -90,6 +81,11 @@ static void d_update(PID *pid, const CfgPid *cfg, float gyro_y, int8_t direction
     pid->derivative = kd_input * pid->kd_scale;
 }
 
+// static void f_update(PID *pid, const CfgPid *cfg, float gyro_y, int8_t direction, float brake_factor) {
+//     const float speed = 
+//     pid->feed_forward = speed * pid->kf_scale;
+// }
+
 void pid_update(
     PID *pid, const IMUData *imu, const MotorData *mot, const CfgPid *cfg, float setpoint
 ) {
@@ -116,9 +112,9 @@ void pid_update(
     // SOFT START
     // after limiting, otherwise soft start wouldn't be effective with aggressive PIDs
     if (pid->soft_start_factor < 1.0f) {
-        new_pid_value *= pid->soft_start_factor;
         const float factor_new = pid->soft_start_factor + pid->soft_start_step_size;
         pid->soft_start_factor = clamp(factor_new, 0.0f, 1.0f);
+        new_pid_value *= pid->soft_start_factor;
     }
 
     filter_ema(&pid->pid_value, new_pid_value, 0.2f);
