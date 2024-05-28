@@ -2002,7 +2002,7 @@ Item {
                     text: {
                         var voltageString = "";
                         if (preferences.showBattVoltage) {
-                        if (preferences.showBattVoltagePerCell) {
+                            if (preferences.showBattVoltagePerCell) {
                                 voltageString = (parent.voltage / motorConfig.batteryCells).toFixed(2);
                             } else {
                                 voltageString = parent.voltage.toFixed(1);
