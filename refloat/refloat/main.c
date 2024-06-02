@@ -293,7 +293,6 @@ static void configure(data *d) {
     d->disengage_timer = d->current_time;
 
     d->startup_step_size = d->config.startup_speed * d->loop_time;
-
     d->tiltback_duty_step_size = d->config.warnings.duty.tiltback_speed * d->loop_time;
     d->tiltback_hv_step_size = d->config.warnings.hv.tiltback_speed * d->loop_time;
     d->tiltback_lv_step_size = d->config.warnings.lv.tiltback_speed * d->loop_time;
@@ -422,15 +421,15 @@ static void check_odometer(data *d) {
  */
 static void do_rc_move(data *d) {
     if (d->rc_steps > 0) {
-        d->rc_current = d->rc_current * 0.95 + d->rc_current_target * 0.05;
+        filter_ema(&d->rc_current, d->rc_current_target, 0.05f);
         if (d->motor.speed_abs > 0.8f) {
             d->rc_current = 0;
         }
         set_current(d->rc_current);
         d->rc_steps--;
         d->rc_counter++;
-        if ((d->rc_counter == 500) && (d->rc_current_target > 2)) {
-            d->rc_current_target /= 2;
+        if ((d->rc_counter == 500) && (d->rc_current_target > 2.0f)) {
+            d->rc_current_target *= 0.5f;
         }
     } else {
         d->rc_counter = 0;
@@ -439,14 +438,14 @@ static void do_rc_move(data *d) {
         // TODO
         if ((d->config.tune.input_tilt.remote_throttle_current_max > 0) &&
             (d->current_time - d->disengage_timer > d->config.tune.input_tilt.remote_throttle_grace_period) &&
-            (fabsf(d->remote.throttle) > 0.02)) {
+            (fabsf(d->remote.throttle) > 0.02f)) {
             // float servo_val = d->throttle_val;
             // servo_val *= (d->config.inputtilt_invert_throttle ? -1.0 : 1.0);
             const float max = d->config.tune.input_tilt.remote_throttle_current_max;
             filter_ema(&d->rc_current, max * d->remote.throttle, 0.05f);
             set_current(d->rc_current);
         } else {
-            d->rc_current = 0;
+            d->rc_current = 0.0f;
             // Disable output
             brake(d);
         }
@@ -811,8 +810,6 @@ static bool startup_conditions_met(data *d) {
         return false;
     }
 
-    // if (d->state.stop_condition == STOP_SWITCH_FULL) {
-
     const bool is_pitch_valid = fabsf(d->imu.pitch_balance) < d->startup_pitch_tolerance;
     const bool is_roll_valid = fabsf(d->imu.roll) < d->config.startup_roll_tolerance;
 
@@ -834,7 +831,7 @@ static void brake(data *d) {
         d->brake_timeout = d->current_time + brake_timeout_length;
     }
 
-    if (d->brake_timeout != 0 && d->current_time > d->brake_timeout) {
+    if (d->brake_timeout != 0.0f && d->current_time > d->brake_timeout) {
         return;
     }
 
@@ -909,9 +906,9 @@ static void refloat_thd(void *arg) {
 
                 // if within 5V of LV tiltback threshold, issue 1 beep for each volt below that
                 float bat_volts = VESC_IF->mc_get_input_voltage_filtered();
-                float threshold = d->config.warnings.lv.threshold + 5;
+                float threshold = d->config.warnings.lv.threshold + 5.0f;
                 if (bat_volts < threshold) {
-                    int beeps = (int) fminf(6, threshold - bat_volts);
+                    int beeps = (int) fminf(6.0f, threshold - bat_volts);
                     beep_alert(d, beeps + 1, true);
                     d->beep_reason = BEEP_LOWBATT;
                 } else {
@@ -989,7 +986,7 @@ static void refloat_thd(void *arg) {
         case (STATE_READY):
             beep_alert_idle(d);
 
-            if ((d->current_time - d->fault_angle_pitch_timer) > 1) {
+            if ((d->current_time - d->fault_angle_pitch_timer) > 1.0f) {
                 // 1 second after disengaging - set startup tolerance back to normal (aka tighter)
                 d->startup_pitch_tolerance = d->config.startup_pitch_tolerance;
             }

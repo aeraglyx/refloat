@@ -24,7 +24,6 @@
 void atr_reset(ATR *atr, float cooldown_alpha) {
     filter_ema(&atr->interpolated, 0.0f, cooldown_alpha);
     filter_ema(&atr->amp_diff, 0.0f, cooldown_alpha);
-    atr->debug = cooldown_alpha;
 }
 
 void atr_configure(ATR *atr, const CfgAtr *cfg) {
@@ -69,21 +68,3 @@ void atr_winddown(ATR *atr) {
     atr->interpolated *= 0.995f;
     atr->amp_diff *= 0.995f;
 }
-
-// static void get_wheelslip_probability(MotorData *mot, const RefloatConfig *cfg) {
-// 	float accel_factor = cfg->atr_amps_accel_ratio;
-// 	float accel_expected = mot->current_filtered / accel_factor;
-// 	float accel_diff = mot->acceleration - accel_expected;
-    
-//     const float wheelslip_start = 4.0f;
-//     const float wheelslip_end = 8.0f;
-//     float is_wheelslip = (fabs(accel_diff) - wheelslip_start) / (wheelslip_end - wheelslip_start);
-//  is_wheelslip = clamp(is_wheelslip, 0.0f, 1.0f);
-
-//     const float freespin_start = 16000.0f;
-//     const float freespin_end = 20000.0f;
-//     float is_freespin = (mot->erpm_abs - freespin_start) / (freespin_end - freespin_start);
-//  is_freespin = clamp(is_freespin, 0.0f, 1.0f);
-
-//     mot->wheelslip_prob = fmaxf(is_wheelslip, is_freespin);
-// }
