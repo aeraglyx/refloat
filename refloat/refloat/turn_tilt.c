@@ -38,8 +38,8 @@ void turn_tilt_update(TurnTilt *tt, const MotorData *mot, const IMUData *imu, co
     float speed_boost = powf(cfg->strength_boost, mot->erpm_abs_10k);
     tt->target *= speed_boost;
 
-    float start_erpm = max(cfg->start_erpm, 10);
-    float direction = clamp_sym(mot->erpm_smooth / start_erpm, 1.0f);
+    float start_speed = max(cfg->start_erpm, 10) * 0.001f;
+    float direction = clamp_sym(mot->speed_smooth / start_speed, 1.0f);
     tt->target *= direction;
 
     // ATR interference: Reduce target during moments of high torque response

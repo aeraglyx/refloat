@@ -31,23 +31,23 @@ void atr_configure(ATR *atr, const CfgAtr *cfg) {
 }
 
 void atr_update(ATR *atr, const MotorData *mot, const CfgAtr *cfg, float dt) {
-    const float amp_offset_lerp = clamp_sym(mot->erpm_smooth * 0.001f, 1.0f);
+    const float amp_offset_lerp = clamp_sym(mot->speed_smooth, 1.0f);
     const float amp_offset_constant = cfg->amp_offset_constant * amp_offset_lerp;
-    const float amp_offset_variable = cfg->amp_offset_variable * mot->erpm_smooth;
+    const float amp_offset_variable = cfg->amp_offset_variable * mot->speed_smooth;
     const float amp_offset = amp_offset_constant + amp_offset_variable;
 
     const float amps = mot->current_filtered - amp_offset;
     const float amps_expected = mot->accel_clamped * cfg->amps_accel_ratio;
     const float amp_diff_raw = amps - amps_expected;
 
-    const float half_time = 0.15f * exp2f(-0.003f * fabsf(mot->erpm_smooth));
+    const float half_time = 0.15f * exp2f(-3.0f * fabsf(mot->speed_smooth));
     const float alpha = half_time_to_alpha(half_time, dt);
     filter_ema(&atr->amp_diff, amp_diff_raw, alpha);
 
     atr->target = atr->amp_diff;
     dead_zonef(&atr->target, cfg->threshold);
 
-    const bool uphill = sign(atr->amp_diff) == sign(mot->erpm_smooth);
+    const bool uphill = sign(atr->amp_diff) == sign(mot->speed_smooth);
     const float strength = uphill ? cfg->strength_up : cfg->strength_down;
     atr->target *= strength;
 

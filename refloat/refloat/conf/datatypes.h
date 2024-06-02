@@ -182,7 +182,7 @@ typedef struct {
     uint16_t roll_delay;
     uint16_t switch_half_delay;
     uint16_t switch_full_delay;
-    uint16_t switch_half_erpm;
+    float switch_half_speed;
     bool is_posi_enabled;
     bool moving_fault_disabled;
     bool is_reversestop_enabled;
@@ -220,6 +220,7 @@ typedef struct {
     float amp_offset_constant;
     float amp_offset_variable;
     float filter;
+    bool use_global_erpm;
 } CfgAtr;
 
 typedef struct {

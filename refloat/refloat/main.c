@@ -164,7 +164,7 @@ typedef struct {
     float brake_timeout;
     float wheelslip_timer;
     float tb_highvoltage_timer;
-    float switch_warn_beep_erpm;
+    float switch_warn_beep_speed;
 
     // Feature: Reverse Stop
     float reverse_stop_step_size;
@@ -329,11 +329,11 @@ static void configure(data *d) {
     d->max_duty_with_margin = VESC_IF->get_cfg_float(CFG_PARAM_l_max_duty) - 0.1;
 
     // Feature: Reverse Stop
-    d->reverse_tolerance = 60.0f;
+    d->reverse_tolerance = 0.06f;  // in meters
     d->reverse_stop_step_size = 100.0 * d->loop_time;
 
     // Speed above which to warn users about an impending full switch fault
-    d->switch_warn_beep_erpm = d->config.warnings.is_footbeep_enabled ? 2000 : 100000;
+    d->switch_warn_beep_speed = d->config.warnings.is_footbeep_enabled ? 2.0f : 100.0f;
 
     d->beeper_enabled = d->config.hardware.esc.is_beeper_enabled;
 
@@ -422,7 +422,7 @@ static void check_odometer(data *d) {
 static void do_rc_move(data *d) {
     if (d->rc_steps > 0) {
         d->rc_current = d->rc_current * 0.95 + d->rc_current_target * 0.05;
-        if (d->motor.erpm_abs > 800) {
+        if (d->motor.speed_abs > 0.8f) {
             d->rc_current = 0;
         }
         set_current(d->rc_current);
@@ -496,7 +496,7 @@ static bool check_faults(data *d) {
     const bool disable_switch_faults =
         d->config.faults.moving_fault_disabled &&
         // Rolling forward (not backwards!)
-        d->motor.erpm > (d->config.faults.switch_half_erpm * 2) &&
+        d->motor.speed > (d->config.faults.switch_half_speed * 2) &&
         fabsf(d->imu.pitch) < 40 && fabsf(d->imu.roll) < 75;
 
     // Switch fully open
@@ -506,7 +506,7 @@ static bool check_faults(data *d) {
             const float switch_full_delay = 0.001f * d->config.faults.switch_full_delay;
 
             const float switch_half_delay = 0.001f * d->config.faults.switch_half_delay;
-            const bool is_slow = d->motor.erpm_abs < d->config.faults.switch_half_erpm * 6;
+            const bool is_slow = d->motor.speed_abs < d->config.faults.switch_half_speed * 6;
 
             if (switch_full_time > switch_full_delay) {
                 state_stop(&d->state, STOP_SWITCH_FULL);
@@ -518,8 +518,8 @@ static bool check_faults(data *d) {
         }
 
         // TODO only under load?
-        if (d->motor.erpm_abs < 200 && fabsf(d->imu.pitch) > 14 &&
-            fabsf(d->input_tilt.interpolated) < 30 && sign(d->imu.pitch) == d->motor.erpm_sign) {
+        if (d->motor.speed_abs < 0.2f && fabsf(d->imu.pitch) > 14 &&
+            fabsf(d->input_tilt.interpolated) < 30 && sign(d->imu.pitch) == d->motor.speed_sign) {
             state_stop(&d->state, STOP_QUICKSTOP);
             return true;
         }
@@ -559,9 +559,9 @@ static bool check_faults(data *d) {
 
     // Switch partially open and stopped
     if (!d->config.faults.is_posi_enabled) {
-        const bool is_above_switch_half_erpm = d->motor.erpm_abs < d->config.faults.switch_half_erpm;
+        const bool is_above_switch_half_speed = d->motor.speed_abs < d->config.faults.switch_half_speed;
 
-        if (!is_sensor_engaged(d) && is_above_switch_half_erpm) {
+        if (!is_sensor_engaged(d) && is_above_switch_half_speed) {
             const float switch_half_time = d->current_time - d->fault_switch_half_timer;
             const float switch_half_delay = 0.001f * d->config.faults.switch_half_delay;
 
@@ -612,13 +612,13 @@ static void calculate_setpoint_target(data *d) {
 
     if (d->state.sat == SAT_REVERSESTOP) {
         // accumalete erpms:
-        d->reverse_total_distance += d->motor.erpm * d->loop_time;
+        d->reverse_total_distance += d->motor.speed * d->loop_time;
         if (fabsf(d->reverse_total_distance) > d->reverse_tolerance) {
-            // tilt down by 10 degrees after 50k aggregate erpm
-            d->setpoint_target = 10 * (fabsf(d->reverse_total_distance) - d->reverse_tolerance) / 60;
+            // tilt down by 10 degrees after 0.06 m
+            d->setpoint_target = 10 * (fabsf(d->reverse_total_distance) - d->reverse_tolerance) / 0.06f;
         } else {
             if (fabsf(d->reverse_total_distance) <= d->reverse_tolerance / 2) {
-                if (d->motor.erpm >= 0) {
+                if (d->motor.speed >= 0) {
                     d->state.sat = SAT_NONE;
                     d->reverse_total_distance = 0;
                     d->setpoint_target = 0;
@@ -627,10 +627,10 @@ static void calculate_setpoint_target(data *d) {
             }
         }
     } else if (
-        fabsf(d->motor.acceleration) > 12000 &&  // not normal, either wheelslip or wheel getting stuck
-        sign(d->motor.acceleration) == d->motor.erpm_sign &&
+        fabsf(d->motor.acceleration) > 10.0f &&  // not normal, either wheelslip or wheel getting stuck
+        sign(d->motor.acceleration) == d->motor.speed_sign &&
         d->motor.duty_cycle > 0.3 &&
-        d->motor.erpm_abs > 2000)  // acceleration can jump a lot at very low speeds
+        d->motor.speed_abs > 2.0f)  // acceleration can jump a lot at very low speeds
     {
         d->state.wheelslip = true;
         d->state.sat = SAT_NONE;
@@ -645,14 +645,14 @@ static void calculate_setpoint_target(data *d) {
                 d->state.wheelslip = false;
             }
         }
-        if (d->config.faults.is_reversestop_enabled && (d->motor.erpm < 0)) {
+        if (d->config.faults.is_reversestop_enabled && (d->motor.speed < 0)) {
             // the 500ms wheelslip time can cause us to blow past the reverse stop condition!
             d->state.sat = SAT_REVERSESTOP;
             d->reverse_timer = d->current_time;
             d->reverse_total_distance = 0;
         }
     } else if (d->motor.duty_cycle > d->config.warnings.duty.threshold) {
-        if (d->motor.erpm > 0) {
+        if (d->motor.speed > 0) {
             d->setpoint_target = d->config.warnings.duty.tiltback_angle;
         } else {
             d->setpoint_target = -d->config.warnings.duty.tiltback_angle;
@@ -664,7 +664,7 @@ static void calculate_setpoint_target(data *d) {
         if (((d->current_time - d->tb_highvoltage_timer) > .5) ||
             (input_voltage > d->config.warnings.hv.threshold + 1)) {
             // 500ms have passed or voltage is another volt higher, time for some tiltback
-            if (d->motor.erpm > 0) {
+            if (d->motor.speed > 0) {
                 d->setpoint_target = d->config.warnings.hv.tiltback_angle;
             } else {
                 d->setpoint_target = -d->config.warnings.hv.tiltback_angle;
@@ -680,7 +680,7 @@ static void calculate_setpoint_target(data *d) {
         beep_alert(d, 3, true);
         d->beep_reason = BEEP_TEMPFET;
         if (VESC_IF->mc_temp_fet_filtered() > (d->mc_max_temp_fet + 1)) {
-            if (d->motor.erpm > 0) {
+            if (d->motor.speed > 0) {
                 d->setpoint_target = d->config.warnings.lv.tiltback_angle;
             } else {
                 d->setpoint_target = -d->config.warnings.lv.tiltback_angle;
@@ -695,7 +695,7 @@ static void calculate_setpoint_target(data *d) {
         beep_alert(d, 3, true);
         d->beep_reason = BEEP_TEMPMOT;
         if (VESC_IF->mc_temp_motor_filtered() > (d->mc_max_temp_mot + 1)) {
-            if (d->motor.erpm > 0) {
+            if (d->motor.speed > 0) {
                 d->setpoint_target = d->config.warnings.lv.tiltback_angle;
             } else {
                 d->setpoint_target = -d->config.warnings.lv.tiltback_angle;
@@ -716,7 +716,7 @@ static void calculate_setpoint_target(data *d) {
         // b) motor current is small (we cannot assume vsag)
         // c) we have more than 20A per Volt of difference (we tolerate some amount of vsag)
         if ((vdelta > 2) || (abs_motor_current < 5) || (ratio > 1)) {
-            if (d->motor.erpm > 0) {
+            if (d->motor.speed > 0) {
                 d->setpoint_target = d->config.warnings.lv.tiltback_angle;
             } else {
                 d->setpoint_target = -d->config.warnings.lv.tiltback_angle;
@@ -729,7 +729,7 @@ static void calculate_setpoint_target(data *d) {
         }
     } else if (d->state.sat != SAT_CENTERING || d->setpoint_target_interpolated == d->setpoint_target) {
         // Normal running
-        if (d->config.faults.is_reversestop_enabled && d->motor.erpm < -200) {
+        if (d->config.faults.is_reversestop_enabled && d->motor.speed < -0.2f) {
             d->state.sat = SAT_REVERSESTOP;
             d->reverse_timer = d->current_time;
             d->reverse_total_distance = 0;
@@ -797,7 +797,7 @@ static void add_surge(data *d) {
         }
 
         // Add surge angle to setpoint
-        if (d->motor.erpm > 0) {
+        if (d->motor.speed > 0) {
             d->setpoint += d->surge_adder;
         } else {
             d->setpoint -= d->surge_adder;
@@ -819,7 +819,7 @@ static bool startup_conditions_met(data *d) {
         return true;
     }
 
-    const bool is_push_start = d->config.startup_pushstart_enabled && d->motor.erpm_abs > 1000;
+    const bool is_push_start = d->config.startup_pushstart_enabled && d->motor.speed_abs > 1.0f;
     if (is_push_start && (fabsf(d->imu.pitch_balance) < 45) && is_roll_valid) {
         return true;
     }
@@ -829,7 +829,7 @@ static bool startup_conditions_met(data *d) {
 
 static void brake(data *d) {
     const float brake_timeout_length = 1.0f;  // Brake Timeout hard-coded to 1s
-    if (d->motor.erpm_abs > 1 || d->brake_timeout == 0) {
+    if (d->motor.speed_abs > 0.001f || d->brake_timeout == 0.0f) {
         d->brake_timeout = d->current_time + brake_timeout_length;
     }
 
@@ -878,12 +878,12 @@ static void refloat_thd(void *arg) {
         charging_timeout(&d->charging, &d->state);
 
         imu_data_update(&d->imu, &d->balance_filter);
-        motor_data_update(&d->motor, d->config.hardware.esc.frequency);
+        motor_data_update(&d->motor, d->config.hardware.esc.frequency, d->imu.gyro[1]);
         remote_data_update(&d->remote, &d->config.hardware.remote);
         footpad_sensor_update(&d->footpad_sensor, &d->config.faults);
 
         if (d->footpad_sensor.state == FS_NONE && d->state.state == STATE_RUNNING &&
-            d->motor.erpm_abs > d->switch_warn_beep_erpm) {
+            d->motor.speed_abs > d->switch_warn_beep_speed) {
             // If we're at riding speed and the switch is off => ALERT the user
             // set force=true since this could indicate an imminent shutdown/nosedive
             beep_on(d, true);

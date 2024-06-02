@@ -29,11 +29,14 @@
 typedef struct {
     float erpm;
     float erpm_filtered;
-    float erpm_abs;
-    float erpm_last;
-    int8_t erpm_sign;
     float erpm_smooth;
     float erpm_abs_10k;
+
+    float speed;
+    float speed_abs;
+    int8_t speed_sign;
+    float speed_smooth;
+    float speed_last;
 
     float current;
     float current_filtered;
@@ -54,6 +57,9 @@ typedef struct {
 
     float current_min;
     float current_max;
+
+    bool use_global_erpm;
+    float erpm_gyro_ratio;
 } MotorData;
 
 void motor_data_init(MotorData *m);
@@ -62,4 +68,4 @@ void motor_data_init(MotorData *m);
 
 void motor_data_configure(MotorData *m, const CfgTune *cfg, float dt);
 
-void motor_data_update(MotorData *m, uint16_t frequency);
+void motor_data_update(MotorData *m, uint16_t frequency, float gyro_pitch);

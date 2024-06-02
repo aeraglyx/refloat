@@ -89,10 +89,10 @@ static void d_update(PID *pid, const CfgPid *cfg, float gyro_y, int8_t direction
 void pid_update(
     PID *pid, const IMUData *imu, const MotorData *mot, const CfgPid *cfg, float setpoint
 ) {
-    const float brake_factor = clamp(fabsf(mot->erpm_smooth) * 0.001f, 0.0f, 1.0f);
+    const float brake_factor = clamp(fabsf(mot->speed_smooth), 0.0f, 1.0f);
 
     const float pitch_offset = setpoint - imu->pitch_balance;
-    const int8_t direction = sign(mot->erpm_smooth);
+    const int8_t direction = sign(mot->speed_smooth);
 
     p_update(pid, cfg, pitch_offset, direction, brake_factor);
     i_update(pid, cfg, pitch_offset);

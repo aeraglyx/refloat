@@ -542,9 +542,9 @@ p, li { white-space: pre-wrap; }
             <suffix> ms</suffix>
             <vTx>3</vTx>
         </faults.switch_full_delay>
-        <faults.switch_half_erpm>
-            <longName>ADC Half State Fault ERPM</longName>
-            <type>2</type>
+        <faults.switch_half_speed>
+            <longName>ADC Half State Fault Speed</longName>
+            <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -553,17 +553,19 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;ERPM (absoulte value) below which a Half State on the ADC switches (sensor zones) will be considered a Fault.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;*Note: ERPM = RPM * (Motor Poles / 2)&lt;br /&gt;For an 11&amp;quot; Tire on a Hypercore Motor (30 Poles):&lt;br /&gt;1000 ERPM ≈ 2.2 mph ≈ 3.5 km/h&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_FAULTS_SWITCH_HALF_ERPM</cDefine>
+            <cDefine>CFG_DFLT_FAULTS_SWITCH_HALF_SPEED</cDefine>
+            <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxInt>100000</maxInt>
-            <minInt>0</minInt>
+            <maxDouble>10</maxDouble>
+            <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepInt>50</stepInt>
-            <valInt>150</valInt>
-            <suffix> ERPM</suffix>
-            <vTx>3</vTx>
-        </faults.switch_half_erpm>
+            <stepDouble>0.05</stepDouble>
+            <valDouble>0.20</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
+            <suffix> m/s</suffix>
+            <vTx>7</vTx>
+        </faults.switch_half_speed>
         <faults.is_posi_enabled>
             <longName>Treat Both Sensors as One (Posi)</longName>
             <type>5</type>
@@ -989,10 +991,10 @@ p, li { white-space: pre-wrap; }
             <maxDouble>1</maxDouble>
             <minDouble>-1</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>0.02</stepDouble>
+            <stepDouble>0.01</stepDouble>
             <valDouble>0.0</valDouble>
             <vTxDoubleScale>1000</vTxDoubleScale>
-            <suffix> °/1000 ERPM</suffix>
+            <suffix> °/(m/s)</suffix>
             <vTx>7</vTx>
         </tune.speed_tilt.variable>
         <tune.speed_tilt.variable_max>
@@ -1830,15 +1832,15 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; font-style:italic;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Recommended Values: 8-18&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
             <cDefine>CFG_DFLT_TUNE_ATR_AMPS_ACCEL_RATIO</cDefine>
-            <editorDecimalsDouble>3</editorDecimalsDouble>
+            <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxDouble>0.05</maxDouble>
+            <maxDouble>20</maxDouble>
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>0.001</stepDouble>
-            <valDouble>0.011</valDouble>
-            <vTxDoubleScale>1000</vTxDoubleScale>
+            <stepDouble>0.5</stepDouble>
+            <valDouble>11.0</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
             <suffix></suffix>
             <vTx>7</vTx>
         </tune.atr.amps_accel_ratio>
@@ -1872,18 +1874,18 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Current per ERPM needed for maintaining speed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Current per m/s needed for maintaining speed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
             <cDefine>CFG_DFLT_TUNE_ATR_AMP_OFFSET_VARIABLE</cDefine>
-            <editorDecimalsDouble>4</editorDecimalsDouble>
+            <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxDouble>0.01</maxDouble>
+            <maxDouble>4</maxDouble>
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>0.0001</stepDouble>
-            <valDouble>0.0008</valDouble>
-            <vTxDoubleScale>100000</vTxDoubleScale>
-            <suffix> A/ERPM</suffix>
+            <stepDouble>0.05</stepDouble>
+            <valDouble>0.75</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
+            <suffix> A/(m/s)</suffix>
             <vTx>7</vTx>
         </tune.atr.amp_offset_variable>
         <tune.atr.filter>
@@ -1908,6 +1910,18 @@ p, li { white-space: pre-wrap; }
             <suffix> s</suffix>
             <vTx>7</vTx>
         </tune.atr.filter>
+        <tune.atr.use_global_erpm>
+            <longName>Global ERPM</longName>
+            <type>5</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Beep when both sensors turn off above 2000erpm (beeps for as long as the sensor remains off)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_USE_GLOBAL_ERPM</cDefine>
+            <valInt>1</valInt>
+        </tune.atr.use_global_erpm>
         <tune.turn_tilt.strength>
             <longName>Strength</longName>
             <type>1</type>
@@ -3324,7 +3338,7 @@ p, li { white-space: pre-wrap; }
         <ser>faults.adc2_threshold</ser>
         <ser>faults.switch_half_delay</ser>
         <ser>faults.switch_full_delay</ser>
-        <ser>faults.switch_half_erpm</ser>
+        <ser>faults.switch_half_speed</ser>
         <ser>faults.is_posi_enabled</ser>
         <ser>faults.moving_fault_disabled</ser>
         <ser>faults.is_reversestop_enabled</ser>
@@ -3372,6 +3386,7 @@ p, li { white-space: pre-wrap; }
         <ser>tune.atr.amp_offset_constant</ser>
         <ser>tune.atr.amp_offset_variable</ser>
         <ser>tune.atr.filter</ser>
+        <ser>tune.atr.use_global_erpm</ser>
         <ser>tune.torque_tilt.strength</ser>
         <ser>tune.torque_tilt.strength_regen</ser>
         <ser>tune.torque_tilt.strength_boost</ser>
@@ -3491,6 +3506,7 @@ p, li { white-space: pre-wrap; }
                     <param>tune.atr.amp_offset_constant</param>
                     <param>tune.atr.amp_offset_variable</param>
                     <param>tune.atr.filter</param>
+                    <param>tune.atr.use_global_erpm</param>
                 </subgroupParams>
             </subgroup>
             <subgroup>
@@ -3553,7 +3569,7 @@ p, li { white-space: pre-wrap; }
                     <param>::sep::Switches</param>
                     <param>faults.switch_half_delay</param>
                     <param>faults.switch_full_delay</param>
-                    <param>faults.switch_half_erpm</param>
+                    <param>faults.switch_half_speed</param>
                     <param>faults.is_posi_enabled</param>
                     <param>faults.moving_fault_disabled</param>
                     <param>::sep::Features</param>
