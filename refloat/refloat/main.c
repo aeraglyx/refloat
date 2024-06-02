@@ -367,7 +367,8 @@ static void init_vars(data *d) {
 
 static void reset_vars(data *d) {
     const float time_disengaged = d->current_time - d->disengage_timer;
-    const float cooldown_alpha = half_time_to_alpha(0.5f, time_disengaged);
+    // const float cooldown_alpha = half_time_to_alpha(0.1f, time_disengaged);
+    const float cooldown_alpha = fminf(time_disengaged, 1.0f);
 
     warnings_reset(&d->warnings, cooldown_alpha);
 
