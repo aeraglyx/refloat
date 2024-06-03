@@ -34,6 +34,9 @@ typedef struct {
 
     float yaw_rate;
     float yaw_rate_alpha;
+
+    float accel[3];
+    float accel_derotated[3];
 } IMUData;
 
 void imu_data_init(IMUData *imu);

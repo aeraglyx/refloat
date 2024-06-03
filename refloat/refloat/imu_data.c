@@ -47,5 +47,6 @@ void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter) {
     const float yaw_rate_new = clamp_sym(imu->gyro[2], 200.0f);
     filter_ema(&imu->yaw_rate, yaw_rate_new, imu->yaw_rate_alpha);
 
-    // TODO accel?
+    VESC_IF->imu_get_accel(imu->accel);
+    VESC_IF->imu_get_accel_derotated(imu->accel_derotated);
 }
