@@ -334,6 +334,40 @@ p, li { white-space: pre-wrap; }
             <suffix></suffix>
             <vTx>7</vTx>
         </tune.balance_filter.accel_confidence_decay>
+        <tune.balance_filter.az_filter>
+            <longName>Accel Z Filter</longName>
+            <type>1</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Half time of D Term filtering. Could help with vibrations at higher D Term.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_BF_AZ_FILTER</cDefine>
+            <editorDecimalsDouble>2</editorDecimalsDouble>
+            <editorScale>1</editorScale>
+            <editAsPercentage>0</editAsPercentage>
+            <maxDouble>2.0</maxDouble>
+            <minDouble>0.0</minDouble>
+            <showDisplay>0</showDisplay>
+            <stepDouble>0.1</stepDouble>
+            <valDouble>0.8</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
+            <suffix> s</suffix>
+            <vTx>7</vTx>
+        </tune.balance_filter.az_filter>
+        <tune.balance_filter.use_bf_fix>
+            <longName>Use BF Fix</longName>
+            <type>5</type>
+            <transmittable>1</transmittable>
+            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Beep when both sensors turn off above 2000erpm (beeps for as long as the sensor remains off)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_BF_USE_BF_FIX</cDefine>
+            <valInt>0</valInt>
+        </tune.balance_filter.use_bf_fix>
         <hardware.esc.frequency>
             <longName>Loop Frequency</longName>
             <type>2</type>
@@ -3328,6 +3362,8 @@ p, li { white-space: pre-wrap; }
         <ser>tune.balance_filter.mahony_kp</ser>
         <ser>tune.balance_filter.mahony_kp_roll</ser>
         <ser>tune.balance_filter.accel_confidence_decay</ser>
+        <ser>tune.balance_filter.az_filter</ser>
+        <!-- <ser>tune.balance_filter.use_bf_fix</ser> -->
         <ser>faults.pitch_threshold</ser>
         <ser>faults.pitch_delay</ser>
         <ser>faults.roll_threshold</ser>
@@ -3479,6 +3515,8 @@ p, li { white-space: pre-wrap; }
                     <param>tune.balance_filter.mahony_kp</param>
                     <param>tune.balance_filter.mahony_kp_roll</param>
                     <param>tune.balance_filter.accel_confidence_decay</param>
+                    <param>tune.balance_filter.az_filter</param>
+                    <!-- <param>tune.balance_filter.use_bf_fix</param> -->
                     <!-- <param>::sep::Brake Scaling</param>
                     <param>tune.pid.kp_brake</param>
                     <param>tune.pid.kd_brake</param> -->

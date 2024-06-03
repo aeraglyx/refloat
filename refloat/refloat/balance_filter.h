@@ -32,6 +32,11 @@ typedef struct {
     float kp_pitch;
     float kp_roll;
     float kp_yaw;
+
+    float az_filter;
+    float az_filtered;
+    // float gy_last;
+    // bool use_bf_fix;
 } BalanceFilterData;
 
 void balance_filter_init(BalanceFilterData *data);
