@@ -858,8 +858,8 @@ static void time_vars_update(data *d) {
 
     filter_ema(&d->loop_time_measured_filtered, d->loop_time_measured, 0.1f);
     const float loop_overshoot = d->loop_time_measured - d->loop_time;
-    const float loop_overshoot_alpha = half_time_to_alpha(0.1f, d->loop_time);
-    filter_ema(&d->loop_overshoot_filtered, loop_overshoot, loop_overshoot_alpha);
+    // const float loop_overshoot_alpha = half_time_to_alpha_fast(0.1f, d->loop_time);
+    filter_ema(&d->loop_overshoot_filtered, loop_overshoot, 0.005f);
 }
 
 static void refloat_thd(void *arg) {
