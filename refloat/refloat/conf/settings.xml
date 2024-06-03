@@ -3590,7 +3590,7 @@ p, li { white-space: pre-wrap; }
         <group>
             <groupName>General</groupName>
             <subgroup>
-                <subgroupName>Tune</subgroupName>
+                <subgroupName>PIDs</subgroupName>
                 <subgroupParams>
                     <!-- <param>::sep::PID</param> -->
                     <param>::sep::Proportional</param>
@@ -3640,28 +3640,41 @@ p, li { white-space: pre-wrap; }
                 </subgroupParams>
             </subgroup>
             <subgroup>
-                <subgroupName>Tune Modifiers</subgroupName>
+                <subgroupName>Torque Tilt</subgroupName>
                 <subgroupParams>
                     <param>::sep::Torque Tiltback</param>
                     <param>tune.torque_tilt.strength</param>
                     <param>tune.torque_tilt.strength_regen</param>
                     <param>tune.torque_tilt.strength_boost</param>
+                    <param>::sep::Nose Angling</param>
                     <param>tune.torque_tilt.speed</param>
                     <param>tune.torque_tilt.speed_max</param>
                     <param>tune.torque_tilt.start_current</param>
                     <param>tune.torque_tilt.angle_limit</param>
                     <param>tune.torque_tilt.turn_boost</param>
+                    <param>::sep::Advanced</param>
                     <param>tune.torque_tilt.method</param>
                     <param>tune.torque_tilt.filter</param>
+                </subgroupParams>
+            </subgroup>
+            <subgroup>
+                <subgroupName>Turn Tilt</subgroupName>
+                <subgroupParams>
                     <param>::sep::Turn Tiltback</param>
                     <param>tune.turn_tilt.strength</param>
                     <param>tune.turn_tilt.strength_boost</param>
+                    <param>::sep::Nose Angling</param>
                     <param>tune.turn_tilt.speed</param>
                     <param>tune.turn_tilt.speed_max</param>
                     <param>tune.turn_tilt.angle_limit</param>
                     <param>tune.turn_tilt.start_angle</param>
                     <param>tune.turn_tilt.start_erpm</param>
                     <param>tune.turn_tilt.filter</param>
+                </subgroupParams>
+            </subgroup>
+            <subgroup>
+                <subgroupName>Speed Tilt</subgroupName>
+                <subgroupParams>
                     <param>::sep::Nose Angling</param>
                     <param>tune.speed_tilt.constant</param>
                     <!-- <param>tune.speed_tilt.constant_erpm</param> -->
@@ -3669,6 +3682,22 @@ p, li { white-space: pre-wrap; }
                     <param>tune.speed_tilt.variable_max</param>
                     <param>tune.speed_tilt.speed</param>
                     <param>tune.speed_tilt.speed_max</param>
+                </subgroupParams>
+            </subgroup>
+            <subgroup>
+                <subgroupName>Remote</subgroupName>
+                <subgroupParams>
+                    <param>::sep::Remote Tiltback</param>
+                    <param>hardware.remote.type</param>
+                    <param>tune.input_tilt.angle_limit</param>
+                    <param>tune.input_tilt.speed</param>
+                    <param>tune.input_tilt.speed_max</param>
+                    <param>hardware.remote.invert_throttle</param>
+                    <param>hardware.remote.deadband</param>
+                    <param>tune.input_tilt.filter</param>
+                    <param>::sep::Remote Throttle</param>
+                    <param>tune.input_tilt.remote_throttle_current_max</param>
+                    <param>tune.input_tilt.remote_throttle_grace_period</param>
                 </subgroupParams>
             </subgroup>
             <subgroup>
@@ -3707,7 +3736,7 @@ p, li { white-space: pre-wrap; }
                 </subgroupParams>
             </subgroup>
             <subgroup>
-                <subgroupName>Pushback Alerts</subgroupName>
+                <subgroupName>Warnings</subgroupName>
                 <subgroupParams>
                     <param>::sep::General Config</param>
                     <param>warnings.tiltback_return_speed</param>
@@ -3726,22 +3755,6 @@ p, li { white-space: pre-wrap; }
                     <param>::sep::Low Voltage Alert Pushback</param>
                     <param>warnings.lv.tiltback_angle</param>
                     <param>warnings.lv.tiltback_speed</param>
-                </subgroupParams>
-            </subgroup>
-            <subgroup>
-                <subgroupName>Remote</subgroupName>
-                <subgroupParams>
-                    <param>::sep::Remote Tiltback</param>
-                    <param>hardware.remote.type</param>
-                    <param>tune.input_tilt.angle_limit</param>
-                    <param>tune.input_tilt.speed</param>
-                    <param>tune.input_tilt.speed_max</param>
-                    <param>hardware.remote.invert_throttle</param>
-                    <param>hardware.remote.deadband</param>
-                    <param>tune.input_tilt.filter</param>
-                    <param>::sep::Remote Throttle</param>
-                    <param>tune.input_tilt.remote_throttle_current_max</param>
-                    <param>tune.input_tilt.remote_throttle_grace_period</param>
                 </subgroupParams>
             </subgroup>
             <subgroup>
@@ -3798,7 +3811,7 @@ p, li { white-space: pre-wrap; }
                 <subgroupParams>
                     <param>::sep::Refloat Package Details</param>
                     <param>disabled</param>
-                    <param>::sep::Balance Loop</param>
+                    <param>::sep::Controller</param>
                     <param>hardware.esc.frequency</param>
                     <param>hardware.esc.imu_x_offset</param>
                     <param>::sep::Voltage Pushbacks</param>
