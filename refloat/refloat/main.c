@@ -173,9 +173,9 @@ typedef struct {
     float reverse_timer;
 
     // Odometer
-    float odo_timer;
-    int odometer_dirty;
-    uint64_t odometer;
+    // float odo_timer;
+    // int odometer_dirty;
+    // uint64_t odometer;
 
     // Feature: RC Move (control via app while idle)
     int rc_steps;
@@ -398,23 +398,23 @@ static void reset_vars(data *d) {
 /**
  * check_odometer: see if we need to write back the odometer during fault state
  */
-static void check_odometer(data *d) {
-    // Make odometer persistent if we've gone 200m or more
-    if (d->odometer_dirty > 0) {
-        float stored_odo = VESC_IF->mc_get_odometer();
-        if ((stored_odo > d->odometer + 200) || (stored_odo < d->odometer - 10000)) {
-            if (d->odometer_dirty == 1) {
-                // Wait 10 seconds before writing to avoid writing if immediately continuing to ride
-                d->odo_timer = d->current_time;
-                d->odometer_dirty++;
-            } else if ((d->current_time - d->odo_timer) > 10) {
-                VESC_IF->store_backup_data();
-                d->odometer = VESC_IF->mc_get_odometer();
-                d->odometer_dirty = 0;
-            }
-        }
-    }
-}
+// static void check_odometer(data *d) {
+//     // Make odometer persistent if we've gone 200m or more
+//     if (d->odometer_dirty > 0) {
+//         float stored_odo = VESC_IF->mc_get_odometer();
+//         if ((stored_odo > d->odometer + 200) || (stored_odo < d->odometer - 10000)) {
+//             if (d->odometer_dirty == 1) {
+//                 // Wait 10 seconds before writing to avoid writing if immediately continuing to ride
+//                 d->odo_timer = d->current_time;
+//                 d->odometer_dirty++;
+//             } else if ((d->current_time - d->odo_timer) > 10) {
+//                 VESC_IF->store_backup_data();
+//                 d->odometer = VESC_IF->mc_get_odometer();
+//                 d->odometer_dirty = 0;
+//             }
+//         }
+//     }
+// }
 
 /**
  *  do_rc_move: perform motor movement while board is idle
@@ -929,7 +929,7 @@ static void refloat_thd(void *arg) {
                 }
                 break;
             }
-            d->odometer_dirty = 1;
+            // d->odometer_dirty = 1;
 
             d->disengage_timer = d->current_time;
 
@@ -991,7 +991,7 @@ static void refloat_thd(void *arg) {
                 d->startup_pitch_tolerance = d->config.startup_pitch_tolerance;
             }
 
-            check_odometer(d);
+            // check_odometer(d);
 
             if (startup_conditions_met(d)) {
                 reset_vars(d);
@@ -1096,7 +1096,7 @@ static void data_init(data *d) {
 
     read_cfg_from_eeprom(&d->config);
 
-    d->odometer = VESC_IF->mc_get_odometer();
+    // d->odometer = VESC_IF->mc_get_odometer();
 
     lcm_init(&d->lcm, &d->config.hardware.leds);
     charging_init(&d->charging);
