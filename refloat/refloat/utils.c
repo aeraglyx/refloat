@@ -62,8 +62,14 @@ float half_time_to_alpha(float half_time, float dt) {
     if (half_time < 0.005f) {
         return 1.0f;
     }
-    // return 0.69f * dt / half_time;  // approximation
     return 1.0f - exp2f(-dt / half_time);  // true value
+}
+
+float half_time_to_alpha_fast(float half_time, float dt) {
+    if (half_time < 0.005f) {
+        return 1.0f;
+    }
+    return 0.69f * dt / half_time;  // approximation
 }
 
 void filter_ema(float *value_smooth, float value_new, float alpha) {
