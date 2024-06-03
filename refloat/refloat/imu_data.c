@@ -36,8 +36,6 @@ void imu_data_configure(IMUData *imu, const CfgTurnTilt *cfg, float dt) {
 }
 
 void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter) {
-    // TODO rad2deg(VESC_IF->ahrs_get_pitch(&d->m_att_ref))
-
     imu->pitch = rad2deg(VESC_IF->imu_get_pitch());
     imu->roll = rad2deg(VESC_IF->imu_get_roll());
     imu->yaw = rad2deg(VESC_IF->imu_get_yaw());

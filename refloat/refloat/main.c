@@ -88,7 +88,8 @@ typedef struct {
     MotorData motor;
     RemoteData remote;
 
-    float mc_max_temp_fet, mc_max_temp_mot;
+    float mc_max_temp_fet;
+    float mc_max_temp_mot;
     // float mc_current_max, mc_current_min;
 
     // IMU data for the balancing filter

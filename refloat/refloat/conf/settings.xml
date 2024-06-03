@@ -3319,8 +3319,6 @@ p, li { white-space: pre-wrap; }
     </Params>
     <SerOrder>
         <ser>tune.pid.kp</ser>
-        <!-- <ser>tune.pid.kp_expo</ser>
-        <ser>tune.pid.kp_expo_pivot</ser> -->
         <ser>tune.pid.kp_brake</ser>
         <ser>tune.pid.kd</ser>
         <ser>tune.pid.kd_filter</ser>
@@ -3469,8 +3467,6 @@ p, li { white-space: pre-wrap; }
                     <!-- <param>::sep::PID</param> -->
                     <param>::sep::Proportional</param>
                     <param>tune.pid.kp</param>
-                    <!-- <param>tune.pid.kp_expo</param>
-                    <param>tune.pid.kp_expo_pivot</param> -->
                     <param>tune.pid.kp_brake</param>
                     <param>::sep::Derivative</param>
                     <param>tune.pid.kd</param>
