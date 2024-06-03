@@ -39,6 +39,11 @@ typedef struct {
 
     float soft_start_step_size;
     float soft_start_factor;
+
+    float z_alpha;
+    float z_filtered;
+
+    float drop_mult;
 } PID;
 
 void pid_reset(PID *pid, const CfgPid *cfg, float cooldown_alpha);

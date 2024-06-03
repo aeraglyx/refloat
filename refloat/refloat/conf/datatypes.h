@@ -205,6 +205,9 @@ typedef struct {
     float kp_brake;
     float kd_brake;
     float soft_start;
+    float drop_filter;
+    float drop_strength;
+    float drop_spread;
 } CfgPid;
 
 typedef struct {
