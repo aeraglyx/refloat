@@ -2019,10 +2019,13 @@ Item {
 
                     anchors.right: above75 ? undefined : parent.right
                     anchors.horizontalCenter: above75 ? parent.horizontalCenter : undefined
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.rightMargin: 0.35 * unit
+                    
                     // anchors.centerIn: parent
                     // anchors.horizontalCenterOffset: parent.width / 4
-                    height: parent.height - 0.08 * unit
-                    width: 2 * unit
+                    height: chargingInfoText.implicitHeight
+                    width: chargingInfoText.implicitWidth
                     z: 2
 
                     property real current: 0
@@ -2030,29 +2033,17 @@ Item {
                     visible: state.charging
 
                     property var textColor: above75 ? Utility.getAppHexColor("darkBackground") : Utility.getAppHexColor("lightText")
-                    LText {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        font.pixelSize: fontSizeSmall
-                        text: "charging"
-                        color: parent.textColor
-                    }
 
                     LText {
-                        anchors.bottom: parent.bottom
-                        width: parent.width / 2
+                        id: chargingInfoText
+                        //anchors.bottom: parent.bottom
+                        //anchors.horizontalCenter: parent.horizontalCenter
+                        //anchors.verticalCenter: parent.verticalCenter
+                        //width: parent.width / 2
+                        //horizontalAlignment: Text.AlignHCenter
+                        //verticalAlignment: Text.AlignVCenter
                         font.pixelSize: fontSizeSmall
-                        horizontalAlignment: Text.AlignHCenter
-                        text: "%1A".arg(toFixed1Zero(parent.current))
-                        color: parent.textColor
-                    }
-
-                    LText {
-                        anchors.bottom: parent.bottom
-                        anchors.right: parent.right
-                        width: parent.width / 2
-                        font.pixelSize: fontSizeSmall
-                        horizontalAlignment: Text.AlignHCenter
-                        text: "%1V".arg(toFixed1Zero(parent.voltage))
+                        text: toFixed1Zero(parent.current) + "A  |  " + toFixed1Zero(parent.voltage) + "V"
                         color: parent.textColor
                     }
                 }
