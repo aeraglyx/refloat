@@ -282,7 +282,7 @@ static void configure(data *d) {
 
     balance_filter_configure(&d->balance_filter, &d->config.tune.balance_filter);
 
-    warnings_configure(&d->warnings, d->loop_time);
+    // warnings_configure(&d->warnings, d->loop_time);
     // atr_configure(&d->atr, &d->config.tune.atr);
     // torque_tilt_configure(&d->torque_tilt, &d->config);
     // turn_tilt_configure(&d->turn_tilt, &d->config);
@@ -370,7 +370,7 @@ static void reset_vars(data *d) {
     // const float cooldown_alpha = half_time_to_alpha(0.1f, time_disengaged);
     const float cooldown_alpha = clamp(time_disengaged, 0.0f, 1.0f);
 
-    warnings_reset(&d->warnings, cooldown_alpha);
+    // warnings_reset(&d->warnings, cooldown_alpha);
 
     atr_reset(&d->atr, cooldown_alpha);
     torque_tilt_reset(&d->torque_tilt, cooldown_alpha);
@@ -935,7 +935,7 @@ static void refloat_thd(void *arg) {
             d->disengage_timer = d->current_time;
 
             // Calculate setpoint and interpolation
-            warnings_update(&d->warnings, &d->motor, &d->config.warnings);
+            // warnings_update(&d->warnings, &d->motor, &d->config.warnings);
             calculate_setpoint_target(d);
             calculate_setpoint_interpolated(d);
             d->setpoint = d->setpoint_target_interpolated;
