@@ -1191,7 +1191,7 @@ p, li { white-space: pre-wrap; }
             <stepDouble>1</stepDouble>
             <valDouble>0.1</valDouble>
             <vTxDoubleScale>10000</vTxDoubleScale>
-            <suffix> %</suffix>
+            <suffix>%</suffix>
             <vTx>7</vTx>
         </hardware.remote.deadband>
         <tune.input_tilt.filter>
