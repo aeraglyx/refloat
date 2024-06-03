@@ -146,6 +146,7 @@ typedef struct {
 typedef struct {
     uint16_t frequency;
     bool is_beeper_enabled;
+    float imu_x_offset;
 } CfgHwEsc;
 
 typedef struct {

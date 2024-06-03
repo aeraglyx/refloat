@@ -31,8 +31,9 @@ void imu_data_init(IMUData *imu) {
 //     filter_ema(&imu->yaw_rate, 0.0f, cooldown_alpha);
 // }
 
-void imu_data_configure(IMUData *imu, const CfgTurnTilt *cfg, float dt) {
+void imu_data_configure(IMUData *imu, const CfgTurnTilt *cfg, const CfgHwEsc *esc, float dt) {
     imu->yaw_rate_alpha = half_time_to_alpha(cfg->filter, dt);
+    imu->angular_to_linear_acc = esc->imu_x_offset / 9.81f;
 }
 
 void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter) {
@@ -49,4 +50,10 @@ void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter) {
 
     VESC_IF->imu_get_accel(imu->accel);
     VESC_IF->imu_get_accel_derotated(imu->accel_derotated);
+
+    const float pitch_angular_acc = deg2rad(imu->gyro[1] - imu->gy_last);
+    imu->gy_last = imu->gyro[1];
+    const float az_correction = pitch_angular_acc * imu->angular_to_linear_acc;
+    imu->az_corrected = imu->accel[2] - az_correction;
+
 }

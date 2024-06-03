@@ -37,12 +37,16 @@ typedef struct {
 
     float accel[3];
     float accel_derotated[3];
+
+    float gy_last;
+    float az_corrected;
+    float angular_to_linear_acc;
 } IMUData;
 
 void imu_data_init(IMUData *imu);
 
 // void imu_data_reset(IMUData *imu, float cooldown_alpha);
 
-void imu_data_configure(IMUData *imu, const CfgTurnTilt *cfg, float dt);
+void imu_data_configure(IMUData *imu, const CfgTurnTilt *cfg, const CfgHwEsc *esc, float dt);
 
 void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter);

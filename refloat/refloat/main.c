@@ -277,7 +277,7 @@ static void configure(data *d) {
 
     lcm_configure(&d->lcm, &d->config.leds);
     motor_data_configure(&d->motor, &d->config.tune, d->loop_time);
-    imu_data_configure(&d->imu, &d->config.tune.turn_tilt, d->loop_time);
+    imu_data_configure(&d->imu, &d->config.tune.turn_tilt, &d->config.hardware.esc, d->loop_time);
     remote_data_configure(&d->remote, &d->config.tune.input_tilt, d->loop_time);
 
     balance_filter_configure(&d->balance_filter, &d->config.tune.balance_filter);
