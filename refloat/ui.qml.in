@@ -707,7 +707,7 @@ Item {
             [s_Startup, "STARTUP"],
             [s_Ready, "READY"],
             [s_Running, "RUNNING"],
-            [s_Connecting, "CONNECTING..."],
+            [s_Connecting, "CONNECTING"],
             [s_Disconnected, "DISCONNECTED"],
         ])
 
@@ -2904,34 +2904,55 @@ Item {
                         }
                     ]
 
-                    LText {
+                    // LText {
+                    //     id: statusTextState
+                    //     anchors.verticalCenter: parent.verticalCenter
+                    //     width: parent.width
+                    //     font.pixelSize: (state.pkgStateString.length >= 10 ? 0.42 : 0.55) * unit
+                    //     font.family: "Exan"
+                    //     horizontalAlignment: Text.AlignHCenter
+                    //     verticalAlignment: Text.AlignVCenter
+                    //     text: state.pkgStateString
+                    // }
+
+                    Text {
                         id: statusTextState
                         anchors.verticalCenter: parent.verticalCenter
                         width: parent.width
-                        font.pixelSize: (state.pkgStateString.length >= 10 ? 0.42 : 0.55) * unit
-                        font.family: "Exan"
+                        font.pixelSize: 0.4 * unit
+                        font.family: "Fira Code"
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         text: state.pkgStateString
-                    }
-
-                    Glow {
-                        anchors.fill: statusTextState
-                        radius: Math.round(0.12 * unit)
-                        samples: radius * 2 + 1
-                        spread: parent.red ? 0.6 : 0.5
-                        opacity: parent.red || parent.blue ? 0.8 : 0.3
+                        font.bold: true
                         color: {
                             if (parent.red) {
-                                return Utility.getAppHexColor("red");
+                                return "#C59";
                             } else if (parent.blue) {
                                 return Utility.getAppHexColor("lightAccent");
                             } else {
                                 return Utility.getAppHexColor("lightText");
                             }
                         }
-                        source: statusTextState
                     }
+
+                    // Glow {
+                    //     anchors.fill: statusTextState
+                    //     radius: Math.round(0.12 * unit)
+                    //     samples: radius * 2 + 1
+                    //     spread: parent.red ? 0.6 : 0.5
+                    //     opacity: parent.red || parent.blue ? 0.8 : 0.3
+                    //     color: {
+                    //         if (parent.red) {
+                    //             return Utility.getAppHexColor("red");
+                    //         } else if (parent.blue) {
+                    //             return Utility.getAppHexColor("lightAccent");
+                    //         } else {
+                    //             return Utility.getAppHexColor("lightText");
+                    //         }
+                    //     }
+                    //     source: statusTextState
+                    // }
 
                     Text {
                         id: statusTextMode
