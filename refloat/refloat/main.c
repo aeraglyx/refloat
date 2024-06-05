@@ -33,6 +33,7 @@
 #include "input_tilt.h"
 
 #include "pid.h"
+#include "haptic_buzz.h"
 
 #include "charging.h"
 #include "footpad_sensor.h"
@@ -105,6 +106,7 @@ typedef struct {
     InputTilt input_tilt;
 
     PID pid;
+    HapticBuzz haptic_buzz;
 
     // Beeper
     int beep_num_left;
@@ -282,13 +284,14 @@ static void configure(data *d) {
 
     balance_filter_configure(&d->balance_filter, &d->config.tune.balance_filter);
 
-    // warnings_configure(&d->warnings, d->loop_time);
+    warnings_configure(&d->warnings, d->loop_time);
     // atr_configure(&d->atr, &d->config.tune.atr);
     // torque_tilt_configure(&d->torque_tilt, &d->config);
     // turn_tilt_configure(&d->turn_tilt, &d->config);
     speed_tilt_configure(&d->speed_tilt, &d->config.tune.speed_tilt);
     // input_tilt_configure(&d->input_tilt, &d->config);
     pid_configure(&d->pid, &d->config.tune.pid, d->loop_time);
+    haptic_buzz_configure(&d->haptic_buzz, &d->config.warnings, d->loop_time);
 
     // This timer is used to determine how long the board has been disengaged / idle
     d->disengage_timer = d->current_time;
@@ -370,7 +373,7 @@ static void reset_vars(data *d) {
     // const float cooldown_alpha = half_time_to_alpha(0.1f, time_disengaged);
     const float cooldown_alpha = clamp(time_disengaged, 0.0f, 1.0f);
 
-    // warnings_reset(&d->warnings, cooldown_alpha);
+    warnings_reset(&d->warnings, cooldown_alpha);
 
     atr_reset(&d->atr, cooldown_alpha);
     torque_tilt_reset(&d->torque_tilt, cooldown_alpha);
@@ -379,6 +382,7 @@ static void reset_vars(data *d) {
     input_tilt_reset(&d->input_tilt, cooldown_alpha);
 
     pid_reset(&d->pid, &d->config.tune.pid, cooldown_alpha);
+    haptic_buzz_reset(&d->haptic_buzz);
 
     filter_ema(&d->setpoint, d->imu.pitch_balance, cooldown_alpha);
     filter_ema(&d->setpoint_target_interpolated, d->imu.pitch_balance, cooldown_alpha);
@@ -935,7 +939,6 @@ static void refloat_thd(void *arg) {
             d->disengage_timer = d->current_time;
 
             // Calculate setpoint and interpolation
-            // warnings_update(&d->warnings, &d->motor, &d->config.warnings);
             calculate_setpoint_target(d);
             calculate_setpoint_interpolated(d);
             d->setpoint = d->setpoint_target_interpolated;
@@ -981,7 +984,12 @@ static void refloat_thd(void *arg) {
             aggregate_tiltbacks(d);
 
             pid_update(&d->pid, &d->imu, &d->motor, &d->config.tune.pid, d->setpoint);
-            set_current(d->pid.pid_value);
+
+            warnings_update(&d->warnings, &d->motor, &d->config.warnings, &d->footpad_sensor);
+            haptic_buzz_update(&d->haptic_buzz, &d->warnings, &d->config.warnings, &d->motor);
+
+            const float current_requested = d->pid.pid_value + d->haptic_buzz.buzz_output;
+            set_current(current_requested);
             break;
 
         case (STATE_READY):

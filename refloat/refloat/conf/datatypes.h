@@ -169,6 +169,10 @@ typedef struct {
     Warning hv;
     float tiltback_return_speed;
 
+    float buzz_strength;
+    float buzz_frequency;
+    float buzz_speed;
+
     bool is_dutybeep_enabled;
     bool is_footbeep_enabled;
     bool is_surgebeep_enabled;

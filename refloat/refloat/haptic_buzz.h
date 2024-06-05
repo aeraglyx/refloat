@@ -20,49 +20,16 @@
 
 #include "conf/datatypes.h"
 #include "motor_data.h"
-#include "footpad_sensor.h"
-
-typedef enum {
-    WARNING_NONE = 0,
-    WARNING_LV = 1,
-    WARNING_HV = 2,
-    WARNING_TEMPFET = 3,
-    WARNING_TEMPMOT = 4,
-    WARNING_CURRENT = 5,
-    WARNING_DUTY = 6,
-    WARNING_SENSORS = 7,
-    WARNING_LOWBATT = 8,
-    WARNING_IDLE = 9,
-    WARNING_ERROR = 10
-} WarningReason;
+#include "warnings.h"
 
 typedef struct {
-    float factor;
-    WarningReason reason;
+    float buzz_output;
+    float t;
+    float step;
+} HapticBuzz;
 
-    float duty;
-    float hv;
-    float lv;
-    float temp_fet;
-    float temp_mot;
-    float sensor;
+void haptic_buzz_reset(HapticBuzz *data);
 
-    float duty_step;
-    float hv_step;
-    float lv_step;
-    float temp_step;
+void haptic_buzz_configure(HapticBuzz *data, const CfgWarnings *cfg, float dt);
 
-    float mc_max_temp_fet;
-    float mc_max_temp_mot;
-} Warnings;
-
-void warnings_reset(Warnings *warnings, float cooldown_alpha);
-
-void warnings_configure(Warnings *warnings, float dt);
-
-void warnings_update(
-    Warnings *warnings,
-    const MotorData *mot,
-    const CfgWarnings *cfg,
-    const FootpadSensor *sensor
-);
+void haptic_buzz_update(HapticBuzz *data, const Warnings *warnings, const CfgWarnings *cfg, const MotorData *mot);
