@@ -35,8 +35,8 @@ void warnings_reset(Warnings *warnings, float cooldown_alpha) {
 }
 
 void warnings_configure(Warnings *warnings, float dt) {
-    warnings->mc_max_temp_fet = VESC_IF->get_cfg_float(CFG_PARAM_l_temp_fet_start) - 3;
-    warnings->mc_max_temp_mot = VESC_IF->get_cfg_float(CFG_PARAM_l_temp_motor_start) - 3;
+    warnings->mc_max_temp_fet = VESC_IF->get_cfg_float(CFG_PARAM_l_temp_fet_start) - 3.0f;
+    warnings->mc_max_temp_mot = VESC_IF->get_cfg_float(CFG_PARAM_l_temp_motor_start) - 3.0f;
 
     warnings->duty_step = 2.0f * dt;
     warnings->hv_step = 1.0f * dt;

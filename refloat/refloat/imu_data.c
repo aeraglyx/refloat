@@ -55,5 +55,4 @@ void imu_data_update(IMUData *imu, BalanceFilterData *balance_filter) {
     imu->gy_last = imu->gyro[1];
     const float az_correction = pitch_angular_acc * imu->angular_to_linear_acc;
     imu->az_corrected = imu->accel[2] - az_correction;
-
 }

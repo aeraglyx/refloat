@@ -980,7 +980,6 @@ static void refloat_thd(void *arg) {
                     d->loop_time
                 );
             }
-
             aggregate_tiltbacks(d);
 
             pid_update(&d->pid, &d->imu, &d->motor, &d->config.tune.pid, d->setpoint);
