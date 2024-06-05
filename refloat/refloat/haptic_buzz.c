@@ -33,8 +33,9 @@ void haptic_buzz_configure(HapticBuzz *data, const CfgWarnings *cfg, float dt) {
     data->step = cfg->buzz_frequency * dt;
 }
 
-
-static float sin_approx(float t) {
+static float sin_scaled(float t) {
+    // based on Bhaskara I's sine approximation
+    // valid for 0 <= t <= 1, outputs from -1 to 1
     const bool second_half = t > 0.5f;
     const float x = (second_half) ? t - 0.5f : t;
     float sin = 20.0f / (16.0f * x * x - 8.0f * x + 5.0f) - 4.0f;
@@ -52,13 +53,15 @@ void haptic_buzz_update(
 ) {
     data->t += data->step;
     data->t = data->t - (int)data->t;
-    // const float strength = fabsf(mot->speed_smooth);
-    data->buzz_output = sin_approx(data->t) * cfg->buzz_strength;
+
+    const float strength_variable = fabsf(mot->speed_smooth) * cfg->buzz_strength_variable;
+    const float strength = cfg->buzz_strength + strength_variable;
+    data->buzz_output = sin_scaled(data->t) * strength;
     data->buzz_output *= warnings->factor;
 
-    float current_time = VESC_IF->system_time();
-    float time = current_time * cfg->buzz_speed;
-    float x = time - (long)time;
-    float beep_target = (x < 0.5f) ? 1.0f : 0.0f;
+    const float current_time = VESC_IF->system_time();
+    const float time = current_time * cfg->buzz_speed;
+    const float x = time - (long)time;
+    const float beep_target = (x < 0.5f) ? 1.0f : 0.0f;
     data->buzz_output *= beep_target;
 }

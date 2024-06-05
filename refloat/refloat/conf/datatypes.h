@@ -170,6 +170,7 @@ typedef struct {
     float tiltback_return_speed;
 
     float buzz_strength;
+    float buzz_strength_variable;
     float buzz_frequency;
     float buzz_speed;
 
