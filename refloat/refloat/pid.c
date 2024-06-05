@@ -84,7 +84,7 @@ static void d_update(PID *pid, const CfgPid *cfg, float gyro_y, int8_t direction
 
 static void drop_update(PID *pid, const CfgPid *cfg, float accel_z) {
     filter_ema(&pid->z_filtered, accel_z, pid->z_alpha);
-    const float factor = fmaxf(1.0f - fabsf(pid->z_filtered) / cfg->drop_spread, 0.0f);
+    const float factor = clamp(1.0f - pid->z_filtered / cfg->drop_spread, 0.0f, 1.0f);
     pid->drop_mult = 1.0f - (1.0f - cfg->drop_strength) * factor;
 }
 
