@@ -156,6 +156,8 @@ typedef struct {
     float reverse_total_distance;
     float reverse_timer;
 
+    float current_requested;
+
     // Odometer
     // float odo_timer;
     // int odometer_dirty;
@@ -170,7 +172,7 @@ typedef struct {
 } data;
 
 static void brake(data *d);
-static void set_current(float current);
+// static void set_current(float current);
 
 const VESC_PIN beeper_pin = VESC_PIN_PPM;
 
@@ -332,9 +334,7 @@ static void init_vars(data *d) {
     d->startup_pitch_tolerance = d->config.startup_pitch_tolerance;
     d->surge_adder = 0.0f;
 
-    // RC Move:
-    // d->rc_steps = 0;
-    // d->rc_current = 0.0f;
+    d->current_requested = 0.0f;
 }
 
 static void reset_vars(data *d) {
@@ -712,10 +712,14 @@ static void brake(data *d) {
     VESC_IF->mc_set_brake_current(d->config.brake_current);
 }
 
-static void set_current(float current) {
+// static void set_current(float current) {
+static void set_current(float current, const MotorData *mot) {
+    float current_limit = mot->braking ? mot->current_min : mot->current_max;
+    const float current_limited = clamp_sym(current, current_limit);
+
     VESC_IF->timeout_reset();
     VESC_IF->mc_set_current_off_delay(0.025f);
-    VESC_IF->mc_set_current(current);
+    VESC_IF->mc_set_current(current_limited);
 }
 
 static void imu_ref_callback(float *acc, float *gyro, [[maybe_unused]] float *mag, float dt) {
@@ -846,8 +850,10 @@ static void refloat_thd(void *arg) {
             warnings_update(&d->warnings, &d->motor, &d->config.warnings, &d->footpad_sensor, 1.0f - d->traction.drop_mult);
             haptic_buzz_update(&d->haptic_buzz, &d->warnings, &d->config.warnings, &d->motor);
 
-            const float current_requested = d->pid.pid_value + d->haptic_buzz.buzz_output;
-            set_current(current_requested);
+            d->current_requested = d->pid.pid_value + d->haptic_buzz.buzz_output;
+            // limit_current(&d->current_requested, &d->motor);
+            // const float current_requested = d->pid.pid_value + d->haptic_buzz.buzz_output;
+            set_current(d->current_requested, &d->motor);
             break;
 
         case (STATE_READY):
