@@ -27,6 +27,7 @@
 void haptic_buzz_reset(HapticBuzz *data) {
     data->buzz_output = 0.0f;
     data->t = 0.0f;
+    data->amplitude = 0.0f;
 }
 
 void haptic_buzz_configure(HapticBuzz *data, const CfgWarnings *cfg, float dt) {
@@ -35,7 +36,7 @@ void haptic_buzz_configure(HapticBuzz *data, const CfgWarnings *cfg, float dt) {
 
 static float sin_scaled(float t) {
     // based on Bhaskara I's sine approximation
-    // valid for 0 <= t <= 1, outputs from -1 to 1
+    // valid for 0 <= t <= 1, outputs -1 to 1
     const bool second_half = t > 0.5f;
     const float x = (second_half) ? t - 0.5f : t;
     float sin = 20.0f / (16.0f * x * x - 8.0f * x + 5.0f) - 4.0f;
@@ -45,23 +46,61 @@ static float sin_scaled(float t) {
     return sin;
 }
 
+static BuzzType get_buzz_type(WarningReason warning_type) {
+    switch (warning_type) {
+        case WARNING_NONE:
+            return BUZZ_NONE;
+
+        case WARNING_DEBUG:
+            return BUZZ_FULL;
+        case WARNING_SENSORS:
+            return BUZZ_FULL;
+
+        case WARNING_DUTY:
+            return BUZZ_FAST;
+        default:
+            return BUZZ_SLOW;
+    }
+}
+
+static bool get_beep_target(BuzzType buzz_type, float speed) {
+    bool beep;
+    if (buzz_type == BUZZ_NONE) {
+        beep = false;
+    } else if (buzz_type == BUZZ_FULL) {
+        beep = true;
+    } else {
+        const float current_time = VESC_IF->system_time();
+        const float time = current_time * speed;
+        const float x = time - (long)time;
+        beep = (x < 0.5f);
+    }
+    return beep;
+}
+
 void haptic_buzz_update(
     HapticBuzz *data,
     const Warnings *warnings,
     const CfgWarnings *cfg,
     const MotorData *mot
 ) {
-    data->t += data->step;
-    data->t = data->t - (int)data->t;
+    const BuzzType buzz_type = get_buzz_type(warnings->reason);
+    const bool beep_target = get_beep_target(buzz_type, cfg->buzz_speed);
 
     const float strength_variable = fabsf(mot->speed_smooth) * cfg->buzz_strength_variable;
     const float strength = cfg->buzz_strength + strength_variable;
-    data->buzz_output = sin_scaled(data->t) * strength;
-    data->buzz_output *= warnings->factor;
+    const float amplitude = (float)beep_target * warnings->factor * strength;
 
-    const float current_time = VESC_IF->system_time();
-    const float time = current_time * cfg->buzz_speed;
-    const float x = time - (long)time;
-    const float beep_target = (x < 0.5f) ? 1.0f : 0.0f;
-    data->buzz_output *= beep_target;
+    // Limit amplitude's rate of change (just in case),
+    // we don't want to induce accidental current overshoots under load.
+    rate_limitf(&data->amplitude, amplitude, 2.5f);
+
+    if (data->amplitude == 0.0f) {
+        data->buzz_output = 0.0f;
+    } else {
+        data->t += data->step;
+        data->t = data->t - (int) data->t;
+        const float wave = sin_scaled(data->t);
+        data->buzz_output = wave * data->amplitude;
+    }
 }

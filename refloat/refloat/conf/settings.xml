@@ -727,7 +727,7 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>0.5</stepDouble>
-            <valDouble>3</valDouble>
+            <valDouble>4</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> A</suffix>
             <vTx>7</vTx>
@@ -749,13 +749,13 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>0.05</stepDouble>
-            <valDouble>0.5</valDouble>
+            <valDouble>0.6</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> A/(m/s)</suffix>
             <vTx>7</vTx>
         </warnings.buzz_strength_variable>
         <warnings.buzz_frequency>
-            <longName>Tone Frequency</longName>
+            <longName>Buzz Tone</longName>
             <type>2</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -766,8 +766,8 @@ p, li { white-space: pre-wrap; }
             <cDefine>CFG_DFLT_WARNINGS_BUZZ_FREQUENCY</cDefine>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxInt>1000</maxInt>
-            <minInt>50</minInt>
+            <maxInt>400</maxInt>
+            <minInt>10</minInt>
             <showDisplay>0</showDisplay>
             <stepInt>10</stepInt>
             <valInt>150</valInt>
@@ -788,15 +788,15 @@ p, li { white-space: pre-wrap; }
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
             <maxDouble>20.0</maxDouble>
-            <minDouble>0.0</minDouble>
+            <minDouble>1.0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>0.5</stepDouble>
-            <valDouble>5.0</valDouble>
+            <valDouble>8.0</valDouble>
             <vTxDoubleScale>10</vTxDoubleScale>
             <suffix> Hz</suffix>
             <vTx>7</vTx>
         </warnings.buzz_speed>
-        <warnings.duty.threshold>
+        <warnings.duty_threshold>
             <longName>Duty Cycle Threshold</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -3457,6 +3457,7 @@ p, li { white-space: pre-wrap; }
         <ser>faults.moving_fault_disabled</ser>
         <ser>faults.is_reversestop_enabled</ser>
         <ser>warnings.buzz_strength</ser>
+        <ser>warnings.buzz_strength_variable</ser>
         <ser>warnings.buzz_frequency</ser>
         <ser>warnings.buzz_speed</ser>
         <ser>warnings.duty_threshold</ser>
@@ -3730,6 +3731,7 @@ p, li { white-space: pre-wrap; }
                 <subgroupParams>
                     <param>::sep::Haptic Buzz</param>
                     <param>warnings.buzz_strength</param>
+                    <param>warnings.buzz_strength_variable</param>
                     <param>warnings.buzz_frequency</param>
                     <param>warnings.buzz_speed</param>
                     <param>::sep::Duty Cycle</param>

@@ -26,7 +26,15 @@ typedef struct {
     float buzz_output;
     float t;
     float step;
+    float amplitude;
 } HapticBuzz;
+
+typedef enum {
+    BUZZ_NONE = 0,
+    BUZZ_FAST = 1,
+    BUZZ_SLOW = 2,
+    BUZZ_FULL = 3,
+} BuzzType;
 
 void haptic_buzz_reset(HapticBuzz *data);
 
