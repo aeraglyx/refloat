@@ -3381,9 +3381,9 @@ Item {
                             spacing: 5
                             clip: true
 
-                            RealValue {id: debugRequestedCurrent; label: "Requested current"; unit: "A";}
-                            RealValue {id: debugFilteredCurrent; label: "Frequency"; unit: "Hz";}
-                            RealValue {id: debugAtrAccDiff; label: "ATR Accel. diff.";}
+                            RealValue {id: debugRequestedCurrent; label: "Acc Z"; unit: "A";}
+                            RealValue {id: debugFilteredCurrent; label: "Acc XY"; unit: "";}
+                            RealValue {id: debugAtrAccDiff; label: "Buzz Ampl"; unit: "°"}
                             Value {id: debugRemoteInput; label: "Remote input"; unit: "%";}
                         }
 

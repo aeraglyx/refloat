@@ -1067,12 +1067,13 @@ static void send_realtime_data(data *d) {
         buffer_append_float32_auto(buffer, d->torque_tilt.interpolated, &ind);
         buffer_append_float32_auto(buffer, d->turn_tilt.interpolated, &ind);
         buffer_append_float32_auto(buffer, d->speed_tilt.interpolated, &ind);
-        buffer_append_float32_auto(buffer, d->input_tilt.interpolated, &ind);
+        // buffer_append_float32_auto(buffer, d->input_tilt.interpolated, &ind);
+        buffer_append_float32_auto(buffer, d->motor.accel_clamped, &ind);
 
         // DEBUG
-        buffer_append_float32_auto(buffer, d->config.faults.switch_half_speed, &ind);
-        buffer_append_float32_auto(buffer, d->imu.accel_derotated[2], &ind);
-        buffer_append_float32_auto(buffer, d->pid.drop_mult, &ind);
+        buffer_append_float32_auto(buffer, d->traction.az_filtered, &ind);
+        buffer_append_float32_auto(buffer, d->traction.an_filtered, &ind);
+        buffer_append_float32_auto(buffer, d->haptic_buzz.amplitude, &ind);
     }
 
     if (d->state.charging) {
