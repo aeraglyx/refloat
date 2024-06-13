@@ -211,10 +211,14 @@ typedef struct {
     float kp_brake;
     float kd_brake;
     float soft_start;
+} CfgPid;
+
+typedef struct {
     float drop_filter;
     float drop_strength;
-    float drop_spread;
-} CfgPid;
+    float drop_threshold_z;
+    float drop_threshold_n;
+} CfgTraction;
 
 typedef struct {
     float strength_up;
@@ -276,6 +280,7 @@ typedef struct {
 typedef struct {
     CfgBalanceFilter balance_filter;
     CfgPid pid;
+    CfgTraction traction;
     CfgAtr atr;
     CfgTorqueTilt torque_tilt;
     CfgTurnTilt turn_tilt;

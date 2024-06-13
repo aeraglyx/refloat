@@ -23,26 +23,15 @@
 #include "imu_data.h"
 
 typedef struct {
-    float pid_value;
+    float gyro_alpha;
+    float az_filtered;
+    float an_filtered;
 
-    float proportional;
-    float integral;
-    float derivative;
+    float drop_mult;
+} Traction;
 
-    float kd_alpha;
-    float kd_filtered;
+void traction_reset(Traction *data, const CfgTraction *cfg, float cooldown_alpha);
 
-    float kp_scale;
-    float kd_scale;
+void traction_configure(Traction *data, const CfgTraction *cfg, float dt);
 
-    float ki;
-
-    float soft_start_step_size;
-    float soft_start_factor;
-} PID;
-
-void pid_reset(PID *pid, const CfgPid *cfg, float cooldown_alpha);
-
-void pid_configure(PID *pid, const CfgPid *cfg, float dt);
-
-void pid_update(PID *pid, const IMUData *imu, const MotorData *mot, const CfgPid *cfg, float setpoint);
+void traction_update(Traction *data, const CfgTraction *cfg, const IMUData *imu);

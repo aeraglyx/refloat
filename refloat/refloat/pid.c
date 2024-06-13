@@ -42,7 +42,6 @@ void pid_reset(PID *pid, const CfgPid *cfg, float cooldown_alpha) {
 
 void pid_configure(PID *pid, const CfgPid *cfg, float dt) {
     pid->kd_alpha = half_time_to_alpha(cfg->kd_filter, dt);
-    pid->z_alpha = half_time_to_alpha(cfg->drop_filter, dt);
     pid->ki = cfg->ki * dt;
     pid->soft_start_step_size = dt / max(cfg->soft_start, dt);
 }
@@ -82,12 +81,6 @@ static void d_update(PID *pid, const CfgPid *cfg, float gyro_y, int8_t direction
     pid->derivative = kd_input * pid->kd_scale;
 }
 
-static void drop_update(PID *pid, const CfgPid *cfg, float accel_z) {
-    filter_ema(&pid->z_filtered, accel_z, pid->z_alpha);
-    const float factor = clamp(1.0f - pid->z_filtered / cfg->drop_spread, 0.0f, 1.0f);
-    pid->drop_mult = 1.0f - (1.0f - cfg->drop_strength) * factor;
-}
-
 // static void f_update(PID *pid, const CfgPid *cfg, float gyro_y, int8_t direction, float brake_factor) {
 //     const float speed = 
 //     pid->feed_forward = speed * pid->kf_scale;
@@ -104,20 +97,26 @@ void pid_update(
     p_update(pid, cfg, pitch_offset, direction, brake_factor);
     i_update(pid, cfg, pitch_offset);
     d_update(pid, cfg, imu->gyro[1], direction, brake_factor);
+    // TODO FEED FORWARD
     
-    drop_update(pid, cfg, imu->accel_derotated[2]);
+    // const float windup_input = pid->proportional
+    // float current_limit = mot->braking ? mot->current_min : mot->current_max;
+    // new_pid_value = clamp_sym(new_pid_value, current_limit);
 
-    // FEED FORWARD
-    // TODO
-
-    float new_pid_value = pid->proportional + pid->integral + pid->derivative;
-    new_pid_value *= pid->drop_mult;
-    // TODO speed boost
+    float pid_sum = pid->proportional + pid->integral + pid->derivative;
 
     // CURRENT LIMITING
     float current_limit = mot->braking ? mot->current_min : mot->current_max;
-    new_pid_value = clamp_sym(new_pid_value, current_limit);
+    float new_pid_value = clamp_sym(pid_sum, current_limit);
     // TODO soft max?
+
+    // const float i_overshoot = pid_sum - pid_sum_saturated;
+    // pid->integral -= i_overshoot;
+
+    // drop_update(pid, cfg, imu->accel_derotated[2]);
+    // new_pid_value *= pid->drop_mult;
+    // TODO speed boost
+
 
     // SOFT START
     // after limiting, otherwise soft start wouldn't be effective with aggressive PIDs

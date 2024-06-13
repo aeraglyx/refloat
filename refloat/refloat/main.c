@@ -34,6 +34,7 @@
 
 #include "pid.h"
 #include "haptic_buzz.h"
+#include "traction.h"
 
 #include "charging.h"
 #include "footpad_sensor.h"
@@ -106,6 +107,7 @@ typedef struct {
     InputTilt input_tilt;
 
     PID pid;
+    Traction traction;
     HapticBuzz haptic_buzz;
 
     // Beeper
@@ -291,6 +293,7 @@ static void configure(data *d) {
     speed_tilt_configure(&d->speed_tilt, &d->config.tune.speed_tilt);
     // input_tilt_configure(&d->input_tilt, &d->config);
     pid_configure(&d->pid, &d->config.tune.pid, d->loop_time);
+    traction_configure(&d->traction, &d->config.tune.traction, d->loop_time);
     haptic_buzz_configure(&d->haptic_buzz, &d->config.warnings, d->loop_time);
 
     // This timer is used to determine how long the board has been disengaged / idle
@@ -884,17 +887,7 @@ static void refloat_thd(void *arg) {
         motor_data_update(&d->motor, d->config.hardware.esc.frequency, d->imu.gyro[1]);
         remote_data_update(&d->remote, &d->config.hardware.remote);
         footpad_sensor_update(&d->footpad_sensor, &d->config.faults);
-
-        if (d->footpad_sensor.state == FS_NONE && d->state.state == STATE_RUNNING &&
-            d->motor.speed_abs > d->switch_warn_beep_speed) {
-            // If we're at riding speed and the switch is off => ALERT the user
-            // set force=true since this could indicate an imminent shutdown/nosedive
-            beep_on(d, true);
-            d->beep_reason = BEEP_SENSORS;
-        } else {
-            // if the switch comes back on we stop beeping
-            beep_off(d, false);
-        }
+        traction_update(&d->traction, &d->config.tune.traction, &d->imu);
 
         // Control Loop State Logic
         switch (d->state.state) {
