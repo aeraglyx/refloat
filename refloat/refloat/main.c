@@ -54,21 +54,6 @@
 
 HEADER
 
-typedef enum {
-    BEEP_NONE = 0,
-    BEEP_LV = 1,
-    BEEP_HV = 2,
-    BEEP_TEMPFET = 3,
-    BEEP_TEMPMOT = 4,
-    BEEP_CURRENT = 5,
-    BEEP_DUTY = 6,
-    BEEP_SENSORS = 7,
-    BEEP_LOWBATT = 8,
-    BEEP_IDLE = 9,
-    BEEP_ERROR = 10
-} BeepReason;
-
-
 // This is all persistent state of the application, which will be allocated in init. It
 // is put here because variables can only be read-only when this program is loaded
 // in flash without virtual memory in RAM (as all RAM already is dedicated to the
@@ -90,8 +75,8 @@ typedef struct {
     MotorData motor;
     RemoteData remote;
 
-    float mc_max_temp_fet;
-    float mc_max_temp_mot;
+    // float mc_max_temp_fet;
+    // float mc_max_temp_mot;
     // float mc_current_max, mc_current_min;
 
     // IMU data for the balancing filter
@@ -137,9 +122,6 @@ typedef struct {
     float startup_pitch_tolerance;
 
     float startup_step_size;
-    float tiltback_duty_step_size;
-    float tiltback_hv_step_size;
-    float tiltback_lv_step_size;
     float tiltback_return_step_size;
 
     float surge_angle;
@@ -147,7 +129,6 @@ typedef struct {
     float surge_angle3;
     float surge_adder;
     bool surge_enable;
-    bool duty_beeping;
 
     float max_duty_with_margin;
 
@@ -168,8 +149,6 @@ typedef struct {
 
     float brake_timeout;
     float wheelslip_timer;
-    float tb_highvoltage_timer;
-    float switch_warn_beep_speed;
 
     // Feature: Reverse Stop
     float reverse_stop_step_size;
@@ -235,26 +214,26 @@ void beep_alert(data *d, int num_beeps, bool longbeep) {
     }
 }
 
-void beep_alert_idle(data *d) {
-    // alert user after 30 minutes
-    if (d->current_time - d->disengage_timer > 1800) {
-        // beep every 60 seconds
-        if (d->current_time - d->nag_timer > 60) {
-            d->nag_timer = d->current_time;
-            const float input_voltage = VESC_IF->mc_get_input_voltage_filtered();
-            if (input_voltage > d->idle_voltage) {
-                // don't beep if the voltage keeps increasing (board is charging)
-                d->idle_voltage = input_voltage;
-            } else {
-                d->beep_reason = BEEP_IDLE;
-                beep_alert(d, 2, 1);
-            }
-        }
-    } else {
-        d->nag_timer = d->current_time;
-        d->idle_voltage = 0;
-    }
-}
+// void beep_alert_idle(data *d) {
+//     // alert user after 30 minutes
+//     if (d->current_time - d->disengage_timer > 1800) {
+//         // beep every 60 seconds
+//         if (d->current_time - d->nag_timer > 60) {
+//             d->nag_timer = d->current_time;
+//             const float input_voltage = VESC_IF->mc_get_input_voltage_filtered();
+//             if (input_voltage > d->idle_voltage) {
+//                 // don't beep if the voltage keeps increasing (board is charging)
+//                 d->idle_voltage = input_voltage;
+//             } else {
+//                 d->beep_reason = BEEP_IDLE;
+//                 beep_alert(d, 2, 1);
+//             }
+//         }
+//     } else {
+//         d->nag_timer = d->current_time;
+//         d->idle_voltage = 0;
+//     }
+// }
 
 void beep_off(data *d, bool force) {
     // don't mess with the beeper if we're in the process of doing a multi-beep
@@ -286,7 +265,7 @@ static void configure(data *d) {
 
     balance_filter_configure(&d->balance_filter, &d->config.tune.balance_filter);
 
-    warnings_configure(&d->warnings, d->loop_time);
+    warnings_configure(&d->warnings, &d->config.warnings, d->loop_time);
     // atr_configure(&d->atr, &d->config.tune.atr);
     // torque_tilt_configure(&d->torque_tilt, &d->config);
     // turn_tilt_configure(&d->turn_tilt, &d->config);
@@ -300,9 +279,6 @@ static void configure(data *d) {
     d->disengage_timer = d->current_time;
 
     d->startup_step_size = d->config.startup_speed * d->loop_time;
-    d->tiltback_duty_step_size = d->config.warnings.duty.tiltback_speed * d->loop_time;
-    d->tiltback_hv_step_size = d->config.warnings.hv.tiltback_speed * d->loop_time;
-    d->tiltback_lv_step_size = d->config.warnings.lv.tiltback_speed * d->loop_time;
     d->tiltback_return_step_size = d->config.warnings.tiltback_return_speed * d->loop_time;
 
     d->surge_angle = d->config.surge_angle;
@@ -325,21 +301,11 @@ static void configure(data *d) {
         VESC_IF->set_cfg_float(CFG_PARAM_IMU_accel_confidence_decay, 0.1);
     }
 
-    d->mc_max_temp_fet = VESC_IF->get_cfg_float(CFG_PARAM_l_temp_fet_start) - 3;
-    d->mc_max_temp_mot = VESC_IF->get_cfg_float(CFG_PARAM_l_temp_motor_start) - 3;
-
-    // d->mc_current_max = VESC_IF->get_cfg_float(CFG_PARAM_l_current_max);
-    // min current is a positive value here!
-    // d->mc_current_min = fabsf(VESC_IF->get_cfg_float(CFG_PARAM_l_current_min));
-
     d->max_duty_with_margin = VESC_IF->get_cfg_float(CFG_PARAM_l_max_duty) - 0.1;
 
     // Feature: Reverse Stop
     d->reverse_tolerance = 0.06f;  // in meters
     d->reverse_stop_step_size = 100.0 * d->loop_time;
-
-    // Speed above which to warn users about an impending full switch fault
-    d->switch_warn_beep_speed = d->config.warnings.is_footbeep_enabled ? 2.0f : 100.0f;
 
     d->beeper_enabled = d->config.hardware.esc.is_beeper_enabled;
 
@@ -468,13 +434,6 @@ static float get_setpoint_adjustment_step_size(data *d) {
         return d->startup_step_size;
     case (SAT_REVERSESTOP):
         return d->reverse_stop_step_size;
-    case (SAT_PB_DUTY):
-        return d->tiltback_duty_step_size;
-    case (SAT_PB_HIGH_VOLTAGE):
-    case (SAT_PB_TEMPERATURE):
-        return d->tiltback_hv_step_size;
-    case (SAT_PB_LOW_VOLTAGE):
-        return d->tiltback_lv_step_size;
     default:
         return 0;
     }
@@ -612,12 +571,6 @@ static bool check_faults(data *d) {
 }
 
 static void calculate_setpoint_target(data *d) {
-    float input_voltage = VESC_IF->mc_get_input_voltage_filtered();
-
-    if (input_voltage < d->config.warnings.hv.threshold) {
-        d->tb_highvoltage_timer = d->current_time;
-    }
-
     if (d->state.sat == SAT_REVERSESTOP) {
         // accumalete erpms:
         d->reverse_total_distance += d->motor.speed * d->loop_time;
@@ -659,82 +612,6 @@ static void calculate_setpoint_target(data *d) {
             d->reverse_timer = d->current_time;
             d->reverse_total_distance = 0;
         }
-    } else if (d->motor.duty_cycle > d->config.warnings.duty.threshold) {
-        if (d->motor.speed > 0) {
-            d->setpoint_target = d->config.warnings.duty.tiltback_angle;
-        } else {
-            d->setpoint_target = -d->config.warnings.duty.tiltback_angle;
-        }
-        d->state.sat = SAT_PB_DUTY;
-    } else if (d->motor.duty_cycle > 0.05 && input_voltage > d->config.warnings.hv.threshold) {
-        d->beep_reason = BEEP_HV;
-        beep_alert(d, 3, false);
-        if (((d->current_time - d->tb_highvoltage_timer) > .5) ||
-            (input_voltage > d->config.warnings.hv.threshold + 1)) {
-            // 500ms have passed or voltage is another volt higher, time for some tiltback
-            if (d->motor.speed > 0) {
-                d->setpoint_target = d->config.warnings.hv.tiltback_angle;
-            } else {
-                d->setpoint_target = -d->config.warnings.hv.tiltback_angle;
-            }
-
-            d->state.sat = SAT_PB_HIGH_VOLTAGE;
-        } else {
-            // The rider has 500ms to react to the triple-beep, or maybe it was just a short spike
-            d->state.sat = SAT_NONE;
-        }
-    } else if (VESC_IF->mc_temp_fet_filtered() > d->mc_max_temp_fet) {
-        // Use the angle from Low-Voltage tiltback, but slower speed from High-Voltage tiltback
-        beep_alert(d, 3, true);
-        d->beep_reason = BEEP_TEMPFET;
-        if (VESC_IF->mc_temp_fet_filtered() > (d->mc_max_temp_fet + 1)) {
-            if (d->motor.speed > 0) {
-                d->setpoint_target = d->config.warnings.lv.tiltback_angle;
-            } else {
-                d->setpoint_target = -d->config.warnings.lv.tiltback_angle;
-            }
-            d->state.sat = SAT_PB_TEMPERATURE;
-        } else {
-            // The rider has 1 degree Celsius left before we start tilting back
-            d->state.sat = SAT_NONE;
-        }
-    } else if (VESC_IF->mc_temp_motor_filtered() > d->mc_max_temp_mot) {
-        // Use the angle from Low-Voltage tiltback, but slower speed from High-Voltage tiltback
-        beep_alert(d, 3, true);
-        d->beep_reason = BEEP_TEMPMOT;
-        if (VESC_IF->mc_temp_motor_filtered() > (d->mc_max_temp_mot + 1)) {
-            if (d->motor.speed > 0) {
-                d->setpoint_target = d->config.warnings.lv.tiltback_angle;
-            } else {
-                d->setpoint_target = -d->config.warnings.lv.tiltback_angle;
-            }
-            d->state.sat = SAT_PB_TEMPERATURE;
-        } else {
-            // The rider has 1 degree Celsius left before we start tilting back
-            d->state.sat = SAT_NONE;
-        }
-    } else if (d->motor.duty_cycle > 0.05 && input_voltage < d->config.warnings.lv.threshold) {
-        beep_alert(d, 3, false);
-        d->beep_reason = BEEP_LV;
-        float abs_motor_current = fabsf(d->motor.current);
-        float vdelta = d->config.warnings.lv.threshold - input_voltage;
-        float ratio = vdelta * 20 / abs_motor_current;
-        // When to do LV tiltback:
-        // a) we're 2V below lv threshold
-        // b) motor current is small (we cannot assume vsag)
-        // c) we have more than 20A per Volt of difference (we tolerate some amount of vsag)
-        if ((vdelta > 2) || (abs_motor_current < 5) || (ratio > 1)) {
-            if (d->motor.speed > 0) {
-                d->setpoint_target = d->config.warnings.lv.tiltback_angle;
-            } else {
-                d->setpoint_target = -d->config.warnings.lv.tiltback_angle;
-            }
-
-            d->state.sat = SAT_PB_LOW_VOLTAGE;
-        } else {
-            d->state.sat = SAT_NONE;
-            d->setpoint_target = 0;
-        }
     } else if (d->state.sat != SAT_CENTERING || d->setpoint_target_interpolated == d->setpoint_target) {
         // Normal running
         if (d->config.faults.is_reversestop_enabled && d->motor.speed < -0.2f) {
@@ -749,18 +626,6 @@ static void calculate_setpoint_target(data *d) {
 
     if (d->state.wheelslip && d->motor.duty_cycle > d->max_duty_with_margin) {
         d->setpoint_target = 0;
-    }
-
-    if (d->state.sat == SAT_PB_DUTY) {
-        if (d->config.warnings.is_dutybeep_enabled || (d->config.warnings.duty.tiltback_angle == 0)) {
-            beep_on(d, true);
-            d->beep_reason = BEEP_DUTY;
-            d->duty_beeping = true;
-        }
-    } else {
-        if (d->duty_beeping) {
-            beep_off(d, false);
-        }
     }
 }
 
@@ -902,17 +767,18 @@ static void refloat_thd(void *arg) {
                 // set state to READY so we need to meet start conditions to start
                 d->state.state = STATE_READY;
 
-                // if within 5V of LV tiltback threshold, issue 1 beep for each volt below that
-                float bat_volts = VESC_IF->mc_get_input_voltage_filtered();
-                float threshold = d->config.warnings.lv.threshold + 5.0f;
-                if (bat_volts < threshold) {
-                    int beeps = (int) fminf(6.0f, threshold - bat_volts);
-                    beep_alert(d, beeps + 1, true);
-                    d->beep_reason = BEEP_LOWBATT;
-                } else {
-                    // Let the rider know that the board is ready (one long beep)
-                    beep_alert(d, 1, true);
-                }
+                // // if within 5V of LV tiltback threshold, issue 1 beep for each volt below that
+                // float bat_volts = VESC_IF->mc_get_input_voltage_filtered();
+                // float threshold = d->config.warnings.lv.threshold + 5.0f;
+                // if (bat_volts < threshold) {
+                //     int beeps = (int) fminf(6.0f, threshold - bat_volts);
+                //     beep_alert(d, beeps + 1, true);
+                //     d->beep_reason = BEEP_LOWBATT;
+                // } else {
+                //     // Let the rider know that the board is ready (one long beep)
+                //     beep_alert(d, 1, true);
+                // }
+                // TODO
             }
             break;
 
@@ -977,7 +843,7 @@ static void refloat_thd(void *arg) {
 
             pid_update(&d->pid, &d->imu, &d->motor, &d->config.tune.pid, d->setpoint);
 
-            warnings_update(&d->warnings, &d->motor, &d->config.warnings, &d->footpad_sensor);
+            warnings_update(&d->warnings, &d->motor, &d->config.warnings, &d->footpad_sensor, 1.0f - d->traction.drop_mult);
             haptic_buzz_update(&d->haptic_buzz, &d->warnings, &d->config.warnings, &d->motor);
 
             const float current_requested = d->pid.pid_value + d->haptic_buzz.buzz_output;
@@ -985,7 +851,7 @@ static void refloat_thd(void *arg) {
             break;
 
         case (STATE_READY):
-            beep_alert_idle(d);
+            // beep_alert_idle(d);
 
             if ((d->current_time - d->fault_angle_pitch_timer) > 1.0f) {
                 // 1 second after disengaging - set startup tolerance back to normal (aka tighter)
@@ -1253,7 +1119,7 @@ static void send_realtime_data(data *d) {
 
     buffer[ind++] = d->state.sat << 4 | d->state.stop_condition;
 
-    buffer[ind++] = d->beep_reason;
+    buffer[ind++] = d->warnings.reason;  // previously beep_reason
 
     buffer_append_float32_auto(buffer, d->imu.pitch, &ind);
     buffer_append_float32_auto(buffer, d->imu.pitch_balance, &ind);

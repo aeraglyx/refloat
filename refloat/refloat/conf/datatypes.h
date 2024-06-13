@@ -156,18 +156,15 @@ typedef struct {
 } CfgHardware;
 
 typedef struct {
-    float threshold;
-    float tiltback_angle;
-    float tiltback_speed;
-    // TODO haptic buzz
-} Warning;
-
-typedef struct {
-    Warning duty;
-    // TODO Warning speed;
-    Warning lv;
-    Warning hv;
     float tiltback_return_speed;
+
+    float duty_threshold;
+    float duty_ramp;
+    float duty_speed;
+
+    uint8_t battery_cells;
+    float lv_threshold;
+    float hv_threshold;
 
     float buzz_strength;
     float buzz_strength_variable;

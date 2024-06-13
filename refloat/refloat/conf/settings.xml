@@ -861,55 +861,55 @@ p, li { white-space: pre-wrap; }
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>1</stepDouble>
-            <valDouble>0.8</valDouble>
+            <valDouble>0.75</valDouble>
             <vTxDoubleScale>10000</vTxDoubleScale>
             <suffix>%</suffix>
             <vTx>7</vTx>
-        </warnings.duty.threshold>
-        <warnings.duty.tiltback_angle>
-            <longName>Angle</longName>
+        </warnings.duty_threshold>
+        <warnings.duty_ramp>
+            <longName>Duty Cycle Ramp</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Desired setpoint angle for Duty Cycle Pushback.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_WARNINGS_DUTY_TILTBACK_ANGLE</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ramps Duty Cycle Haptic Buzz strength from Threshold to (Threshold + Ramp).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_WARNINGS_DUTY_RAMP</cDefine>
+            <editorDecimalsDouble>0</editorDecimalsDouble>
+            <editorScale>100</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxDouble>30</maxDouble>
-            <minDouble>0</minDouble>
+            <maxDouble>1</maxDouble>
+            <minDouble>0.01</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>1</stepDouble>
-            <valDouble>5</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> °</suffix>
+            <valDouble>0.10</valDouble>
+            <vTxDoubleScale>10000</vTxDoubleScale>
+            <suffix>%</suffix>
             <vTx>7</vTx>
-        </warnings.duty.tiltback_angle>
-        <warnings.duty.tiltback_speed>
-            <longName>Speed</longName>
+        </warnings.duty_ramp>
+        <warnings.duty_speed>
+            <longName>Responsiveness</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rate at which nose is tilted back when exceeding Duty Cycle limit (fast pushback can be dangerous!).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_WARNINGS_DUTY_TILTBACK_SPEED</cDefine>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This specifies how quickly will Haptic Buzz respond to changing Duty Cycle. Lower values will filter out any spikes but with a delay and lingering.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_WARNINGS_DUTY_SPEED</cDefine>
             <editorDecimalsDouble>1</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxDouble>30</maxDouble>
+            <maxDouble>100</maxDouble>
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
             <stepDouble>0.5</stepDouble>
-            <valDouble>3</valDouble>
+            <valDouble>4</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> °/s</suffix>
+            <suffix> Hz</suffix>
             <vTx>7</vTx>
-        </warnings.duty.tiltback_speed>
+        </warnings.duty_speed>
         <warnings.is_dutybeep_enabled>
             <longName>Beep on Duty Pushback</longName>
             <type>5</type>
@@ -999,75 +999,27 @@ p, li { white-space: pre-wrap; }
             <cDefine>CFG_DFLT_WARNINGS_IS_SURGEBEEP_ENABLED</cDefine>
             <valInt>1</valInt>
         </warnings.is_surgebeep_enabled>
-        <warnings.hv.threshold>
-            <longName>High Voltage Threshold</longName>
-            <type>1</type>
+        <warnings.battery_cells>
+            <longName>Cells in Series</longName>
+            <type>2</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;High Voltage threshold to trigger a safety pushback (Pushback raises the nose of the vehicle to alert you). High voltage pushback is most likely to be triggered when braking or going downhill on a full battery, sometimes resulting in a tail drag (take caution!).&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Value: 4.3V * Cell Count (i.e. for a 15s battery, 4.3V * 15 = 64.5V)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_WARNINGS_HV_THRESHOLD</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Number of cells in series, used for Voltage Warnings. E.g. if you have a 20s2p battery, input 20.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_WARNINGS_BATTERY_CELLS</cDefine>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxDouble>150</maxDouble>
-            <minDouble>0</minDouble>
+            <maxInt>100</maxInt>
+            <minInt>1</minInt>
             <showDisplay>0</showDisplay>
-            <stepDouble>0.5</stepDouble>
-            <valDouble>85</valDouble>
-            <vTxDoubleScale>10</vTxDoubleScale>
-            <suffix> V</suffix>
-            <vTx>7</vTx>
-        </warnings.hv.threshold>
-        <warnings.hv.tiltback_angle>
-            <longName>Angle</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Desired setpoint angle for High Voltage Pushback.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_WARNINGS_HV_TILTBACK_ANGLE</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>30</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>1</stepDouble>
-            <valDouble>8</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> °</suffix>
-            <vTx>7</vTx>
-        </warnings.hv.tiltback_angle>
-        <warnings.hv.tiltback_speed>
-            <longName>Speed</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rate at which nose is tilted back when exceeding High Voltage limit (fast pushback can be dangerous!).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_WARNINGS_HV_TILTBACK_SPEED</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>30</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>0.5</stepDouble>
-            <valDouble>1</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> °/s</suffix>
-            <vTx>7</vTx>
-        </warnings.hv.tiltback_speed>
-        <warnings.lv.threshold>
+            <stepInt>1</stepInt>
+            <valInt>20</valInt>
+            <suffix></suffix>
+            <vTx>3</vTx>
+        </warnings.battery_cells>
+        <warnings.lv_threshold>
             <longName>Low Voltage Threshold</longName>
             <type>1</type>
             <transmittable>1</transmittable>
@@ -1075,70 +1027,42 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Low Voltage threshold to trigger a safety pushback (Pushback raises the nose of the vehicle informing you to slow down).&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Recommended Value: 3.0V * Cell Count (i.e. for a 15s battery, 3.0V * 15 = 45V)&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-style:italic;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;*DISCLAIMER: Make sure your Voltage Cutoff Start and End (Motor CFG -&amp;gt; General -&amp;gt; Voltage) are below this threshold! LV Pushback should be used as a notice to stop riding immediately, while the Voltage Cutoffs should be used as a last resort measure to protect the battery.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;ALWAYS RESPECT LOW VOLTAGE PUSHBACK!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;When to start Low Voltage warning. Unlike (Re)Float, this is per cell, so generally doesn't need to be changed (instead configure number of cells in Specs) and should be around 3.0 V. Please respect this warning, stop riding and chanrge the board.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
             <cDefine>CFG_DFLT_WARNINGS_LV_THRESHOLD</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
+            <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxDouble>150</maxDouble>
+            <maxDouble>10</maxDouble>
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>0.5</stepDouble>
-            <valDouble>60</valDouble>
-            <vTxDoubleScale>10</vTxDoubleScale>
+            <stepDouble>0.05</stepDouble>
+            <valDouble>3.0</valDouble>
+            <vTxDoubleScale>100</vTxDoubleScale>
             <suffix> V</suffix>
             <vTx>7</vTx>
-        </warnings.lv.threshold>
-        <warnings.lv.tiltback_angle>
-            <longName>Angle</longName>
+        </warnings.lv_threshold>
+        <warnings.hv_threshold>
+            <longName>High Voltage Threshold</longName>
             <type>1</type>
             <transmittable>1</transmittable>
             <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Desired setpoint angle for Low Voltage Pushback.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_WARNINGS_LV_TILTBACK_ANGLE</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;When to start High Voltage warning. Unlike (Re)Float, this is per cell, so generally doesn't need to be changed (instead configure number of cells in Specs) and should be around 4.25 V. Please respect this warning, perhaps ride around for a few minutes before going down a hill with a full battery.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
+            <cDefine>CFG_DFLT_WARNINGS_HV_THRESHOLD</cDefine>
+            <editorDecimalsDouble>2</editorDecimalsDouble>
             <editorScale>1</editorScale>
             <editAsPercentage>0</editAsPercentage>
-            <maxDouble>30</maxDouble>
+            <maxDouble>10</maxDouble>
             <minDouble>0</minDouble>
             <showDisplay>0</showDisplay>
-            <stepDouble>1</stepDouble>
-            <valDouble>10</valDouble>
+            <stepDouble>0.05</stepDouble>
+            <valDouble>4.25</valDouble>
             <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> °</suffix>
+            <suffix> V</suffix>
             <vTx>7</vTx>
-        </warnings.lv.tiltback_angle>
-        <warnings.lv.tiltback_speed>
-            <longName>Speed</longName>
-            <type>1</type>
-            <transmittable>1</transmittable>
-            <description>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Roboto'; ; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Rate at which nose is tilted back when exceeding Low Voltage threshold (fast pushback can be dangerous!).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</description>
-            <cDefine>CFG_DFLT_WARNING_LV_TILTBACK_SPEED</cDefine>
-            <editorDecimalsDouble>1</editorDecimalsDouble>
-            <editorScale>1</editorScale>
-            <editAsPercentage>0</editAsPercentage>
-            <maxDouble>30</maxDouble>
-            <minDouble>0</minDouble>
-            <showDisplay>0</showDisplay>
-            <stepDouble>0.5</stepDouble>
-            <valDouble>1</valDouble>
-            <vTxDoubleScale>100</vTxDoubleScale>
-            <suffix> °/s</suffix>
-            <vTx>7</vTx>
-        </warnings.lv.tiltback_speed>
+        </warnings.hv_threshold>
         <warnings.tiltback_return_speed>
             <longName>Return To Level Speed</longName>
             <type>1</type>
@@ -3579,21 +3503,18 @@ p, li { white-space: pre-wrap; }
         <ser>warnings.buzz_strength</ser>
         <ser>warnings.buzz_frequency</ser>
         <ser>warnings.buzz_speed</ser>
-        <ser>warnings.duty.threshold</ser>
-        <ser>warnings.duty.tiltback_angle</ser>
-        <ser>warnings.duty.tiltback_speed</ser>
-        <ser>warnings.hv.threshold</ser>
-        <ser>warnings.hv.tiltback_angle</ser>
-        <ser>warnings.hv.tiltback_speed</ser>
-        <ser>warnings.lv.threshold</ser>
-        <ser>warnings.lv.tiltback_angle</ser>
-        <ser>warnings.lv.tiltback_speed</ser>
+        <ser>warnings.duty_threshold</ser>
+        <ser>warnings.duty_ramp</ser>
+        <ser>warnings.duty_speed</ser>
+        <ser>warnings.battery_cells</ser>
+        <ser>warnings.hv_threshold</ser>
+        <ser>warnings.lv_threshold</ser>
         <ser>warnings.tiltback_return_speed</ser>
-        <ser>warnings.is_dutybeep_enabled</ser>
+        <!-- <ser>warnings.is_dutybeep_enabled</ser> -->
         <ser>warnings.is_footbeep_enabled</ser>
-        <ser>warnings.is_surgebeep_enabled</ser>
-        <ser>surge_angle</ser>
-        <ser>surge_duty_start</ser>
+        <!-- <ser>warnings.is_surgebeep_enabled</ser> -->
+        <!-- <ser>surge_angle</ser> -->
+        <!-- <ser>surge_duty_start</ser> -->
         <ser>tune.input_tilt.angle_limit</ser>
         <ser>tune.input_tilt.speed</ser>
         <ser>tune.input_tilt.speed_max</ser>
@@ -3855,23 +3776,23 @@ p, li { white-space: pre-wrap; }
                     <param>warnings.buzz_strength</param>
                     <param>warnings.buzz_frequency</param>
                     <param>warnings.buzz_speed</param>
+                    <param>::sep::Duty Cycle</param>
+                    <param>warnings.duty_threshold</param>
+                    <param>warnings.duty_ramp</param>
+                    <param>warnings.duty_speed</param>
+                    <!-- <param>warnings.is_dutybeep_enabled</param> -->
+                    <!-- <param>::sep::Duty Surge</param> -->
+                    <!-- <param>surge_duty_start</param> -->
+                    <!-- <param>surge_angle</param> -->
+                    <!-- <param>warnings.is_surgebeep_enabled</param> -->
+                    <param>::sep::Voltage</param>
+                    <param>warnings.lv_threshold</param>
+                    <param>warnings.hv_threshold</param>
+                    <!-- <param>::sep::Temperature</param> -->
+                    <param>::sep::Footpad Sensor</param>
+                    <param>warnings.is_footbeep_enabled</param>
                     <param>::sep::General Config</param>
                     <param>warnings.tiltback_return_speed</param>
-                    <param>::sep::Duty Cycle Alert Pushback</param>
-                    <param>warnings.duty.threshold</param>
-                    <param>warnings.duty.tiltback_angle</param>
-                    <param>warnings.duty.tiltback_speed</param>
-                    <param>warnings.is_dutybeep_enabled</param>
-                    <param>::sep::Duty Surge</param>
-                    <param>surge_duty_start</param>
-                    <param>surge_angle</param>
-                    <param>warnings.is_surgebeep_enabled</param>
-                    <param>::sep::High Voltage Alert Pushback</param>
-                    <param>warnings.hv.tiltback_angle</param>
-                    <param>warnings.hv.tiltback_speed</param>
-                    <param>::sep::Low Voltage Alert Pushback</param>
-                    <param>warnings.lv.tiltback_angle</param>
-                    <param>warnings.lv.tiltback_speed</param>
                 </subgroupParams>
             </subgroup>
             <subgroup>
@@ -3931,15 +3852,13 @@ p, li { white-space: pre-wrap; }
                     <param>::sep::Controller</param>
                     <param>hardware.esc.frequency</param>
                     <param>hardware.esc.imu_x_offset</param>
-                    <param>::sep::Voltage Pushbacks</param>
-                    <param>warnings.hv.threshold</param>
-                    <param>warnings.lv.threshold</param>
+                    <param>hardware.esc.is_beeper_enabled</param>
+                    <param>::sep::Battery</param>
+                    <param>warnings.battery_cells</param>
                     <param>::sep::Foot Sensors</param>
                     <param>faults.adc1_threshold</param>
                     <param>faults.adc2_threshold</param>
-                    <param>warnings.is_footbeep_enabled</param>
-                    <param>::sep::Miscellaneous</param>
-                    <param>hardware.esc.is_beeper_enabled</param>
+                    <!-- <param>::sep::Miscellaneous</param> -->
                     <param>::sep::Leds (changes require reboot)</param>
                     <param>hardware.leds.type</param>
                     <param>hardware.leds.pin</param>
