@@ -163,12 +163,6 @@ typedef struct {
     // int odometer_dirty;
     // uint64_t odometer;
 
-    // Feature: RC Move (control via app while idle)
-    // int rc_steps;
-    // int rc_counter;
-    // float rc_current_target;
-    // float rc_current;
-
 } data;
 
 static void brake(data *d);
@@ -362,10 +356,6 @@ static void reset_vars(data *d) {
     d->startup_pitch_tolerance = d->config.startup_pitch_tolerance;
     d->surge_adder = 0.0f;
 
-    // RC Move:
-    // d->rc_steps = 0;
-    // d->rc_current = 0.0f;
-
     // state_engage(&d->state);
 }
 
@@ -386,42 +376,6 @@ static void reset_vars(data *d) {
 //                 d->odometer = VESC_IF->mc_get_odometer();
 //                 d->odometer_dirty = 0;
 //             }
-//         }
-//     }
-// }
-
-/**
- *  do_rc_move: perform motor movement while board is idle
- */
-// static void do_rc_move(data *d) {
-//     if (d->rc_steps > 0) {
-//         filter_ema(&d->rc_current, d->rc_current_target, 0.05f);
-//         if (d->motor.speed_abs > 0.8f) {
-//             d->rc_current = 0;
-//         }
-//         set_current(d->rc_current);
-//         d->rc_steps--;
-//         d->rc_counter++;
-//         if ((d->rc_counter == 500) && (d->rc_current_target > 2.0f)) {
-//             d->rc_current_target *= 0.5f;
-//         }
-//     } else {
-//         d->rc_counter = 0;
-
-//         // Throttle must be greater than 2% (Help mitigate lingering throttle)
-//         // TODO
-//         if ((d->config.tune.input_tilt.remote_throttle_current_max > 0) &&
-//             (d->current_time - d->disengage_timer > d->config.tune.input_tilt.remote_throttle_grace_period) &&
-//             (fabsf(d->remote.throttle) > 0.02f)) {
-//             // float servo_val = d->throttle_val;
-//             // servo_val *= (d->config.inputtilt_invert_throttle ? -1.0 : 1.0);
-//             const float max = d->config.tune.input_tilt.remote_throttle_current_max;
-//             filter_ema(&d->rc_current, max * d->remote.throttle, 0.05f);
-//             set_current(d->rc_current);
-//         } else {
-//             d->rc_current = 0.0f;
-//             // Disable output
-//             brake(d);
 //         }
 //     }
 // }
@@ -872,8 +826,6 @@ static void refloat_thd(void *arg) {
                 break;
             }
 
-            // Set RC current or maintain brake current (and keep WDT happy!)
-            // do_rc_move(d);
             brake(d);
             break;
 
@@ -1068,34 +1020,6 @@ static void cmd_handtest(data *d, unsigned char *cfg) {
         configure(d);
     }
 }
-
-// void cmd_rc_move(data *d, unsigned char *cfg) {
-//     int ind = 0;
-//     int direction = cfg[ind++];
-//     int current = cfg[ind++];
-//     int time = cfg[ind++];
-//     int sum = cfg[ind++];
-//     if (sum != time + current) {
-//         current = 0;
-//     } else if (direction == 0) {
-//         current = -current;
-//     }
-
-//     if (d->state.state == STATE_READY) {
-//         d->rc_counter = 0;
-//         if (current == 0) {
-//             d->rc_steps = 1;
-//             d->rc_current_target = 0;
-//             d->rc_current = 0;
-//         } else {
-//             d->rc_steps = time * 100;
-//             d->rc_current_target = current / 10.0;
-//             if (d->rc_current_target > 8) {
-//                 d->rc_current_target = 2;
-//             }
-//         }
-//     }
-// }
 
 static void send_realtime_data(data *d) {
     static const int bufsize = 67;
