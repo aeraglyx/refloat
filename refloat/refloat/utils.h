@@ -98,6 +98,7 @@ uint32_t rnd(uint32_t seed);
 void rate_limitf(float *value, float target, float step);
 // float get_step(float offset, float step_max, float ramp);
 float clamp(float value, float min, float max);
+float clamp_01(float value);
 float clamp_sym(float angle_in, float angle_limit);
 
 void dead_zonef(float *value, float threshold);

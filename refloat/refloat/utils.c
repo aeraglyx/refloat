@@ -30,6 +30,11 @@ float clamp(float value, float min, float max) {
     return m > max ? max : m;
 }
 
+float clamp_01(float value) {
+    const float m = value < 0.0f ? 0.0f : value;
+    return m > 1.0f ? 1.0f : m;
+}
+
 float clamp_sym(float angle_in, float angle_limit) {
     return clamp(angle_in, -angle_limit, angle_limit);
 }
