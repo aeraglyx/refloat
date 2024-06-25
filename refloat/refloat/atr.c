@@ -35,8 +35,11 @@ void atr_update(ATR *atr, const MotorData *mot, const CfgAtr *cfg, float dt) {
     const float amp_offset_variable = cfg->amp_offset_variable * mot->speed_smooth;
     const float amp_offset = amp_offset_constant + amp_offset_variable;
 
-    const float amps = mot->current_filtered - amp_offset;
-    const float amps_expected = mot->accel_clamped * cfg->amps_accel_ratio;
+    const float amps = mot->current_filtered;
+    const float accel = mot->accel_clamped;
+    const float ratio = cfg->amps_accel_ratio;
+
+    const float amps_expected = accel * ratio + amp_offset;
     const float amp_diff_raw = amps - amps_expected;
 
     const float half_time = 0.15f * exp2f(-3.0f * fabsf(mot->speed_smooth));
