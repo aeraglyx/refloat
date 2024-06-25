@@ -23,26 +23,46 @@
 #include <stdint.h>
 
 void traction_reset(Traction *data, const CfgTraction *cfg, float cooldown_alpha) {
-    // data->pid_value = 0.0f;
+    // not used, update is outside RUNNING
+    // filter_ema(&data->az, 1.0f, cooldown_alpha);
+    // filter_ema(&data->an, 0.0f, cooldown_alpha);
 }
 
 void traction_configure(Traction *data, const CfgTraction *cfg, float dt) {
-    data->gyro_alpha = half_time_to_alpha(cfg->drop_filter, dt);
+    data->_gyro_alpha = half_time_to_alpha(cfg->drop_filter, dt);
 }
 
-void traction_update(Traction *data, const CfgTraction *cfg, const IMUData *imu) {
+void drop_update(Traction *data, const CfgTraction *cfg, const IMUData *imu) {
     const float ax = imu->accel_derotated[0];
     const float ay = imu->accel_derotated[1];
     const float az = imu->accel_derotated[2];
 
-    filter_ema(&data->az_filtered, az, data->gyro_alpha);
-    const float an = sqrtf(ax * ax + ay * ay);
-    filter_ema(&data->an_filtered, an, data->gyro_alpha);
+    filter_ema(&data->ax, ax, data->_gyro_alpha);
+    filter_ema(&data->ay, ay, data->_gyro_alpha);
+    filter_ema(&data->az, az, data->_gyro_alpha);
+    data->an = sqrtf(data->ax * data->ax + data->ay * data->ay);
 
     // const float factor_z = clamp(1.0f - data->az_filtered / cfg->drop_threshold_z, 0.0f, 1.0f);
     // const float factor_n = clamp(1.0f - data->an_filtered / cfg->drop_threshold_n, 0.0f, 1.0f);
-    const bool factor_z = data->az_filtered < cfg->drop_threshold_z;
-    const bool factor_n = fabsf(data->an_filtered) < cfg->drop_threshold_n;
+    const bool factor_z = data->az < cfg->drop_threshold_z;
+    const bool factor_n = fabsf(data->an) < cfg->drop_threshold_n;
     const bool factor = factor_z && factor_n;
-    data->drop_mult = 1.0f - (1.0f - cfg->drop_strength) * (float)factor;
+    data->drop_factor = (float)factor;
+}
+
+void wheelslip_update(Traction *data, const CfgTraction *cfg, const MotorData *mot) {
+    const float accel_factor = clamp_01((fabsf(mot->acceleration) - 5.0f) * 0.2f);
+    const float speed_factor = mot->speed_abs * 0.5f;
+    const float duty_factor = mot->duty_cycle * 2.0f;
+    // const float direction_factor = sign(d->motor.acceleration) == d->motor.speed_sign;
+
+    const float factor = accel_factor * speed_factor * duty_factor * !mot->braking;
+    data->wheelslip_factor = clamp_01(factor);
+}
+
+void traction_update(Traction *data, const CfgTraction *cfg, const IMUData *imu, const MotorData *mot) {
+    drop_update(data, cfg, imu);
+    wheelslip_update(data, cfg, mot);
+
+    data->drop_mult = 1.0f - (1.0f - cfg->drop_strength) * data->drop_factor;
 }

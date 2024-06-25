@@ -23,15 +23,20 @@
 #include "imu_data.h"
 
 typedef struct {
-    float gyro_alpha;
-    float az_filtered;
-    float an_filtered;
-
+    float drop_factor;
     float drop_mult;
+
+    float ax;
+    float ay;
+    float az;
+    float an;
+    float _gyro_alpha;
+
+    float wheelslip_factor;
 } Traction;
 
 void traction_reset(Traction *data, const CfgTraction *cfg, float cooldown_alpha);
 
 void traction_configure(Traction *data, const CfgTraction *cfg, float dt);
 
-void traction_update(Traction *data, const CfgTraction *cfg, const IMUData *imu);
+void traction_update(Traction *data, const CfgTraction *cfg, const IMUData *imu, const MotorData *mot);
