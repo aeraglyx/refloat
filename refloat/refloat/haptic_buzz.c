@@ -50,12 +50,10 @@ static BuzzType get_buzz_type(WarningReason warning_type) {
     switch (warning_type) {
         case WARNING_NONE:
             return BUZZ_NONE;
-
         case WARNING_DEBUG:
             return BUZZ_FULL;
         case WARNING_SENSORS:
             return BUZZ_FULL;
-
         case WARNING_DUTY:
             return BUZZ_FAST;
         default:
@@ -70,6 +68,9 @@ static bool get_beep_target(BuzzType buzz_type, float speed) {
     } else if (buzz_type == BUZZ_FULL) {
         beep = true;
     } else {
+        if (buzz_type == BUZZ_SLOW) {
+            speed *= 0.25f;
+        }
         const float current_time = VESC_IF->system_time();
         const float time = current_time * speed;
         const float x = time - (long)time;
@@ -99,7 +100,7 @@ void haptic_buzz_update(
         data->buzz_output = 0.0f;
     } else {
         data->t += data->step;
-        data->t = data->t - (int) data->t;
+        data->t = data->t - (int)data->t;
         const float wave = sin_scaled(data->t);
         data->buzz_output = wave * data->amplitude;
     }
