@@ -710,7 +710,7 @@ static void refloat_thd(void *arg) {
         motor_data_update(&d->motor, d->config.hardware.esc.frequency, d->imu.gyro[1]);
         remote_data_update(&d->remote, &d->config.hardware.remote);
         footpad_sensor_update(&d->footpad_sensor, &d->config.faults);
-        traction_update(&d->traction, &d->config.tune.traction, &d->imu);
+        traction_update(&d->traction, &d->config.tune.traction, &d->imu, &d->motor);
 
         // Control Loop State Logic
         switch (d->state.state) {
