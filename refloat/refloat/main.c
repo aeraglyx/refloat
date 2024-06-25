@@ -1071,9 +1071,9 @@ static void send_realtime_data(data *d) {
         buffer_append_float32_auto(buffer, d->motor.accel_clamped, &ind);
 
         // DEBUG
-        buffer_append_float32_auto(buffer, d->traction.az_filtered, &ind);
-        buffer_append_float32_auto(buffer, d->traction.an_filtered, &ind);
-        buffer_append_float32_auto(buffer, d->haptic_buzz.amplitude, &ind);
+        buffer_append_float32_auto(buffer, d->traction.az, &ind);
+        buffer_append_float32_auto(buffer, d->traction.an, &ind);
+        buffer_append_float32_auto(buffer, d->traction.wheelslip_factor, &ind);
     }
 
     if (d->state.charging) {

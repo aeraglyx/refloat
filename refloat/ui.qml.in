@@ -3381,9 +3381,9 @@ Item {
                             spacing: 5
                             clip: true
 
-                            RealValue {id: debugRequestedCurrent; label: "Acc Z"; unit: "A";}
+                            RealValue {id: debugRequestedCurrent; label: "Acc Z"; unit: "";}
                             RealValue {id: debugFilteredCurrent; label: "Acc XY"; unit: "";}
-                            RealValue {id: debugAtrAccDiff; label: "Buzz Ampl"; unit: "°"}
+                            RealValue {id: debugAtrAccDiff; label: "Wheelslip"; unit: ""}
                             Value {id: debugRemoteInput; label: "Remote input"; unit: "%";}
                         }
 
